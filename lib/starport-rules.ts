@@ -16,6 +16,17 @@ STYLE RULES (always)
 - Names: kid-legible, plain and fun to say (Hungry Hippo, Joke Troll, Star Socks, Shushfly, Bubble Crown). Puns welcome. No dark, gory or scary-for-real ideas.
 - Write game values as numerals: "Difficulty 12", "lose 2 tokens", "3 Coins", "1 success".
 - Effects must be short and concrete enough for a parent to run at the table without a rules lookup. One or two sentences each.
+
+RULES TEXT (the most important rule)
+Separate the flavor from the rules. The DESCRIPTION is where the fun, silly, magical details go. Every EFFECT, ABILITY and SPECIAL is plain rules text: say exactly what happens in game terms, directly, the way a parent would explain it at the table.
+- Write effects as direct statements about the Player: "You always take the first turn in turn-based encounters." "You get +1 on every Sneaky roll." "Once per adventure, restore 3 lost tokens." "1 Player loses 2 tokens."
+- Use only these game effects (or a clear, concrete world power like "you can breathe underwater" or "you can see in the dark"):
+  +N on [trait] rolls · +N to your maximum [trait] tokens · restore N lost tokens · re-roll a roll · gain 1 extra success · a creature loses its next turn · ignore one creature ability · go first in turn-based encounters · lose N fewer tokens · lose N tokens · lose your next turn · lose 1 Coin · drop or lose an equipment item · stuck until someone succeeds on a [trait] roll.
+- Never invent new number systems or jargon (no "turn order points", "charges", "levels of power", "stacks", percentages or fractions).
+- Never repeat flavor inside an effect ("a rainbow wind pushes you" belongs in the description, not the rule).
+- Equipment: never mention whether it uses your turn inside the effect; the card shows that separately.
+- If an effect has a limit, say it plainly: "Once per adventure", "Once per encounter", "One time only".
+- Read your rules text back as if you were a parent who has never played: if any word would make them stop and ask "what does that mean?", rewrite it.
 - Be funny and specific. Tickling, burping, sneezing, sticky goo, sleepy songs, stolen socks, glitter, bad jokes, dance parties and dramatic sighs are the Starport flavor. Surprise the reader with at least one unexpected detail.
 - Never use real brands, real people, or known characters from movies, books, games or TV.
 `;
@@ -67,8 +78,8 @@ CORE EQUIPMENT RULES
 
 PERMANENT PRICE LADDER (2e prices — match these)
 - 5 Coins: convenience or narrow utility (Magical Backpack — carry unlimited items).
-- 10 Coins: +2 to maximum tokens in one trait (Calculating Helmet +2 Smart, Ballast Belt +2 Tough, Speaky's Cloak +2 Sneaky); re-roll by spending 3 tokens (Wishstone); +5 to turn order (Quick Boots); produce any ordinary object (Mystical Utility Belt); on any success spend 1 Helpful to restore 1 token to a friend (Helpful Gloves).
-- 15 Coins: +1 on EVERY roll of one trait (Star Socks Sneaky, Iron Boots Tough, Scholar's Feather Smart); +4 max Helpful (Fortune Brush).
+- 10 Coins: "You get +2 to your maximum Smart tokens." (Calculating Helmet; same idea for Tough or Sneaky); "Spend 3 tokens to re-roll any action roll." (Wishstone); "You almost always go first in turn-based encounters." (Quick Boots); "You can pull any ordinary object out of this belt." (Mystical Utility Belt); "When you succeed on a roll, you may spend 1 Helpful token to give a friend back 1 lost token." (Helpful Gloves).
+- 15 Coins: "You get +1 on every Sneaky roll." (Star Socks; Iron Boots for Tough, Scholar's Feather for Smart); "You get +4 to your maximum Helpful tokens." (Fortune Brush).
 - 20 Coins: an "action item" — when you succeed on a [trait] roll against a creature using it, you gain the success as normal PLUS a bonus (spend 1 token: the creature loses its next turn — Slow Staff; spend 1 token: 1 extra success — Shockwave Hammer; +1 Smart for the rest of the encounter — Farsight Mask).
 - 25-35 Coins: strong world powers (walk through stone, hypnotism that turns spare tokens into successes, auto-succeed hiding) — supplement-level.
 - 50 Coins: +1 on ALL action rolls (Brooch of Power). This is the ceiling.

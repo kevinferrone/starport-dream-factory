@@ -186,6 +186,41 @@ async function askClaude(kind: Kind, userText: string, readingLevel?: number | n
   throw new Error("The Dream Factory couldn't finish this one. Please try again.");
 }
 
+const RULE_FIELDS: Record<Kind, string> = {
+  creature: "abilities[].effect and special.effect",
+  equipment: "effect",
+  pet: "bonuses and power.effect",
+};
+
+/**
+ * Second look: reads the rules text like a parent at the table and rewrites anything
+ * unclear. Keeps the name, description, numbers, price and picture exactly the same.
+ */
+async function reviewRules(kind: Kind, card: AnyCard, readingLevel?: number | null): Promise<AnyCard> {
+  try {
+    const prompt =
+      `Here is a finished Starport ${kind} card:\n${JSON.stringify(card, null, 2)}\n\n` +
+      `Review ONLY the rules text (${RULE_FIELDS[kind]}). For each one, ask: could a parent who has never played run this at the table instantly, without asking what anything means? Does it follow the RULES TEXT rules (direct game terms only, no invented number systems or jargon, no flavor inside the rule${kind === "equipment" ? ", no mention of whether it uses a turn" : ""})?\n` +
+      (kind === "creature" ? `Difficulty: ${(card as CreatureCard).difficulty} (keep it).\n` : "") +
+      `Rewrite any rule that fails into one or two short, direct sentences with the same strength. Leave rules that already pass exactly as they are. Keep every other field identical. Call the ${TOOLS[kind].name} tool with the full card.`;
+    const reviewed = (await askClaude(kind, prompt, readingLevel)) as AnyCard;
+    // Never let the review change anything but rules text.
+    const keep = { name: card.name, description: card.description, image_prompt: card.image_prompt };
+    if (kind === "creature") {
+      const c = card as CreatureCard;
+      return { ...reviewed, ...keep, difficulty: c.difficulty, successes: c.successes } as CreatureCard;
+    }
+    if (kind === "equipment") {
+      const e = card as EquipmentCard;
+      return { ...reviewed, ...keep, cost: e.cost, type: e.type, uses_turn: e.uses_turn } as EquipmentCard;
+    }
+    const p = card as PetCard;
+    return { ...reviewed, ...keep, cost: p.cost, roleplay: p.roleplay } as PetCard;
+  } catch {
+    return card; // if the review fails, the original card is still fine to show
+  }
+}
+
 /** Writes new stats from the buttons. */
 export async function writeCard(
   kind: Kind,
@@ -194,7 +229,8 @@ export async function writeCard(
   text?: string,
   readingLevel?: number | null
 ): Promise<AnyCard> {
-  return askClaude(kind, describeRequest(kind, labels, difficulty, text), readingLevel);
+  const card = await askClaude(kind, describeRequest(kind, labels, difficulty, text), readingLevel);
+  return reviewRules(kind, card, readingLevel);
 }
 
 /** "Shake up the stats": same name, look and picture; new rules. */
@@ -210,7 +246,8 @@ export async function rerollCard(
     describeRequest(kind, labels, difficulty, text) +
     `\n\nThis is a re-roll. Keep exactly this name, description and image_prompt:\nname: ${old.name}\ndescription: ${old.description}\nimage_prompt: ${old.image_prompt}\n\nThe previous stats were:\n${JSON.stringify(old)}\n\nInvent DIFFERENT abilities, effects and numbers that still fit the buttons and the balance guide.`;
   const card = await askClaude(kind, prompt, readingLevel);
-  return { ...card, name: old.name, description: old.description, image_prompt: old.image_prompt };
+  const fresh = { ...card, name: old.name, description: old.description, image_prompt: old.image_prompt };
+  return reviewRules(kind, fresh, readingLevel);
 }
 
 /** Screens the kid's free-text box. Returns true if it's OK. */

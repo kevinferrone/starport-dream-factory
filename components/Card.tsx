@@ -58,7 +58,8 @@ export default function Card({
     <div className="chips" key="chips">
       {chips.map((i) => (
         <span className="chip" key={i}>
-          <span aria-hidden>{pieces[i].icon}</span> {at(i)}
+          <span aria-hidden>{pieces[i].icon}</span>
+          <span className="chip-text">{at(i)}</span>
         </span>
       ))}
     </div>
