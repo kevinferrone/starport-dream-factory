@@ -24,7 +24,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
     <>
       <section className="hero">
         <h1>
-          Starport
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="logo" src="/starport-logo.png" alt="Starport" width={1200} height={267} />
           <span className="line2">Dream Factory</span>
         </h1>
         <p>Build your own creatures, equipment and pets for Starport.</p>

@@ -6,6 +6,7 @@ import type { Kind } from "@/lib/options";
 import type { AnyCard } from "@/lib/generate";
 import Card from "@/components/Card";
 import { speak } from "@/components/ReadAloud";
+import { PHRASES } from "@/lib/voice-phrases";
 
 type Props = {
   id: string;
@@ -36,7 +37,7 @@ export default function CardActions(props: Props) {
   };
 
   const shake = async () => {
-    speak("Shaking up the stats");
+    speak(PHRASES.shaking);
     setBusy("shake");
     setError(null);
     try {
@@ -51,7 +52,7 @@ export default function CardActions(props: Props) {
   };
 
   const save = async () => {
-    speak("Saved!");
+    speak(PHRASES.saved);
     setBusy("save");
     try {
       await post("/api/save");
@@ -64,6 +65,7 @@ export default function CardActions(props: Props) {
   };
 
   const pdf = async () => {
+    speak(PHRASES.pdf);
     setBusy("pdf");
     try {
       const node = document.getElementById("the-card");
@@ -106,7 +108,7 @@ export default function CardActions(props: Props) {
         <a
           className="big-btn small plain"
           href={`/build/${props.kind}?from=${props.id}`}
-          onClick={() => speak("Change my buttons")}
+          onClick={() => speak(PHRASES.changeButtons)}
         >
           <span className="emoji" aria-hidden>🔁</span>
           Change my buttons
@@ -122,7 +124,7 @@ export default function CardActions(props: Props) {
             Saved
           </span>
         )}
-        <button className="big-btn small gum" onClick={() => window.print()} disabled={!!busy}>
+        <button className="big-btn small gum" onClick={() => { speak(PHRASES.print); window.print(); }} disabled={!!busy}>
           <span className="emoji" aria-hidden>🖨️</span>
           Print
         </button>

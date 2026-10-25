@@ -13,6 +13,7 @@ import {
   type OptionGroup,
 } from "@/lib/options";
 import { speak } from "@/components/ReadAloud";
+import { PHRASES, pickFirst, difficultyPhrase } from "@/lib/voice-phrases";
 
 type Props = {
   kind: Kind;
@@ -53,13 +54,13 @@ export default function Builder({ kind, remaining, initial }: Props) {
 
   const build = async () => {
     if (missing) {
-      speak(`Pick ${missing.title} first`);
+      speak(pickFirst(missing.title));
       setError(`Pick ${missing.title.toLowerCase()} first!`);
       return;
     }
     setError(null);
     setBusy(true);
-    speak("Building!");
+    speak(PHRASES.building);
     try {
       const res = await fetch("/api/build", {
         method: "POST",
@@ -146,7 +147,8 @@ export default function Builder({ kind, remaining, initial }: Props) {
               value={difficulty}
               aria-label="Difficulty"
               onChange={(e) => setDifficulty(Number(e.target.value))}
-              onPointerUp={() => speak(`${face.label}, ${difficulty}`)}
+              onPointerUp={(e) => speak(difficultyPhrase(Number(e.currentTarget.value)))}
+              onKeyUp={(e) => speak(difficultyPhrase(Number(e.currentTarget.value)))}
             />
           </div>
         </section>

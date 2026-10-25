@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAccess, PLANS, type Tier } from "@/lib/access";
+import SetPassword from "./SetPassword";
 
 export default async function PlansPage({ searchParams }: { searchParams: Promise<{ welcome?: string; limit?: string }> }) {
   const { welcome, limit } = await searchParams;
@@ -54,6 +55,8 @@ export default async function PlansPage({ searchParams }: { searchParams: Promis
           );
         })}
       </div>
+
+      <SetPassword />
 
       <div className="actions" style={{ paddingBottom: 40 }}>
         {profile?.stripe_customer_id && (

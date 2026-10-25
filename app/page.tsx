@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getAccess, PLANS } from "@/lib/access";
 import { KINDS, type Kind } from "@/lib/options";
 import { SpeakingLink } from "@/components/ReadAloud";
+import { KIND_SPOKEN } from "@/lib/voice-phrases";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -19,7 +20,8 @@ export default async function Home() {
     <>
       <section className="hero">
         <h1>
-          Starport
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="logo" src="/starport-logo.png" alt="Starport" width={1200} height={267} />
           <span className="line2">Dream Factory</span>
         </h1>
         <p>Pick what you want to make. Press the buttons. Watch it come to life!</p>
@@ -27,7 +29,7 @@ export default async function Home() {
 
       <nav className="tiles" aria-label="What do you want to make?">
         {kinds.map(([kind, k]) => (
-          <SpeakingLink key={kind} href={`/build/${kind}`} label={`Make ${k.title}`} className={`tile ${kind}`}>
+          <SpeakingLink key={kind} href={`/build/${kind}`} label={KIND_SPOKEN[kind]} className={`tile ${kind}`}>
             <span className="big" aria-hidden>{k.icon}</span>
             {k.title}
           </SpeakingLink>

@@ -2,7 +2,7 @@
 
 Kids press picture buttons to build their own Starport creatures, equipment and pets. Claude writes balanced stats from the Starport rules, OpenAI draws the picture, and the result is a trading card they can save, print or download as a PDF.
 
-Parents hold the accounts. Plans: Free (10 creations total), Star $4.99/month (20 a month), Superstar $9.99/month (100 a month). "Shake up the stats" is free (10 per card); every new picture counts as 1 creation.
+Parents hold the accounts. Plans: Free (3 creations total), Star $4.99/month (20 a month), Superstar $9.99/month (100 a month). "Shake up the stats" is free (10 per card); every new picture counts as 1 creation.
 
 ## Setup, step by step
 

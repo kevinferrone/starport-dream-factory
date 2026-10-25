@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Baloo_2 } from "next/font/google";
 import "./globals.css";
 import { createClient } from "@/lib/supabase/server";
-import { ReadAloudToggle } from "@/components/ReadAloud";
+import { ReadAloudToggle, SpeakingLink } from "@/components/ReadAloud";
+import { PHRASES } from "@/lib/voice-phrases";
 
 const baloo = Baloo_2({ subsets: ["latin"], weight: ["500", "700", "800"], variable: "--font-baloo" });
 
@@ -26,19 +27,19 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </a>
             {user && (
               <>
-                <a href="/" className="icon-link" title="Home">
+                <SpeakingLink href="/" label={PHRASES.home} className="icon-link" title="Home">
                   <span className="emoji" aria-hidden>🏠</span>
                   <span className="text">Home</span>
-                </a>
-                <a href="/cards" className="icon-link" title="My cards">
+                </SpeakingLink>
+                <SpeakingLink href="/cards" label={PHRASES.myCards} className="icon-link" title="My cards">
                   <span className="emoji" aria-hidden>🗂️</span>
                   <span className="text">My cards</span>
-                </a>
+                </SpeakingLink>
                 <ReadAloudToggle />
-                <a href="/plans" className="icon-link" title="Grown-ups">
+                <SpeakingLink href="/plans" label={PHRASES.grownUps} className="icon-link" title="Grown-ups">
                   <span className="emoji" aria-hidden>🔑</span>
                   <span className="text">Grown-ups</span>
-                </a>
+                </SpeakingLink>
               </>
             )}
           </header>

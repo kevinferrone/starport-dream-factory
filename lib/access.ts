@@ -7,7 +7,7 @@ export const PLANS: Record<
   Tier,
   { name: string; price: string; limit: number; period: "total" | "month"; blurb: string }
 > = {
-  free: { name: "Free", price: "$0", limit: 10, period: "total", blurb: "10 creations to try it out" },
+  free: { name: "Free", price: "$0", limit: 3, period: "total", blurb: "3 creations to try it out" },
   plus: { name: "Star", price: "$4.99/month", limit: 20, period: "month", blurb: "20 creations every month" },
   pro: { name: "Superstar", price: "$9.99/month", limit: 100, period: "month", blurb: "100 creations every month" },
 };

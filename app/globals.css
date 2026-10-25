@@ -1,8 +1,10 @@
-/* Starport Dream Factory — candy-colored night sky, chunky squishy buttons. */
+/* Starport Dream Factory — bright daytime sky, candy colors, chunky squishy buttons. */
 
 :root {
-  --sky: #1f2b7b;        /* Starport night sky */
-  --sky-deep: #16205e;
+  --sky: #a9defc;        /* Starport daytime sky */
+  --sky-top: #7cc8f7;
+  --sky-low: #d8f1ff;
+  --sky-deep: #2f7fc4;   /* shadows and overlays */
   --sun: #ffc93c;        /* sunflower */
   --gum: #ff6fb5;        /* bubblegum */
   --mint: #2ed9a3;
@@ -33,17 +35,15 @@ body {
   line-height: 1.45;
   color: var(--ink);
   background-color: var(--sky);
-  /* hand-placed stars */
+  /* soft puffy clouds over a daytime sky */
   background-image:
-    radial-gradient(2px 2px at 8% 12%, #fff 60%, transparent 61%),
-    radial-gradient(3px 3px at 22% 64%, #fff8 60%, transparent 61%),
-    radial-gradient(2px 2px at 37% 28%, #fff 60%, transparent 61%),
-    radial-gradient(3px 3px at 58% 8%, #ffe9a8 60%, transparent 61%),
-    radial-gradient(2px 2px at 71% 46%, #fff 60%, transparent 61%),
-    radial-gradient(2px 2px at 88% 18%, #fff9 60%, transparent 61%),
-    radial-gradient(3px 3px at 93% 72%, #fff 60%, transparent 61%),
-    radial-gradient(2px 2px at 48% 86%, #ffe9a8 60%, transparent 61%),
-    radial-gradient(2px 2px at 13% 90%, #fff 60%, transparent 61%);
+    radial-gradient(ellipse 160px 60px at 10% 14%, #ffffffd0 60%, transparent 62%),
+    radial-gradient(ellipse 110px 46px at 16% 10%, #ffffffd0 60%, transparent 62%),
+    radial-gradient(ellipse 190px 64px at 86% 30%, #ffffffb8 60%, transparent 62%),
+    radial-gradient(ellipse 120px 50px at 80% 26%, #ffffffb8 60%, transparent 62%),
+    radial-gradient(ellipse 170px 58px at 30% 78%, #ffffffa8 60%, transparent 62%),
+    radial-gradient(ellipse 150px 54px at 92% 88%, #ffffffa8 60%, transparent 62%),
+    linear-gradient(to bottom, var(--sky-top), var(--sky) 45%, var(--sky-low));
   background-attachment: fixed;
 }
 
@@ -61,7 +61,7 @@ button { font: inherit; color: inherit; }
   align-items: center;
   gap: 10px;
   padding: 14px 0;
-  color: #fff;
+  color: var(--ink);
 }
 .topbar .brand {
   display: flex;
@@ -80,13 +80,13 @@ button { font: inherit; color: inherit; }
   min-height: 48px;
   padding: 6px 14px;
   border-radius: 999px;
-  background: #ffffff1f;
+  background: #ffffffc4;
   border: 0;
   text-decoration: none;
   font-weight: 700;
   font-size: 16px;
   cursor: pointer;
-  color: #fff;
+  color: var(--ink);
 }
 .icon-link .emoji { font-size: 24px; }
 .icon-link[aria-pressed="true"] { background: var(--sun); color: var(--ink); }
@@ -98,7 +98,7 @@ button { font: inherit; color: inherit; }
 /* ---------- Home ---------- */
 .hero {
   text-align: center;
-  color: #fff;
+  color: var(--ink);
   padding: 28px 0 8px;
 }
 .hero h1 {
@@ -107,10 +107,17 @@ button { font: inherit; color: inherit; }
   font-weight: 800;
   margin: 0;
   letter-spacing: -0.01em;
-  text-shadow: 0 6px 0 var(--sky-deep);
+  text-shadow: 0 5px 0 #ffffff;
 }
-.hero h1 .line2 { display: block; color: var(--sun); transform: rotate(-2deg); }
-.hero p { font-size: 20px; margin: 18px auto 0; max-width: 34ch; color: #dfe3ff; }
+.hero h1 .logo {
+  display: block;
+  width: min(560px, 92%);
+  height: auto;
+  margin: 0 auto 2px;
+  filter: drop-shadow(0 6px 0 #ffffff99);
+}
+.hero h1 .line2 { display: block; color: var(--ink); transform: rotate(-2deg); }
+.hero p { font-size: 20px; margin: 18px auto 0; max-width: 34ch; color: var(--ink-soft); }
 
 .tiles {
   display: grid;
@@ -150,11 +157,11 @@ button { font: inherit; color: inherit; }
   gap: 14px;
   padding: 10px 18px;
   border-radius: 999px;
-  background: #ffffff1a;
-  color: #fff;
+  background: #ffffffd9;
+  color: var(--ink);
   font-weight: 700;
 }
-.meter a { color: var(--sun); }
+.meter a { color: #c2347a; }
 
 /* ---------- Panels ---------- */
 .panel {
@@ -255,7 +262,7 @@ button { font: inherit; color: inherit; }
   padding: 14px 0 22px;
   display: flex;
   justify-content: center;
-  background: linear-gradient(to top, var(--sky) 60%, transparent);
+  background: linear-gradient(to top, var(--sky-low) 55%, transparent);
 }
 .big-btn {
   display: inline-flex;
@@ -297,7 +304,7 @@ button { font: inherit; color: inherit; }
   z-index: 50;
   display: grid;
   place-items: center;
-  background: #16205ef0;
+  background: #2f7fc4f2;
   color: #fff;
   text-align: center;
 }
@@ -310,7 +317,7 @@ button { font: inherit; color: inherit; }
 .machine .ring span:nth-child(3) { left: 0; top: 50%; translate: 0 -50%; }
 .machine .ring span:nth-child(4) { right: 0; top: 50%; translate: 0 -50%; }
 .machine p { font-size: 26px; font-weight: 800; margin: 0; }
-.machine small { display: block; margin-top: 6px; font-size: 17px; color: #c9cffc; }
+.machine small { display: block; margin-top: 6px; font-size: 17px; color: #e3f4ff; }
 @keyframes spin { to { rotate: 360deg; } }
 @keyframes bob { 50% { translate: 0 -10px; } }
 @media (prefers-reduced-motion: reduce) {
@@ -369,7 +376,7 @@ button { font: inherit; color: inherit; }
 }
 
 .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
-.note { color: #dfe3ff; text-align: center; margin: 0; font-size: 16px; }
+.note { color: var(--ink-soft); text-align: center; margin: 0; font-size: 16px; }
 
 /* My cards */
 .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 18px; padding-bottom: 40px; }
@@ -387,7 +394,7 @@ button { font: inherit; color: inherit; }
 .mini.pet { --c: var(--pet); }
 .mini img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; display: block; background: #fff; }
 .mini span { display: block; padding: 6px 4px 2px; }
-.empty { color: #fff; text-align: center; padding: 40px 0; font-size: 22px; }
+.empty { color: var(--ink); text-align: center; padding: 40px 0; font-size: 22px; }
 
 /* Plans */
 .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 20px 0 30px; }
@@ -405,6 +412,24 @@ button { font: inherit; color: inherit; }
   border: 3px solid var(--line);
   font: inherit;
 }
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 56px;
+  border-radius: 999px;
+  border: 3px solid var(--line);
+  background: #fff;
+  font-size: 19px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 5px 0 var(--line);
+}
+.google-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--line); }
+.or { display: flex; align-items: center; gap: 10px; color: var(--ink-soft); font-size: 15px; }
+.or::before, .or::after { content: ""; flex: 1; height: 2px; background: var(--line); }
+.text-btn { background: none; border: 0; color: var(--ink-soft); text-decoration: underline; cursor: pointer; font-size: 16px; padding: 4px; }
 .check { display: flex; gap: 10px; align-items: flex-start; font-size: 16px; }
 .check input { width: 26px; height: 26px; margin-top: 2px; }
 
