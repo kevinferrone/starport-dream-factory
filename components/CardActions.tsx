@@ -51,6 +51,7 @@ export default function CardActions(props: Props) {
       audioRef.current = audio;
       // Slower for younger readers. Pitch stays natural; highlights follow the audio's own clock.
       audio.preservesPitch = true;
+      audio.defaultPlaybackRate = readingRate(props.readingLevel);
       audio.playbackRate = readingRate(props.readingLevel);
       const tick = () => {
         const t = audio.currentTime;
