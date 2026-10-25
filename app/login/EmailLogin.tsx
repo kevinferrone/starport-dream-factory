@@ -11,7 +11,8 @@ export default function EmailLogin() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const site = () => process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+  // Always come back to the exact address the parent is on, so the sign-in can finish.
+  const site = () => window.location.origin;
 
   const google = async () => {
     setError(null);
