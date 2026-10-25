@@ -147,9 +147,13 @@ async function askClaude(kind: Kind, userText: string): Promise<AnyCard> {
     const res = await anthropic().messages.create({
       model: process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5",
       max_tokens: 1500,
-      system: CORE_RULES + "\n" + RULES[kind],
+      system:
+        CORE_RULES +
+        "\n" +
+        RULES[kind] +
+        `\n\nALWAYS deliver your answer by calling the ${tool.name} tool exactly once. Never answer in plain text.`,
       tools: [tool],
-      tool_choice: { type: "tool", name: tool.name },
+      tool_choice: { type: "auto" },
       messages,
     });
     const block = res.content.find((b) => b.type === "tool_use");
@@ -170,6 +174,10 @@ async function askClaude(kind: Kind, userText: string): Promise<AnyCard> {
           },
         ],
       });
+    } else {
+      // Answered without the tool: nudge it and try again.
+      messages.push({ role: "assistant", content: res.content });
+      messages.push({ role: "user", content: `Please call the ${tool.name} tool now with the finished card.` });
     }
   }
   throw new Error("The Dream Factory couldn't finish this one. Please try again.");
