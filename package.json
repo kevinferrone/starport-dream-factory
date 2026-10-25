@@ -1,0 +1,32 @@
+{
+  "name": "starport-dream-factory",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": ">=0.55.0 <1.0.0",
+    "@supabase/ssr": ">=0.6.1 <1.0.0",
+    "@supabase/supabase-js": "^2.50.0",
+    "html-to-image": "^1.11.11",
+    "jspdf": "^3.0.1",
+    "next": "^15.5.0",
+    "openai": "^5.10.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "stripe": "^18.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "typescript": "^5.8.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
