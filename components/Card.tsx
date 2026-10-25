@@ -77,7 +77,8 @@ export default function Card({
         )}
         <div className="banner">
           <h3>{at(0)}</h3>
-          <span className="kindmark" aria-label={KINDS[kind].title}>{KINDS[kind].icon}</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="kindmark" src={`/tiles/${kind}.webp`} alt={KINDS[kind].title} />
         </div>
         <div className="body">{body}</div>
         <div className="foot">Starport Dream Factory</div>

@@ -376,7 +376,7 @@ button { font: inherit; color: inherit; }
 }
 .tcard.equipment .banner { color: #fff; }
 .tcard .banner h3 { margin: 0; font-size: 25px; line-height: 1.05; font-weight: 800; }
-.tcard .banner .kindmark { font-size: 28px; }
+.tcard .banner .kindmark { height: 44px; width: auto; flex: none; filter: drop-shadow(0 2px 0 #0002); }
 .tcard .body { padding: 12px 16px 16px; font-size: 15.5px; line-height: 1.4; }
 .tcard .desc { margin: 0 0 10px; font-style: italic; color: var(--ink-soft); }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
@@ -493,3 +493,11 @@ table.admin td, table.admin th { padding: 8px; border-bottom: 2px solid var(--li
 .tcard .rule.small strong { font-size: 14px; }
 .read-btn { min-height: 64px; }
 @media print { .read-btn { display: none !important; } }
+
+/* My cards: one shelf per kind */
+.shelf { margin-bottom: 30px; }
+.shelf-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 12px; }
+.shelf-head h2 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 30px; font-weight: 800; margin-right: auto; }
+.shelf-head h2 img { height: 56px; width: auto; }
+.shelf-head h2 .count { font-size: 18px; font-weight: 700; color: var(--ink-soft); }
+.shelf-empty { color: var(--ink-soft); margin: 0 0 8px; }
