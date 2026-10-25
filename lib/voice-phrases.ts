@@ -1,7 +1,7 @@
 import { GROUPS, KINDS, DIFFICULTY_MIN, DIFFICULTY_MAX, difficultyFace, allOptions, type Kind } from "@/lib/options";
 
 /** What the home tiles say out loud. */
-export const KIND_SPOKEN: Record<Kind, string> = { creature: "Creature", equipment: "Equipment", pet: "Pet" };
+export const KIND_SPOKEN: Record<Kind, string> = { creature: "Creatures", equipment: "Equipment", pet: "Pets" };
 
 /** Fixed things the app says. */
 export const PHRASES = {
