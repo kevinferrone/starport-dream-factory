@@ -469,11 +469,31 @@ table.admin td, table.admin th { padding: 8px; border-bottom: 2px solid var(--li
 .legal li { margin-bottom: 6px; }
 
 /* ---------- Print: only the card ---------- */
+@page { size: letter portrait; margin: 0.5in; }
 @media print {
-  body { background: #fff; }
-  .topbar, .actions, .note, .no-print { display: none !important; }
-  .card-stage { padding: 0; }
-  .tcard { box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body { background: #fff !important; background-image: none !important; }
+  .topbar, .actions, .note, .no-print, .read-btn, .error, .tap-hint { display: none !important; }
+  .wrap { width: auto; }
+  .card-stage { display: block; padding: 0; }
+  /* One card, always on one page: 4 inches wide, never split across pages. */
+  .tcard {
+    width: 4in;
+    margin: 0 auto;
+    padding: 0.12in;
+    box-shadow: none;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .tcard .art { max-height: 3.76in; }
+  .tcard .banner h3 { font-size: 18pt; }
+  .tcard .banner .kindmark { height: 0.45in; }
+  .tcard .body { font-size: 10.5pt; padding: 0.1in 0.14in 0.12in; }
+  .tcard .rule strong { font-size: 11.5pt; }
+  .tcard .chip { font-size: 10pt; }
+  .tcard .chip b { font-size: 12pt; }
+  .tcard .w.on { background: none; box-shadow: none; }
 }
 
 /* Builder page title with its picture */
