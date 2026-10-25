@@ -19,7 +19,7 @@ export default function EmailLogin() {
       options: { emailRedirectTo: `${site}/auth/callback` },
     });
     setBusy(false);
-    if (error) setError("We couldn't send the link. Check the email address and try again.");
+    if (error) setError(`We couldn't send the link: ${error.message}`);
     else setSent(true);
   };
 
