@@ -13,8 +13,8 @@ async function confirmParent(formData: FormData) {
   redirect("/");
 }
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ step?: string; missing?: string }> }) {
-  const { step, missing } = await searchParams;
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ step?: string; missing?: string; error?: string }> }) {
+  const { step, missing, error } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -32,6 +32,11 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       </section>
 
       <section className="panel" style={{ maxWidth: 560, margin: "28px auto" }}>
+        {error && !user && (
+          <p className="error" role="alert">
+            Sign-in didn&apos;t finish: {error}
+          </p>
+        )}
         {user ? (
           <form action={confirmParent} className="form">
             <h2>

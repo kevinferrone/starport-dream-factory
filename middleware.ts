@@ -29,6 +29,16 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
+
+  // If Supabase sends a sign-in back to the wrong page (e.g. the homepage),
+  // forward it to the callback so the sign-in still finishes.
+  const q = request.nextUrl.searchParams;
+  if (!path.startsWith("/auth") && (q.has("code") || q.has("error_description"))) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/callback";
+    return NextResponse.redirect(url);
+  }
+
   const isPublic =
     path === "/login" ||
     path === "/privacy" ||
