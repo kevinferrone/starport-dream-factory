@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import { randomUUID } from "crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Kind } from "@/lib/options";
+import { readingGuide } from "@/lib/reading-level";
 import {
   CORE_RULES,
   CREATURE_RULES,
@@ -140,7 +141,7 @@ function checkCard(kind: Kind, card: AnyCard, difficulty?: number): string | nul
 const anthropic = () => new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const openai = () => new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-async function askClaude(kind: Kind, userText: string): Promise<AnyCard> {
+async function askClaude(kind: Kind, userText: string, readingLevel?: number | null): Promise<AnyCard> {
   const tool = TOOLS[kind];
   const messages: Anthropic.MessageParam[] = [{ role: "user", content: userText }];
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -151,6 +152,8 @@ async function askClaude(kind: Kind, userText: string): Promise<AnyCard> {
         CORE_RULES +
         "\n" +
         RULES[kind] +
+        "\n\n" +
+        readingGuide(readingLevel) +
         `\n\nALWAYS deliver your answer by calling the ${tool.name} tool exactly once. Never answer in plain text.`,
       tools: [tool],
       tool_choice: { type: "auto" },
@@ -188,9 +191,10 @@ export async function writeCard(
   kind: Kind,
   labels: Record<string, string[]>,
   difficulty?: number,
-  text?: string
+  text?: string,
+  readingLevel?: number | null
 ): Promise<AnyCard> {
-  return askClaude(kind, describeRequest(kind, labels, difficulty, text));
+  return askClaude(kind, describeRequest(kind, labels, difficulty, text), readingLevel);
 }
 
 /** "Shake up the stats": same name, look and picture; new rules. */
@@ -199,12 +203,13 @@ export async function rerollCard(
   labels: Record<string, string[]>,
   old: AnyCard,
   difficulty?: number,
-  text?: string
+  text?: string,
+  readingLevel?: number | null
 ): Promise<AnyCard> {
   const prompt =
     describeRequest(kind, labels, difficulty, text) +
     `\n\nThis is a re-roll. Keep exactly this name, description and image_prompt:\nname: ${old.name}\ndescription: ${old.description}\nimage_prompt: ${old.image_prompt}\n\nThe previous stats were:\n${JSON.stringify(old)}\n\nInvent DIFFERENT abilities, effects and numbers that still fit the buttons and the balance guide.`;
-  const card = await askClaude(kind, prompt);
+  const card = await askClaude(kind, prompt, readingLevel);
   return { ...card, name: old.name, description: old.description, image_prompt: old.image_prompt };
 }
 

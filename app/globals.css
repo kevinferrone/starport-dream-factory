@@ -475,3 +475,11 @@ table.admin td, table.admin th { padding: 8px; border-bottom: 2px solid var(--li
   .card-stage { padding: 0; }
   .tcard { box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+
+/* Read my card: the word being spoken lights up */
+.tcard .w { border-radius: 4px; transition: background 0.08s; }
+.tcard .w.on { background: var(--sun); box-shadow: 0 0 0 2px var(--sun); color: var(--ink); }
+.tcard .rule.small { font-size: 14px; color: var(--ink-soft); }
+.tcard .rule.small strong { font-size: 14px; }
+.read-btn { min-height: 64px; }
+@media print { .read-btn { display: none !important; } }

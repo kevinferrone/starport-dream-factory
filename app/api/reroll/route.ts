@@ -34,7 +34,15 @@ export async function POST(req: Request) {
   if (!check.ok) return NextResponse.json({ error: check.error }, { status: 400 });
 
   try {
-    const card = await rerollCard(kind, check.labels, row.card as AnyCard, difficulty ?? undefined, row.prompt_text ?? undefined);
+    const { data: profile } = await db.from("profiles").select("reading_level").eq("id", user.id).single();
+    const card = await rerollCard(
+      kind,
+      check.labels,
+      row.card as AnyCard,
+      difficulty ?? undefined,
+      row.prompt_text ?? undefined,
+      profile?.reading_level
+    );
     await db
       .from("creations")
       .update({ card, reroll_count: row.reroll_count + 1 })

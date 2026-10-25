@@ -3,14 +3,29 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAccess, PLANS, type Tier } from "@/lib/access";
 import SetPassword from "./SetPassword";
+import { revalidatePath } from "next/cache";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { READING_LEVELS, DEFAULT_READING_LEVEL } from "@/lib/reading-level";
 
-export default async function PlansPage({ searchParams }: { searchParams: Promise<{ welcome?: string; limit?: string }> }) {
-  const { welcome, limit } = await searchParams;
+async function saveReadingLevel(formData: FormData) {
+  "use server";
+  const level = Number(formData.get("level"));
+  if (!Number.isInteger(level) || level < 0 || level > 7) return;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  await createAdminClient().from("profiles").update({ reading_level: level }).eq("id", user.id);
+  revalidatePath("/plans");
+  redirect("/plans?level=saved");
+}
+
+export default async function PlansPage({ searchParams }: { searchParams: Promise<{ welcome?: string; limit?: string; level?: string }> }) {
+  const { welcome, limit, level } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
   const access = await getAccess(user.id);
-  const { data: profile } = await supabase.from("profiles").select("stripe_customer_id, tier").eq("id", user.id).single();
+  const { data: profile } = await supabase.from("profiles").select("stripe_customer_id, tier, reading_level").eq("id", user.id).single();
 
   const tiers: Tier[] = ["free", "plus", "pro"];
   const icons: Record<Tier, string> = { free: "🌱", plus: "⭐", pro: "🌟" };
@@ -56,6 +71,30 @@ export default async function PlansPage({ searchParams }: { searchParams: Promis
           );
         })}
       </div>
+
+      <section className="panel" style={{ maxWidth: 560, margin: "0 auto 18px" }}>
+        <form action={saveReadingLevel} className="form">
+          <h2>
+            <span className="emoji" aria-hidden>📖</span> Card reading level
+          </h2>
+          <p className="hint">
+            New cards are written for this reader. The rules stay the same; only the words change.
+          </p>
+          {level === "saved" && (
+            <p className="error" style={{ background: "#d9fbef", color: "#0d6b4e" }}>
+              Saved. Your next cards will be written at this level.
+            </p>
+          )}
+          <select name="level" defaultValue={profile?.reading_level ?? DEFAULT_READING_LEVEL} aria-label="Reading level">
+            {READING_LEVELS.map((l) => (
+              <option key={l.value} value={l.value}>
+                Write cards for a {l.label} reader
+              </option>
+            ))}
+          </select>
+          <button className="big-btn small" type="submit">Save reading level</button>
+        </form>
+      </section>
 
       <SetPassword />
 

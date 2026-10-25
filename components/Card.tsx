@@ -1,9 +1,70 @@
 import type { Kind } from "@/lib/options";
 import { KINDS } from "@/lib/options";
-import type { CreatureCard, EquipmentCard, PetCard, AnyCard } from "@/lib/generate";
+import type { AnyCard } from "@/lib/generate";
+import { cardPieces, wordOffsets, words, type Piece } from "@/lib/card-text";
+
+/** Text split into word spans so the read-aloud can highlight each one. */
+function Words({ text, start, highlight }: { text: string; start: number; highlight: number | null }) {
+  return (
+    <>
+      {words(text).map((w, i) => (
+        <span key={i} className={start + i === highlight ? "w on" : "w"}>
+          {w}{" "}
+        </span>
+      ))}
+    </>
+  );
+}
 
 /** The printable trading card. Pure display, safe for server or client. */
-export default function Card({ kind, card, imageUrl }: { kind: Kind; card: AnyCard; imageUrl: string | null }) {
+export default function Card({
+  kind,
+  card,
+  imageUrl,
+  highlight = null,
+}: {
+  kind: Kind;
+  card: AnyCard;
+  imageUrl: string | null;
+  highlight?: number | null;
+}) {
+  const pieces = cardPieces(kind, card);
+  const offsets = wordOffsets(pieces);
+  const at = (i: number) => <Words text={pieces[i].text} start={offsets[i]} highlight={highlight} />;
+
+  // Group the body pieces into the card's layout.
+  const chips: number[] = [];
+  const body: React.ReactNode[] = [];
+  for (let i = 0; i < pieces.length; i++) {
+    const p: Piece = pieces[i];
+    if (p.role === "title") continue;
+    if (p.role === "desc") body.push(<p className="desc" key={i}>{at(i)}</p>);
+    else if (p.role === "chip") chips.push(i);
+    else if (p.role === "ruleName") {
+      const next = pieces[i + 1];
+      const hasText = next && (next.role === "ruleText" || next.role === "note");
+      body.push(
+        <p className={`rule${next?.role === "note" ? " small" : ""}`} key={i}>
+          <strong>{at(i)}</strong>
+          {hasText && at(i + 1)}
+        </p>
+      );
+      if (hasText) i++;
+    } else if (p.role === "ruleText") body.push(<p className="rule" key={i}>{at(i)}</p>);
+    else if (p.role === "note") body.push(<p className="rule small" key={i}>{at(i)}</p>);
+  }
+  // Chips sit right after the description.
+  const chipRow = (
+    <div className="chips" key="chips">
+      {chips.map((i) => (
+        <span className="chip" key={i}>
+          <span aria-hidden>{pieces[i].icon}</span> {at(i)}
+        </span>
+      ))}
+    </div>
+  );
+  body.splice(1, 0, chipRow);
+
   return (
     <article className={`tcard ${kind}`} id="the-card">
       <div className="inner">
@@ -14,75 +75,12 @@ export default function Card({ kind, card, imageUrl }: { kind: Kind; card: AnyCa
           <div className="art" />
         )}
         <div className="banner">
-          <h3>{card.name}</h3>
+          <h3>{at(0)}</h3>
           <span className="kindmark" aria-label={KINDS[kind].title}>{KINDS[kind].icon}</span>
         </div>
-        <div className="body">
-          <p className="desc">{card.description}</p>
-          {kind === "creature" && <CreatureBody c={card as CreatureCard} />}
-          {kind === "equipment" && <EquipmentBody e={card as EquipmentCard} />}
-          {kind === "pet" && <PetBody p={card as PetCard} />}
-        </div>
+        <div className="body">{body}</div>
         <div className="foot">Starport Dream Factory</div>
       </div>
     </article>
-  );
-}
-
-function CreatureBody({ c }: { c: CreatureCard }) {
-  return (
-    <>
-      <div className="chips">
-        <span className="chip">🎯 Difficulty <b>{c.difficulty}</b></span>
-        <span className="chip">⭐ Successes to defeat <b>{c.successes}</b></span>
-      </div>
-      {c.abilities.map((a) => (
-        <p className="rule" key={a.name}>
-          <strong>{a.name}</strong>
-          {a.effect}
-        </p>
-      ))}
-      <p className="rule">
-        <strong>Special: {c.special.name}</strong>
-        {c.special.effect}
-      </p>
-    </>
-  );
-}
-
-function EquipmentBody({ e }: { e: EquipmentCard }) {
-  return (
-    <>
-      <div className="chips">
-        <span className="chip">🪙 Cost <b>{e.cost}</b> {e.cost === 1 ? "Coin" : "Coins"}</span>
-        <span className="chip">{e.type === "consumable" ? "✰ One-time use" : "♾️ Keep forever"}</span>
-      </div>
-      <p className="rule">{e.effect}</p>
-      <p className="rule" style={{ fontSize: 14, color: "var(--ink-soft)" }}>
-        {e.uses_turn ? "Using this item takes your turn." : "Using this item does not take your turn."}
-      </p>
-    </>
-  );
-}
-
-function PetBody({ p }: { p: PetCard }) {
-  return (
-    <>
-      <div className="chips">
-        <span className="chip">🪙 Cost <b>{p.cost}</b> {p.cost === 1 ? "Coin" : "Coins"}</span>
-      </div>
-      <p className="rule">
-        <strong>Bonus</strong>
-        {p.bonuses}
-      </p>
-      <p className="rule">
-        <strong>{p.power.name}</strong>
-        {p.power.effect}
-      </p>
-      <p className="rule" style={{ fontSize: 14, color: "var(--ink-soft)" }}>
-        <strong style={{ fontSize: 14 }}>For the Guide</strong>
-        {p.roleplay}
-      </p>
-    </>
   );
 }

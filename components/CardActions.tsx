@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Kind } from "@/lib/options";
 import type { AnyCard } from "@/lib/generate";
@@ -23,8 +23,50 @@ export default function CardActions(props: Props) {
   const [card, setCard] = useState(props.card);
   const [saved, setSaved] = useState(props.saved);
   const [rerollsLeft, setRerollsLeft] = useState(props.rerollsLeft);
-  const [busy, setBusy] = useState<null | "shake" | "save" | "pdf">(null);
+  const [busy, setBusy] = useState<null | "shake" | "save" | "pdf" | "read">(null);
   const [error, setError] = useState<string | null>(null);
+  const [highlight, setHighlight] = useState<number | null>(null);
+  const [reading, setReading] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const frame = useRef<number>(0);
+
+  const stopReading = () => {
+    audioRef.current?.pause();
+    cancelAnimationFrame(frame.current);
+    setReading(false);
+    setHighlight(null);
+  };
+  useEffect(() => stopReading, []);
+
+  // Reads the whole card aloud, lighting up each word as it's spoken.
+  const readCard = async () => {
+    if (reading) return stopReading();
+    setBusy("read");
+    setError(null);
+    try {
+      const data = (await post("/api/card-voice")) as { audio: string; times: { s: number; e: number }[] };
+      const audio = new Audio(data.audio);
+      audioRef.current = audio;
+      const tick = () => {
+        const t = audio.currentTime;
+        let idx = -1;
+        for (let i = 0; i < data.times.length; i++) {
+          if (data.times[i].s <= t + 0.04) idx = i;
+          else break;
+        }
+        setHighlight(idx >= 0 ? idx : null);
+        frame.current = requestAnimationFrame(tick);
+      };
+      audio.onended = stopReading;
+      await audio.play();
+      setReading(true);
+      frame.current = requestAnimationFrame(tick);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't read this card right now.");
+    } finally {
+      setBusy(null);
+    }
+  };
 
   const post = async (url: string) => {
     const res = await fetch(url, {
@@ -38,6 +80,7 @@ export default function CardActions(props: Props) {
   };
 
   const shake = async () => {
+    stopReading();
     speak(PHRASES.shaking);
     setBusy("shake");
     setError(null);
@@ -68,19 +111,8 @@ export default function CardActions(props: Props) {
   const pdf = async () => {
     setBusy("pdf");
     try {
-      const node = document.getElementById("the-card");
-      if (!node) return;
-      const [{ toPng }, { jsPDF }] = await Promise.all([import("html-to-image"), import("jspdf")]);
-      const dataUrl = await toPng(node, { pixelRatio: 2.5, backgroundColor: "#ffffff" });
-      const img = new Image();
-      img.src = dataUrl;
-      await img.decode();
-      // A letter-size page with the card centered, 4.5 inches wide.
-      const doc = new jsPDF({ unit: "in", format: "letter" });
-      const w = 4.5;
-      const h = (img.height / img.width) * w;
-      doc.addImage(dataUrl, "PNG", (8.5 - w) / 2, 0.75, w, h);
-      doc.save(`${card.name.replace(/[^a-z0-9]+/gi, "-")}.pdf`);
+      const { downloadCardPdf } = await import("@/lib/card-pdf");
+      await downloadCardPdf(props.kind, card, props.imageUrl);
     } catch {
       setError("Couldn't make the PDF. Try Print and choose Save as PDF.");
     } finally {
@@ -96,7 +128,17 @@ export default function CardActions(props: Props) {
 
   return (
     <div className="card-stage">
-      <Card kind={props.kind} card={card} imageUrl={props.imageUrl} />
+      <Card kind={props.kind} card={card} imageUrl={props.imageUrl} highlight={highlight} />
+
+      <button
+        className={`big-btn read-btn${reading ? " gum" : ""}`}
+        onClick={readCard}
+        disabled={busy === "read" || busy === "shake"}
+        onMouseEnter={() => !reading && speak(PHRASES.readCard)}
+      >
+        <span className="emoji" aria-hidden>{reading ? "⏹️" : "🔊"}</span>
+        {busy === "read" ? "Getting ready…" : reading ? "Stop reading" : "Read my card"}
+      </button>
 
       {error && <p className="error no-print" role="alert">{error}</p>}
 

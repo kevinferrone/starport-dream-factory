@@ -10,6 +10,7 @@ export const PHRASES = {
   shaking: "Shaking up the stats",
   saved: "Saved!",
   saveCard: "Save my card",
+  readCard: "Read my card",
   changeButtons: "Change my buttons",
   home: "Home",
   myCards: "My cards",

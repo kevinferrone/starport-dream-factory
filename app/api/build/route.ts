@@ -30,7 +30,12 @@ export async function POST(req: Request) {
   }
 
   try {
-    const card = await writeCard(input.kind, check.labels, input.difficulty, input.text);
+    const { data: profile } = await createAdminClient()
+      .from("profiles")
+      .select("reading_level")
+      .eq("id", user.id)
+      .single();
+    const card = await writeCard(input.kind, check.labels, input.difficulty, input.text, profile?.reading_level);
     const picture = await drawPicture(user.id, card);
 
     const db = createAdminClient();

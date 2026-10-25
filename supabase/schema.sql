@@ -14,8 +14,11 @@ create table if not exists public.profiles (
   stripe_customer_id text,
   stripe_subscription_id text,
   subscription_status text,
+  -- grade level for card writing: 0 = kindergarten ... 7 = 7th grade and up
+  reading_level int check (reading_level between 0 and 7),
   created_at timestamptz not null default now()
 );
+alter table public.profiles add column if not exists reading_level int check (reading_level between 0 and 7);
 
 -- Emails given free access before they sign up
 create table if not exists public.comp_invites (
