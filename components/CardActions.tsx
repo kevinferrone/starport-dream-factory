@@ -8,6 +8,7 @@ import Card from "@/components/Card";
 import Link from "next/link";
 import { speak } from "@/components/ReadAloud";
 import { PHRASES } from "@/lib/voice-phrases";
+import { readingRate } from "@/lib/reading-level";
 
 type Props = {
   id: string;
@@ -16,6 +17,7 @@ type Props = {
   imageUrl: string | null;
   saved: boolean;
   rerollsLeft: number;
+  readingLevel: number | null;
 };
 
 export default function CardActions(props: Props) {
@@ -47,6 +49,9 @@ export default function CardActions(props: Props) {
       const data = (await post("/api/card-voice")) as { audio: string; times: { s: number; e: number }[] };
       const audio = new Audio(data.audio);
       audioRef.current = audio;
+      // Slower for younger readers. Pitch stays natural; highlights follow the audio's own clock.
+      audio.preservesPitch = true;
+      audio.playbackRate = readingRate(props.readingLevel);
       const tick = () => {
         const t = audio.currentTime;
         let idx = -1;

@@ -32,3 +32,11 @@ export function readingGuide(level: number | null | undefined) {
       : "lively, full sentences with rich vocabulary, wordplay and puns";
   return `READING LEVEL: The child reading this card is at a ${who} reading level. Write the name, description and every rules sentence for that reader: ${style}. Keep Starport game words exactly as they are (Difficulty, successes, tokens, Smart/Sneaky/Tough/Helpful roll, Coins, turn) and keep the rules just as clear and complete.`;
 }
+
+/** How fast "Read my card" plays: much slower for K–2, a little slower for 3rd–4th, normal for 5th and up. */
+export function readingRate(level: number | null | undefined) {
+  const l = level ?? DEFAULT_READING_LEVEL;
+  if (l <= 2) return 0.72;
+  if (l <= 4) return 0.86;
+  return 1;
+}

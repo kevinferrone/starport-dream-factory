@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { MAX_REROLLS_PER_CARD } from "@/lib/access";
-import { validateChoices, type Kind } from "@/lib/options";
+import { validateChoices, fitChoices, type Kind } from "@/lib/options";
 import { rerollCard, type AnyCard } from "@/lib/generate";
 
 export const runtime = "nodejs";
@@ -28,8 +28,8 @@ export async function POST(req: Request) {
   }
 
   const { difficulty, ...rest } = row.choices as { difficulty?: number | null; [k: string]: unknown };
-  const choices = rest as Record<string, string[]>;
   const kind = row.kind as Kind;
+  const choices = fitChoices(kind, rest as Record<string, string[]>);
   const check = validateChoices({ kind, choices, difficulty: difficulty ?? undefined, text: row.prompt_text ?? undefined });
   if (!check.ok) return NextResponse.json({ error: check.error }, { status: 400 });
 

@@ -91,8 +91,10 @@ export default function Builder({ kind, remaining, initial }: Props) {
   return (
     <div className={`kind-${kind}`}>
       <div className="hero" style={{ paddingTop: 6 }}>
-        <h1 style={{ fontSize: "clamp(36px, 6vw, 56px)" }}>
-          <span aria-hidden>{k.icon}</span> {k.title}
+        <h1 className="build-title">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={`/tiles/${kind}.webp`} alt="" aria-hidden />
+          {k.title}
         </h1>
       </div>
 

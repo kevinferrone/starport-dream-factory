@@ -476,6 +476,16 @@ table.admin td, table.admin th { padding: 8px; border-bottom: 2px solid var(--li
   .tcard { box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 
+/* Builder page title with its picture */
+.hero h1.build-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  font-size: clamp(36px, 6vw, 56px);
+}
+.hero h1.build-title img { height: 1.9em; width: auto; filter: drop-shadow(0 4px 0 #ffffff99); }
+
 /* Read my card: the word being spoken lights up */
 .tcard .w { border-radius: 4px; transition: background 0.08s; }
 .tcard .w.on { background: var(--sun); box-shadow: 0 0 0 2px var(--sun); color: var(--ink); }

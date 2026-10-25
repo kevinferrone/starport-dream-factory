@@ -11,7 +11,10 @@ export default async function CardPage({ params }: { params: Promise<{ id: strin
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data } = await supabase.from("creations").select("*").eq("id", id).single();
+  const [{ data }, { data: profile }] = await Promise.all([
+    supabase.from("creations").select("*").eq("id", id).single(),
+    supabase.from("profiles").select("reading_level").eq("id", user.id).single(),
+  ]);
   if (!data) notFound();
 
   return (
@@ -22,6 +25,7 @@ export default async function CardPage({ params }: { params: Promise<{ id: strin
       imageUrl={data.image_url}
       saved={data.status === "saved"}
       rerollsLeft={Math.max(0, MAX_REROLLS_PER_CARD - data.reroll_count)}
+      readingLevel={profile?.reading_level ?? null}
     />
   );
 }

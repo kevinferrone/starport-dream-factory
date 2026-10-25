@@ -146,7 +146,7 @@ export const PET_GROUPS: OptionGroup[] = [
     title: "Personality",
     icon: "😊",
     min: 0,
-    max: 3,
+    max: 1,
     options: [
       o("Happy", "😊"), o("Sleepy", "😴"), o("Grumpy", "😠"), o("Shy", "😳"), o("Silly", "🤪"),
       o("Bossy", "🙄"), o("Know-it-all", "🤓"), o("Scaredy", "😱"), o("Cuddly", "🤗"), o("Always hungry", "😋"),
@@ -193,6 +193,13 @@ export function difficultyFace(d: number) {
 
 export function allOptions(group: OptionGroup): Option[] {
   return group.options ?? group.sections?.flatMap((s) => s.options) ?? [];
+}
+
+/** Trims saved choices to today's button limits (e.g. older cards made before a limit changed). */
+export function fitChoices(kind: Kind, choices: Record<string, string[]>): Record<string, string[]> {
+  const out: Record<string, string[]> = {};
+  for (const g of GROUPS[kind]) out[g.id] = (choices[g.id] ?? []).slice(0, g.max);
+  return out;
 }
 
 /** What a builder sends: choices are { groupId: [optionId, ...] } */

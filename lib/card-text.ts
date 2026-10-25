@@ -40,8 +40,6 @@ export function cardPieces(kind: Kind, card: AnyCard): Piece[] {
     p.push({ role: "ruleText", text: pet.bonuses });
     p.push({ role: "ruleName", text: pet.power.name });
     p.push({ role: "ruleText", text: pet.power.effect });
-    p.push({ role: "ruleName", text: "For the Guide" });
-    p.push({ role: "note", text: pet.roleplay });
   }
   return p;
 }

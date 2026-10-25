@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAccess } from "@/lib/access";
-import { KINDS, type Kind } from "@/lib/options";
+import { KINDS, fitChoices, type Kind } from "@/lib/options";
 import Builder from "@/components/Builder";
 
 export default async function BuildPage({
@@ -28,7 +28,7 @@ export default async function BuildPage({
     if (data && data.kind === kind) {
       const { difficulty, ...rest } = data.choices as { difficulty?: number | null; [k: string]: unknown };
       initial = {
-        choices: rest as Record<string, string[]>,
+        choices: fitChoices(kind as Kind, rest as Record<string, string[]>),
         difficulty: difficulty ?? undefined,
         text: data.prompt_text ?? undefined,
       };

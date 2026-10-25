@@ -37,7 +37,7 @@ export type PetCard = {
   cost: number;
   bonuses: string;
   power: { name: string; effect: string };
-  roleplay: string;
+  roleplay?: string; // older cards only; no longer shown or generated
   image_prompt: string;
 };
 export type AnyCard = CreatureCard | EquipmentCard | PetCard;
@@ -94,10 +94,9 @@ const TOOLS: Record<Kind, Anthropic.Tool> = {
         cost: { type: "integer", description: "1-50 Coins" },
         bonuses: { type: "string", description: "e.g. +2 to your maximum Smart tokens" },
         power: named,
-        roleplay: { type: "string", description: "One line telling the Guide how to act as this pet" },
         image_prompt: { type: "string" },
       },
-      required: ["name", "description", "cost", "bonuses", "power", "roleplay", "image_prompt"],
+      required: ["name", "description", "cost", "bonuses", "power", "image_prompt"],
     },
   },
 };
@@ -215,7 +214,7 @@ async function reviewRules(kind: Kind, card: AnyCard, readingLevel?: number | nu
       return { ...reviewed, ...keep, cost: e.cost, type: e.type, uses_turn: e.uses_turn } as EquipmentCard;
     }
     const p = card as PetCard;
-    return { ...reviewed, ...keep, cost: p.cost, roleplay: p.roleplay } as PetCard;
+    return { ...reviewed, ...keep, cost: p.cost } as PetCard;
   } catch {
     return card; // if the review fails, the original card is still fine to show
   }

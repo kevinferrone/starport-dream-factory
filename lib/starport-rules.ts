@@ -29,6 +29,7 @@ Separate the flavor from the rules. The DESCRIPTION is where the fun, silly, mag
 - Read your rules text back as if you were a parent who has never played: if any word would make them stop and ask "what does that mean?", rewrite it.
 - Be funny and specific. Tickling, burping, sneezing, sticky goo, sleepy songs, stolen socks, glitter, bad jokes, dance parties and dramatic sighs are the Starport flavor. Surprise the reader with at least one unexpected detail.
 - Never use real brands, real people, or known characters from movies, books, games or TV.
+- Cards are for PLAYERS (kids). Write everything to the Player ("you"). Never address the Guide, add Guide notes, or give roleplay directions.
 `;
 
 export const CREATURE_RULES = `
@@ -99,7 +100,7 @@ BALANCE CHECK
 
 export const PET_RULES = `
 PET CARD
-Name · Description (looks and personality, one funny habit) · Cost in Coins (1-50) · Bonuses (usually +maximum tokens) · Special power (often once per adventure) · How the pet acts (a line for the Guide to roleplay it).
+Name · Description (looks and personality, one funny habit) · Cost in Coins (1-50) · Bonuses (usually +maximum tokens) · Special power (often once per adventure).
 
 CORE PET RULES
 - A Player can have only 1 pet; adopting another makes the first run away.
