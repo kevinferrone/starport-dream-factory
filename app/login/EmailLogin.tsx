@@ -113,6 +113,9 @@ export default function EmailLogin() {
         New here? Google or the sign-in link creates your account, with 3 free creations. You can add a
         password later on the Grown-ups page.
       </p>
+      <p className="hint">
+        By signing in you agree to our <a href="/terms">Terms</a> and <a href="/privacy">Privacy policy</a>.
+      </p>
     </div>
   );
 }
