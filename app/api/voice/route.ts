@@ -16,7 +16,7 @@ export async function GET(req: Request) {
   const text = new URL(req.url).searchParams.get("t") ?? "";
   if (!ALLOWED.has(text)) return NextResponse.json({ error: "Unknown phrase" }, { status: 400 });
 
-  const voice = process.env.OPENAI_TTS_VOICE || "coral";
+  const voice = process.env.OPENAI_TTS_VOICE || "sage";
   const key = createHash("sha1").update(`${voice}|v1|${text}`).digest("hex");
   const path = `voice/${key}.mp3`;
   const db = createAdminClient();

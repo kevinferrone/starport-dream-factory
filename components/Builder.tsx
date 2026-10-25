@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   GROUPS,
   KINDS,
@@ -11,8 +12,9 @@ import {
   type Kind,
   type Option,
   type OptionGroup,
+  allOptions,
 } from "@/lib/options";
-import { speak } from "@/components/ReadAloud";
+import { speak, useSpeakOnHover, warmVoices } from "@/components/ReadAloud";
 import { PHRASES, pickFirst, difficultyPhrase } from "@/lib/voice-phrases";
 
 type Props = {
@@ -37,9 +39,14 @@ export default function Builder({ kind, remaining, initial }: Props) {
   const [text, setText] = useState(initial?.text ?? "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const say = useSpeakOnHover();
+
+  // Record this builder's words ahead of time so hovering speaks right away.
+  useEffect(() => {
+    warmVoices([k.button, ...groups.flatMap((g) => allOptions(g).map((o) => o.label))]);
+  }, [kind]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggle = (g: OptionGroup, opt: Option) => {
-    speak(opt.label);
     setChoices((prev) => {
       const cur = prev[g.id] ?? [];
       if (cur.includes(opt.id)) return { ...prev, [g.id]: cur.filter((x) => x !== opt.id) };
@@ -94,14 +101,19 @@ export default function Builder({ kind, remaining, initial }: Props) {
         const full = g.max > 1 && picked.length >= g.max;
         const renderOpt = (opt: Option) => {
           const on = picked.includes(opt.id);
+          const { spokeOnClick, ...hover } = say(opt.label);
           return (
             <button
+              {...hover}
               key={opt.id}
               type="button"
               className={`pick${g.id === "size" ? " wide" : ""}`}
               aria-pressed={on}
               disabled={!on && full}
-              onClick={() => toggle(g, opt)}
+              onClick={() => {
+                spokeOnClick();
+                toggle(g, opt);
+              }}
             >
               <span className="emoji" aria-hidden>{opt.icon}</span>
               {opt.label}
@@ -173,11 +185,16 @@ export default function Builder({ kind, remaining, initial }: Props) {
         <div style={{ textAlign: "center" }}>
           {error && <p className="error" role="alert">{error}</p>}
           {outOfBuilds ? (
-            <a className="big-btn gum" href="/plans">
+            <Link className="big-btn gum" href="/plans">
               <span className="emoji" aria-hidden>⭐</span> Get more creations
-            </a>
+            </Link>
           ) : (
-            <button className="big-btn" onClick={build} disabled={busy}>
+            <button
+              className="big-btn"
+              onClick={build}
+              disabled={busy}
+              onMouseEnter={() => speak(k.button)}
+            >
               <span className="emoji" aria-hidden>🏭</span>
               {k.button}
             </button>

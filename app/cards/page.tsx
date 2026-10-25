@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -21,16 +22,16 @@ export default async function MyCards() {
       </div>
       {!cards?.length ? (
         <p className="empty">
-          No saved cards yet. <a href="/">Make your first one!</a>
+          No saved cards yet. <Link href="/">Make your first one!</Link>
         </p>
       ) : (
         <div className="gallery">
           {cards.map((c) => (
-            <a key={c.id} href={`/cards/${c.id}`} className={`mini ${c.kind}`}>
+            <Link key={c.id} href={`/cards/${c.id}`} className={`mini ${c.kind}`}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={c.image_url ?? ""} alt="" />
               <span>{(c.card as { name: string }).name}</span>
-            </a>
+            </Link>
           ))}
         </div>
       )}

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAccess, PLANS } from "@/lib/access";
@@ -30,7 +31,8 @@ export default async function Home() {
       <nav className="tiles" aria-label="What do you want to make?">
         {kinds.map(([kind, k]) => (
           <SpeakingLink key={kind} href={`/build/${kind}`} label={KIND_SPOKEN[kind]} className={`tile ${kind}`}>
-            <span className="big" aria-hidden>{k.icon}</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="tile-art" src={`/tiles/${kind}.webp`} alt="" aria-hidden />
             {k.title}
           </SpeakingLink>
         ))}
@@ -42,7 +44,7 @@ export default async function Home() {
           {access.remaining} of {plan.limit} creations left
           {plan.period === "month" ? " this month" : ""}
         </span>
-        {access.tier !== "pro" && <a href="/plans">Get more</a>}
+        {access.tier !== "pro" && <Link href="/plans">Get more</Link>}
       </div>
     </>
   );

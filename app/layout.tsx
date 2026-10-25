@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Baloo_2 } from "next/font/google";
 import "./globals.css";
 import { createClient } from "@/lib/supabase/server";
-import { ReadAloudToggle, SpeakingLink } from "@/components/ReadAloud";
-import { PHRASES } from "@/lib/voice-phrases";
+import { ReadAloudToggle, SpeakingLink, WarmVoices } from "@/components/ReadAloud";
+import { PHRASES, KIND_SPOKEN } from "@/lib/voice-phrases";
 
 const baloo = Baloo_2({ subsets: ["latin"], weight: ["500", "700", "800"], variable: "--font-baloo" });
 
@@ -21,10 +22,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <div className="wrap">
           <header className="topbar">
-            <a href="/" className="brand">
+            <Link href="/" className="brand">
               <span aria-hidden>🏭</span>
               <span className="text">Dream Factory</span>
-            </a>
+            </Link>
             {user && (
               <>
                 <SpeakingLink href="/" label={PHRASES.home} className="icon-link" title="Home">
@@ -36,6 +37,21 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   <span className="text">My cards</span>
                 </SpeakingLink>
                 <ReadAloudToggle />
+                <WarmVoices
+                  phrases={[
+                    ...Object.values(KIND_SPOKEN),
+                    PHRASES.home,
+                    PHRASES.myCards,
+                    PHRASES.grownUps,
+                    PHRASES.shaking,
+                    PHRASES.changeButtons,
+                    PHRASES.saveCard,
+                    PHRASES.saved,
+                    PHRASES.print,
+                    PHRASES.pdf,
+                    PHRASES.building,
+                  ]}
+                />
                 <SpeakingLink href="/plans" label={PHRASES.grownUps} className="icon-link" title="Grown-ups">
                   <span className="emoji" aria-hidden>🔑</span>
                   <span className="text">Grown-ups</span>

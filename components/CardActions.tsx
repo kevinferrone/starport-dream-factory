@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { Kind } from "@/lib/options";
 import type { AnyCard } from "@/lib/generate";
 import Card from "@/components/Card";
+import Link from "next/link";
 import { speak } from "@/components/ReadAloud";
 import { PHRASES } from "@/lib/voice-phrases";
 
@@ -65,7 +66,6 @@ export default function CardActions(props: Props) {
   };
 
   const pdf = async () => {
-    speak(PHRASES.pdf);
     setBusy("pdf");
     try {
       const node = document.getElementById("the-card");
@@ -101,20 +101,30 @@ export default function CardActions(props: Props) {
       {error && <p className="error no-print" role="alert">{error}</p>}
 
       <div className="actions">
-        <button className="big-btn small" onClick={shake} disabled={!!busy || rerollsLeft <= 0}>
+        <button
+          className="big-btn small"
+          onClick={shake}
+          disabled={!!busy || rerollsLeft <= 0}
+          onMouseEnter={() => speak(PHRASES.shaking)}
+        >
           <span className="emoji" aria-hidden>🎲</span>
           {busy === "shake" ? "Shaking…" : "Shake up the stats"}
         </button>
-        <a
+        <Link
           className="big-btn small plain"
           href={`/build/${props.kind}?from=${props.id}`}
-          onClick={() => speak(PHRASES.changeButtons)}
+          onMouseEnter={() => speak(PHRASES.changeButtons)}
         >
           <span className="emoji" aria-hidden>🔁</span>
           Change my buttons
-        </a>
+        </Link>
         {!saved ? (
-          <button className="big-btn small mint" onClick={save} disabled={!!busy}>
+          <button
+            className="big-btn small mint"
+            onClick={save}
+            disabled={!!busy}
+            onMouseEnter={() => speak(PHRASES.saveCard)}
+          >
             <span className="emoji" aria-hidden>💾</span>
             Save my card
           </button>
@@ -124,11 +134,21 @@ export default function CardActions(props: Props) {
             Saved
           </span>
         )}
-        <button className="big-btn small gum" onClick={() => { speak(PHRASES.print); window.print(); }} disabled={!!busy}>
+        <button
+          className="big-btn small gum"
+          onClick={() => window.print()}
+          disabled={!!busy}
+          onMouseEnter={() => speak(PHRASES.print)}
+        >
           <span className="emoji" aria-hidden>🖨️</span>
           Print
         </button>
-        <button className="big-btn small plain" onClick={pdf} disabled={!!busy}>
+        <button
+          className="big-btn small plain"
+          onClick={pdf}
+          disabled={!!busy}
+          onMouseEnter={() => speak(PHRASES.pdf)}
+        >
           <span className="emoji" aria-hidden>📄</span>
           {busy === "pdf" ? "Making PDF…" : "Download PDF"}
         </button>

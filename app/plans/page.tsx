@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAccess, PLANS, type Tier } from "@/lib/access";
@@ -65,7 +66,7 @@ export default async function PlansPage({ searchParams }: { searchParams: Promis
           </form>
         )}
         {access.isAdmin && (
-          <a className="big-btn small gum" href="/admin">Admin</a>
+          <Link className="big-btn small gum" href="/admin">Admin</Link>
         )}
         <form action="/auth/signout" method="post">
           <button className="big-btn small plain" type="submit">Sign out</button>
