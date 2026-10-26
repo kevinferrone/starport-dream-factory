@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { MAX_REROLLS_PER_CARD } from "@/lib/access";
-import { validateChoices, fitChoices, type Kind } from "@/lib/options";
+import { validateChoices, fitChoices, pickedItem, type Kind } from "@/lib/options";
+import { drawPlan } from "@/lib/patterns";
 import { rerollCard, type AnyCard } from "@/lib/generate";
 
 export const runtime = "nodejs";
@@ -40,14 +41,21 @@ export async function POST(req: Request) {
 
   try {
     const { data: profile } = await db.from("profiles").select("reading_level").eq("id", user.id).single();
+    // A fresh draw from the pattern banks, so a shake-up really changes the rules.
+    const item = pickedItem(choices);
+    const plan = drawPlan(kind, choices, difficulty ?? undefined, item ? { once: !!item.once, boosts: item.boosts ?? [] } : null);
     const card = await rerollCard(
       kind,
       check.labels,
       row.card as AnyCard,
       difficulty ?? undefined,
       row.prompt_text ?? undefined,
-      profile?.reading_level
+      profile?.reading_level,
+      plan.text
     );
+    if (kind === "equipment" && plan.consumable !== undefined) {
+      (card as { type: string }).type = plan.consumable ? "consumable" : "permanent";
+    }
     await db
       .from("creations")
       .update({ card, reroll_count: row.reroll_count + 1 })

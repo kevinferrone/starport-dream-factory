@@ -115,7 +115,8 @@ function describeRequest(
   labels: Record<string, string[]>,
   difficulty: number | undefined,
   text: string | undefined,
-  hasDrawing = false
+  hasDrawing = false,
+  plan?: string
 ) {
   const lines = Object.entries(labels)
     .filter(([, v]) => v.length)
@@ -125,7 +126,10 @@ function describeRequest(
   const drawing = hasDrawing
     ? `\n\nThe kid also DREW their ${kind} (the attached picture). The drawing is the MAIN reference and wins over any button that disagrees with it: base the name, description and image_prompt on what they drew (its shape, colors, features and any details), and let the buttons add personality and powers. In image_prompt, describe the drawing faithfully and specifically (body shape, colors, number of eyes, limbs and other features) so the illustrator can recreate it. If part of the drawing is hard to read, make a kind, playful guess.`
     : "";
-  return `A kid made these choices in the Starport Dream Factory:\n${lines.join("\n") || "- (no buttons picked)"}${drawing}\n\nBuild one ${kind} that clearly reflects everything they picked. Anything they didn't pick, invent yourself. Make it unique, interesting and funny.`;
+  const patterns = plan
+    ? `\n\nUSE EXACTLY THESE RULE PATTERNS (they were chosen for this card). Keep each pattern's structure, fill in the [brackets] and N to fit this ${kind} and the balance guide, and give each one its own fun name and wording that matches the ${kind}'s look and personality. Never use the pattern names themselves on the card:\n${plan}`
+    : "";
+  return `A kid made these choices in the Starport Dream Factory:\n${lines.join("\n") || "- (no buttons picked)"}${drawing}${patterns}\n\nBuild one ${kind} that clearly reflects everything they picked. Anything they didn't pick, invent yourself. Make it unique, interesting and funny.`;
 }
 
 /** Returns a problem description, or null if the card follows the rules. */
@@ -215,7 +219,7 @@ async function reviewRules(kind: Kind, card: AnyCard, readingLevel?: number | nu
       `Here is a finished Starport ${kind} card:\n${JSON.stringify(card, null, 2)}\n\n` +
       `Review ONLY the rules text (${RULE_FIELDS[kind]}). For each one, ask: could a parent who has never played run this at the table instantly, without asking what anything means? Does it follow the RULES TEXT rules (direct game terms only, no invented number systems or jargon, no flavor inside the rule${kind === "equipment" ? ", no mention of whether it uses a turn" : ""})?\n` +
       (kind === "creature" ? `Difficulty: ${(card as CreatureCard).difficulty} (keep it).\n` : "") +
-      `Rewrite any rule that fails into one or two short, direct sentences with the same strength. Leave rules that already pass exactly as they are. Keep every other field identical. Call the ${TOOLS[kind].name} tool with the full card.`;
+      `Rewrite any rule that fails into one or two short, direct sentences with the same strength and the same structure (who it affects, what roll, what happens). Leave rules that already pass exactly as they are. Keep every other field identical. Call the ${TOOLS[kind].name} tool with the full card.`;
     const reviewed = (await askClaude(kind, prompt, readingLevel)) as AnyCard;
     // Never let the review change anything but rules text.
     const keep = { name: card.name, description: card.description, image_prompt: card.image_prompt };
@@ -241,9 +245,10 @@ export async function writeCard(
   difficulty?: number,
   text?: string,
   readingLevel?: number | null,
-  drawing?: Drawing
+  drawing?: Drawing,
+  plan?: string
 ): Promise<AnyCard> {
-  const card = await askClaude(kind, describeRequest(kind, labels, difficulty, text, !!drawing), readingLevel, drawing);
+  const card = await askClaude(kind, describeRequest(kind, labels, difficulty, text, !!drawing, plan), readingLevel, drawing);
   return reviewRules(kind, card, readingLevel);
 }
 
@@ -306,11 +311,12 @@ export async function rerollCard(
   old: AnyCard,
   difficulty?: number,
   text?: string,
-  readingLevel?: number | null
+  readingLevel?: number | null,
+  plan?: string
 ): Promise<AnyCard> {
   const prompt =
-    describeRequest(kind, labels, difficulty, text) +
-    `\n\nThis is a re-roll. Keep exactly this name, description and image_prompt:\nname: ${old.name}\ndescription: ${old.description}\nimage_prompt: ${old.image_prompt}\n\nThe previous stats were:\n${JSON.stringify(old)}\n\nInvent DIFFERENT abilities, effects and numbers that still fit the buttons and the balance guide.`;
+    describeRequest(kind, labels, difficulty, text, false, plan) +
+    `\n\nThis is a re-roll. Keep exactly this name, description and image_prompt:\nname: ${old.name}\ndescription: ${old.description}\nimage_prompt: ${old.image_prompt}\n\nThe previous stats were:\n${JSON.stringify(old)}\n\nWrite NEW rules from the patterns above, with different names and numbers that still fit the buttons and the balance guide.`;
   const card = await askClaude(kind, prompt, readingLevel);
   const fresh = { ...card, name: old.name, description: old.description, image_prompt: old.image_prompt };
   return reviewRules(kind, fresh, readingLevel);

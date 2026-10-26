@@ -42,7 +42,9 @@ BALANCE GUIDE
 - An ability that hits ALL Players should cost about half what a single-target ability costs.
 - Good Specials give Players a clever way in (a weakness, a "right approach" that earns 2 successes) OR add a twist (a trigger at the 3rd success, a lockout on one trait's tokens, an effect when a Player succeeds or fails). The best Specials do both.
 
-ABILITY PATTERNS FROM THE BOOKS (reuse these structures)
+Each card is handed its exact ability and special patterns. The examples below only show tone and wording.
+
+ABILITY EXAMPLES FROM THE BOOKS
 - "1 Player loses 2 tokens." (Tickle — Joke Troll)
 - "1 Player must describe how they avoid the [thing], making an appropriate action roll against the creature. On a failed roll, [penalty]." (Chomp — Hungry Hippo: lose 1 random equipment item)
 - "All Players must succeed on a Sneaky roll against the creature or [become tangled] and lose 1 token." (Tangle — Tangleon)
@@ -51,7 +53,7 @@ ABILITY PATTERNS FROM THE BOOKS (reuse these structures)
 - "All Players lose 1 token and must succeed on a Smart roll or miss their next turn." (Relax — Mushrooga Troupe)
 - Stuck until freed: "the Player is stuck in candy; the only way to escape is to use a turn and succeed on a Tough roll against the creature." (Candy Monster)
 
-SPECIAL PATTERNS FROM THE BOOKS
+SPECIAL EXAMPLES FROM THE BOOKS
 - Right approach: "If a Player succeeds on a roll related to feeding it, they gain 2 successes instead of 1." (Hungry Hippo — Starving)
 - Key needed: "Can only be defeated by telling jokes it has never heard before." (Joke Troll)
 - Trait lockout: "Tough rolls made against it always fail." (Mossgut) / "Smart tokens can't be used on rolls against it." (Blumber Bear)

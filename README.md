@@ -38,7 +38,8 @@ update public.profiles set is_admin = true where email = 'YOUR EMAIL';
 The Grown-ups page now shows an **Admin** button: give specific emails free access, or make the whole site free.
 
 ## Where things live
-- `lib/options.ts`: every button (pictures, words, how many can be picked).
+- `lib/options.ts`: every button (pictures, words, how many can be picked). Equipment item buttons use `item(label, icon, "keep" | "once", [pattern ids])`, so every new item type must be sorted into the pattern categories.
+- `lib/patterns.ts`: the approved rule pattern banks (creature abilities and specials, equipment, pet bonuses and powers), their rarity, and which buttons make each more likely.
 - `lib/starport-rules.ts`: the Starport rules, examples and price ladders the AI follows.
 - `lib/access.ts`: plan limits and prices shown in the app.
 - `lib/generate.ts`: the Claude and OpenAI calls.

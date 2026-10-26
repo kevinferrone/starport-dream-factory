@@ -1,7 +1,13 @@
 // Every button in the three builders. Each one has a picture (emoji) and a word.
 // Add, remove or rename buttons here; the builders and the AI prompts read from this file.
 
-export type Option = { id: string; label: string; icon: string };
+export type Option = {
+  id: string;
+  label: string;
+  icon: string;
+  once?: boolean; // equipment items: true = use once, false = keep forever
+  boosts?: string[]; // equipment items: pattern ids this item type makes more likely
+};
 export type OptionGroup = {
   id: string;
   title: string;
@@ -17,6 +23,17 @@ const o = (label: string, icon: string): Option => ({
   id: label.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
   label,
   icon,
+});
+
+/**
+ * An equipment item button. Every item type MUST say whether it's use-once and which
+ * patterns it makes more likely (pattern ids from lib/patterns.ts), so new items are
+ * always sorted into the pattern categories.
+ */
+const item = (label: string, icon: string, kind: "keep" | "once", boosts: string[]): Option => ({
+  ...o(label, icon),
+  once: kind === "once",
+  boosts,
 });
 
 export const KINDS: Record<Kind, { title: string; icon: string; button: string; color: string }> = {
@@ -59,12 +76,48 @@ export const EQUIPMENT_GROUPS: OptionGroup[] = [
     min: 0,
     max: 1,
     options: [
-      o("Staff", "🦯"), o("Wand", "🪄"), o("Bag", "🎒"), o("Tool", "🔧"), o("Hammer", "🔨"),
-      o("Bowl", "🥣"), o("Hat", "🎩"), o("Feather", "🪶"), o("Orb", "🔮"), o("Potion", "🧪"),
-      o("Jacket", "🧥"), o("Cape", "🦸"), o("Crown", "👑"), o("Headband", "🎀"), o("Ring", "💍"),
-      o("Necklace", "📿"), o("Belt", "🪢"), o("Armor", "🛡️"), o("Boots", "🥾"), o("Gloves", "🧤"),
-      o("Goggles", "🥽"), o("Socks", "🧦"), o("Mask", "🎭"), o("Scarf", "🧣"), o("Umbrella", "☂️"),
-      o("Cookie", "🍪"), o("Glitter", "✨"), o("Sticker", "🏷️"), o("Music box", "🎶"), o("Key", "🔑"),
+      // Keep forever
+      item("Staff", "🦯", "keep", ["action-item", "two-at-once"]),
+      item("Wand", "🪄", "keep", ["action-item", "star-roll"]),
+      item("Bag", "🎒", "keep", ["pocket-refill", "token-swap"]),
+      item("Tool", "🔧", "keep", ["second-chance", "token-swap"]),
+      item("Hammer", "🔨", "keep", ["action-item", "two-at-once"]),
+      item("Bowl", "🥣", "keep", ["pocket-refill", "token-saver"]),
+      item("Hat", "🎩", "keep", ["more-tokens", "super-senses"]),
+      item("Feather", "🪶", "keep", ["super-senses", "lucky-streak"]),
+      item("Jacket", "🧥", "keep", ["shield", "token-saver"]),
+      item("Cape", "🦸", "keep", ["shield", "go-first"]),
+      item("Crown", "👑", "keep", ["more-tokens", "every-roll"]),
+      item("Headband", "🎀", "keep", ["more-tokens", "better-rolls"]),
+      item("Ring", "💍", "keep", ["better-rolls", "second-chance", "natural-luck"]),
+      item("Necklace", "📿", "keep", ["shield", "help-friend", "natural-luck"]),
+      item("Belt", "🪢", "keep", ["more-tokens", "double-tokens"]),
+      item("Armor", "🛡️", "keep", ["shield", "token-saver"]),
+      item("Boots", "🥾", "keep", ["better-rolls", "go-first"]),
+      item("Gloves", "🧤", "keep", ["more-tokens", "help-friend"]),
+      item("Goggles", "🥽", "keep", ["super-senses", "lucky-streak"]),
+      item("Socks", "🧦", "keep", ["better-rolls", "go-first"]),
+      item("Mask", "🎭", "keep", ["super-senses", "comeback"]),
+      item("Scarf", "🧣", "keep", ["help-friend", "token-saver"]),
+      item("Umbrella", "☂️", "keep", ["shield", "token-saver"]),
+      item("Music box", "🎶", "keep", ["two-at-once", "lucky-streak"]),
+      item("Key", "🔑", "keep", ["second-chance", "coins-to-tokens"]),
+      // Use once
+      item("Orb", "🔮", "once", ["refill", "block", "coin-toss", "double-up"]),
+      item("Potion", "🧪", "once", ["refill", "quick-power"]),
+      item("Cookie", "🍪", "once", ["refill", "big-boost"]),
+      item("Glitter", "✨", "once", ["silly-fix", "soft-landing", "sure-thing"]),
+      item("Sticker", "🏷️", "once", ["block", "silly-fix"]),
+      item("Candy", "🍬", "once", ["big-boost", "refill"]),
+      item("Cupcake", "🧁", "once", ["refill", "soft-landing"]),
+      item("Juice box", "🧃", "once", ["refill", "wild-token"]),
+      item("Balloon", "🎈", "once", ["quick-power", "soft-landing"]),
+      item("Magic scroll", "📜", "once", ["block", "sleepy-time", "zoom-home"]),
+      item("Seed", "🌰", "once", ["refill", "silly-fix"]),
+      item("Lucky dice", "🎲", "once", ["coin-toss", "sure-thing", "double-up"]),
+      item("Party popper", "🎉", "once", ["everybody-freeze", "big-boost"]),
+      item("Candle", "🕯️", "once", ["block", "sleepy-time"]),
+      item("Mystery egg", "🥚", "once", ["wild-token", "quick-power"]),
     ],
   },
   {
@@ -258,4 +311,12 @@ export function validateChoices(input: BuildInput): { ok: true; labels: Record<s
   }
   if (input.text && input.text.length > 300) return { ok: false, error: "Description is too long" };
   return { ok: true, labels };
+}
+
+/** The picked equipment item type, if any (with its use-once flag and pattern boosts). */
+export function pickedItem(choices: Record<string, string[]>): Option | null {
+  const id = choices.item?.[0];
+  if (!id) return null;
+  const g = EQUIPMENT_GROUPS.find((x) => x.id === "item")!;
+  return allOptions(g).find((x) => x.id === id) ?? null;
 }

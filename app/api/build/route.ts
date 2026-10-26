@@ -3,7 +3,8 @@ import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAccess } from "@/lib/access";
-import { validateChoices, fillRandom, type BuildInput } from "@/lib/options";
+import { validateChoices, fillRandom, pickedItem, type BuildInput } from "@/lib/options";
+import { drawPlan } from "@/lib/patterns";
 import { writeCard, drawPicture, textIsSafe, checkDrawing, type Drawing } from "@/lib/generate";
 
 export const runtime = "nodejs";
@@ -74,7 +75,25 @@ export async function POST(req: Request) {
 
   try {
     const { data: profile } = await db.from("profiles").select("reading_level").eq("id", user.id).single();
-    const card = await writeCard(input.kind, check.labels, input.difficulty, input.text, profile?.reading_level, drawing);
+    const item = pickedItem(choices);
+    const plan = drawPlan(
+      input.kind,
+      choices,
+      input.difficulty,
+      item ? { once: !!item.once, boosts: item.boosts ?? [] } : null
+    );
+    const card = await writeCard(
+      input.kind,
+      check.labels,
+      input.difficulty,
+      input.text,
+      profile?.reading_level,
+      drawing,
+      plan.text
+    );
+    if (input.kind === "equipment" && plan.consumable !== undefined) {
+      (card as { type: string }).type = plan.consumable ? "consumable" : "permanent";
+    }
     const picture = await drawPicture(user.id, card, drawing);
 
     const { data, error } = await db
