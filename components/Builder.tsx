@@ -286,8 +286,6 @@ export default function Builder({ kind, remaining, initial }: Props) {
               disabled={busy}
               onMouseEnter={() => speak(k.button)}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="btn-mascot" src="/flummox.webp" alt="" aria-hidden />
               {k.button}
             </button>
           )}
