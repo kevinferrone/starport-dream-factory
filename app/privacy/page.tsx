@@ -31,13 +31,14 @@ export default function Privacy() {
         <li>The grown-up&apos;s email address, and their name if they sign in with Google.</li>
         <li>Which plan the account is on and how many creations have been made.</li>
         <li>
-          What gets built: the buttons pressed, any words typed in the idea box, and the cards and pictures
-          that come out.
+          What gets built: the buttons pressed, any words typed in the idea box, any drawing uploaded, and the
+          cards and pictures that come out.
         </li>
       </ul>
       <p>
         Please help kids keep the idea box about their creation, not about themselves (no names, schools or
-        addresses).
+        addresses), and upload drawings rather than photos of people. Uploads that show a real person&apos;s
+        face are turned away.
       </p>
 
       <h2>What we don&apos;t collect</h2>
@@ -54,8 +55,9 @@ export default function Privacy() {
         <li><b>Vercel</b> runs the website.</li>
         <li><b>Stripe</b> processes subscription payments.</li>
         <li>
-          <b>Anthropic</b> and <b>OpenAI</b> receive the buttons and idea-box words to write each card,
-          draw its picture, record the read-aloud voice, and check the idea box for anything unsuitable.
+          <b>Anthropic</b> and <b>OpenAI</b> receive the buttons, idea-box words and any uploaded drawing to
+          write each card, draw its picture, record the read-aloud voice, and check uploads for anything
+          unsuitable.
         </li>
         <li><b>Google</b> handles sign-in if you choose Continue with Google.</li>
       </ul>

@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import OpenAI from "openai";
+import OpenAI, { toFile } from "openai";
 import { randomUUID } from "crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Kind } from "@/lib/options";
@@ -101,6 +101,9 @@ const TOOLS: Record<Kind, Anthropic.Tool> = {
   },
 };
 
+/** A kid's drawing, ready to show to Claude and the illustrator. */
+export type Drawing = { data: Buffer; mediaType: "image/jpeg" | "image/png" | "image/webp" };
+
 const RULES: Record<Kind, string> = {
   creature: CREATURE_RULES,
   equipment: EQUIPMENT_RULES,
@@ -111,14 +114,18 @@ function describeRequest(
   kind: Kind,
   labels: Record<string, string[]>,
   difficulty: number | undefined,
-  text: string | undefined
+  text: string | undefined,
+  hasDrawing = false
 ) {
   const lines = Object.entries(labels)
     .filter(([, v]) => v.length)
     .map(([k, v]) => `- ${k}: ${v.join(", ")}`);
   if (kind === "creature") lines.push(`- Difficulty: ${difficulty} (use exactly this number)`);
   if (text?.trim()) lines.push(`- The kid's own idea (follow it if it fits Starport's rules): "${text.trim()}"`);
-  return `A kid pressed these buttons in the Starport Dream Factory:\n${lines.join("\n")}\n\nBuild one ${kind} that clearly reflects every button they picked. Make it unique, interesting and funny.`;
+  const drawing = hasDrawing
+    ? `\n\nThe kid also DREW their ${kind} (the attached picture). The drawing is the MAIN reference and wins over any button that disagrees with it: base the name, description and image_prompt on what they drew (its shape, colors, features and any details), and let the buttons add personality and powers. In image_prompt, describe the drawing faithfully and specifically (body shape, colors, number of eyes, limbs and other features) so the illustrator can recreate it. If part of the drawing is hard to read, make a kind, playful guess.`
+    : "";
+  return `A kid made these choices in the Starport Dream Factory:\n${lines.join("\n") || "- (no buttons picked)"}${drawing}\n\nBuild one ${kind} that clearly reflects everything they picked. Anything they didn't pick, invent yourself. Make it unique, interesting and funny.`;
 }
 
 /** Returns a problem description, or null if the card follows the rules. */
@@ -140,9 +147,16 @@ function checkCard(kind: Kind, card: AnyCard, difficulty?: number): string | nul
 const anthropic = () => new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const openai = () => new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-async function askClaude(kind: Kind, userText: string, readingLevel?: number | null): Promise<AnyCard> {
+const imageBlock = (d: Drawing): Anthropic.ImageBlockParam => ({
+  type: "image",
+  source: { type: "base64", media_type: d.mediaType, data: d.data.toString("base64") },
+});
+
+async function askClaude(kind: Kind, userText: string, readingLevel?: number | null, drawing?: Drawing): Promise<AnyCard> {
   const tool = TOOLS[kind];
-  const messages: Anthropic.MessageParam[] = [{ role: "user", content: userText }];
+  const messages: Anthropic.MessageParam[] = [
+    { role: "user", content: drawing ? [imageBlock(drawing), { type: "text", text: userText }] : userText },
+  ];
   for (let attempt = 0; attempt < 3; attempt++) {
     const res = await anthropic().messages.create({
       model: process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5",
@@ -226,10 +240,63 @@ export async function writeCard(
   labels: Record<string, string[]>,
   difficulty?: number,
   text?: string,
-  readingLevel?: number | null
+  readingLevel?: number | null,
+  drawing?: Drawing
 ): Promise<AnyCard> {
-  const card = await askClaude(kind, describeRequest(kind, labels, difficulty, text), readingLevel);
+  const card = await askClaude(kind, describeRequest(kind, labels, difficulty, text, !!drawing), readingLevel, drawing);
   return reviewRules(kind, card, readingLevel);
+}
+
+/**
+ * Makes sure an upload is a drawing, toy or object — not a photo of a real person —
+ * and is fine for kids. Returns null if OK, or a friendly reason if not.
+ */
+export async function checkDrawing(d: Drawing, dataUrl: string): Promise<string | null> {
+  const tool: Anthropic.Tool = {
+    name: "drawing_check",
+    description: "Report whether this upload can be used.",
+    input_schema: {
+      type: "object",
+      properties: {
+        ok: { type: "boolean" },
+        reason: { type: "string", description: "If not ok, one short kid-friendly sentence." },
+      },
+      required: ["ok"],
+    },
+  };
+  try {
+    const [moderation, res] = await Promise.all([
+      openai().moderations.create({
+        model: "omni-moderation-latest",
+        input: [{ type: "image_url", image_url: { url: dataUrl } }],
+      }),
+      anthropic().messages.create({
+        model: process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5",
+        max_tokens: 200,
+        tools: [tool],
+        tool_choice: { type: "auto" },
+        messages: [
+          {
+            role: "user",
+            content: [
+              imageBlock(d),
+              {
+                type: "text",
+                text: "A child uploaded this to turn into a character, item or pet for a kids' game. Call drawing_check. ok = true if it is a drawing, painting, sketch, craft, toy or object (a hand holding the paper is fine). ok = false if it is a photograph where a real person's face is clearly visible, or if it is not suitable for young children.",
+              },
+            ],
+          },
+        ],
+      }),
+    ]);
+    if (moderation.results.some((r) => r.flagged)) return "Let's try a different picture.";
+    const block = res.content.find((b) => b.type === "tool_use");
+    const out = block && block.type === "tool_use" ? (block.input as { ok: boolean; reason?: string }) : null;
+    if (out && !out.ok) return "Please use a drawing, not a photo of a person.";
+    return null;
+  } catch {
+    return null; // don't block kids if a check service hiccups
+  }
 }
 
 /** "Shake up the stats": same name, look and picture; new rules. */
@@ -260,15 +327,29 @@ export async function textIsSafe(text: string | undefined): Promise<boolean> {
   }
 }
 
-/** Draws the picture and stores it. Returns its public URL and storage path. */
-export async function drawPicture(userId: string, card: AnyCard) {
-  const res = await openai().images.generate({
-    model: process.env.OPENAI_IMAGE_MODEL || "gpt-image-1.5",
-    prompt: `${IMAGE_STYLE}\n\nSubject: ${card.image_prompt}`,
-    size: "1024x1024",
-    quality: (process.env.OPENAI_IMAGE_QUALITY as "low" | "medium" | "high") || "medium",
-    n: 1,
-  });
+/** Draws the picture (from the kid's drawing when there is one) and stores it. */
+export async function drawPicture(userId: string, card: AnyCard, drawing?: Drawing) {
+  const model = process.env.OPENAI_IMAGE_MODEL || "gpt-image-1.5";
+  const quality = (process.env.OPENAI_IMAGE_QUALITY as "low" | "medium" | "high") || "medium";
+  const res = drawing
+    ? await openai().images.edit({
+        model,
+        image: await toFile(drawing.data, `drawing.${drawing.mediaType.split("/")[1]}`, { type: drawing.mediaType }),
+        prompt:
+          `${IMAGE_STYLE}\n\nThis is a child's own drawing. Bring it to life as a finished illustration in the style above, ` +
+          `keeping THEIR design: the same body shape, colors, number of eyes and limbs, features, and pose, as close to the drawing as possible. ` +
+          `Clean it up and make it look amazing, but don't add or remove main features. Do not include paper, pencils, hands or the background of the photo.\n\nSubject: ${card.image_prompt}`,
+        size: "1024x1024",
+        quality,
+        n: 1,
+      })
+    : await openai().images.generate({
+        model,
+        prompt: `${IMAGE_STYLE}\n\nSubject: ${card.image_prompt}`,
+        size: "1024x1024",
+        quality,
+        n: 1,
+      });
   const b64 = res.data?.[0]?.b64_json;
   if (!b64) throw new Error("No picture came back. Please try again.");
 

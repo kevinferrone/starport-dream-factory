@@ -27,7 +27,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "That's a lot of shaking! Try changing your buttons instead." }, { status: 429 });
   }
 
-  const { difficulty, ...rest } = row.choices as { difficulty?: number | null; [k: string]: unknown };
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { difficulty, drawing_path, ...rest } = row.choices as {
+    difficulty?: number | null;
+    drawing_path?: string | null;
+    [k: string]: unknown;
+  };
   const kind = row.kind as Kind;
   const choices = fitChoices(kind, rest as Record<string, string[]>);
   const check = validateChoices({ kind, choices, difficulty: difficulty ?? undefined, text: row.prompt_text ?? undefined });

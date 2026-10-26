@@ -30,8 +30,8 @@ export const CREATURE_GROUPS: OptionGroup[] = [
     id: "personality",
     title: "Personality",
     icon: "😄",
-    min: 1,
-    max: 3,
+    min: 0,
+    max: 1,
     options: [
       o("Funny", "😂"), o("Grumpy", "😠"), o("Sneaky", "🥷"), o("Strong", "💪"), o("Smart", "🧠"),
       o("Wild", "🤪"), o("Shy", "😳"), o("Happy", "😊"), o("Nervous", "😰"), o("Sleepy", "😴"),
@@ -41,7 +41,7 @@ export const CREATURE_GROUPS: OptionGroup[] = [
     id: "looks",
     title: "Looks",
     icon: "👀",
-    min: 1,
+    min: 0,
     max: 3,
     options: [
       o("Furry", "🧸"), o("Slimy", "🐌"), o("Scaly", "🐍"), o("Metal", "🔩"), o("Feathers", "🪶"),
@@ -56,7 +56,7 @@ export const EQUIPMENT_GROUPS: OptionGroup[] = [
     id: "item",
     title: "Item",
     icon: "🎒",
-    min: 1,
+    min: 0,
     max: 1,
     options: [
       o("Staff", "🦯"), o("Wand", "🪄"), o("Bag", "🎒"), o("Tool", "🔧"), o("Hammer", "🔨"),
@@ -71,7 +71,7 @@ export const EQUIPMENT_GROUPS: OptionGroup[] = [
     id: "power",
     title: "Powers",
     icon: "⚡",
-    min: 1,
+    min: 0,
     max: 3,
     sections: [
       {
@@ -107,7 +107,7 @@ export const PET_GROUPS: OptionGroup[] = [
     id: "type",
     title: "Pet type",
     icon: "🐾",
-    min: 1,
+    min: 0,
     max: 1,
     options: [
       o("Cat", "🐱"), o("Dog", "🐶"), o("Mouse", "🐭"), o("Fox", "🦊"), o("Bunny", "🐰"),
@@ -120,7 +120,7 @@ export const PET_GROUPS: OptionGroup[] = [
     id: "size",
     title: "Size",
     icon: "📏",
-    min: 1,
+    min: 0,
     max: 1,
     options: [
       { id: "tiny", label: "Tiny (fits in a pocket)", icon: "🐜" },
@@ -133,7 +133,7 @@ export const PET_GROUPS: OptionGroup[] = [
     id: "power",
     title: "Powers",
     icon: "✨",
-    min: 1,
+    min: 0,
     max: 3,
     options: [
       o("Smart", "🧠"), o("Sneaky", "🥷"), o("Strong", "💪"), o("Helpful", "🤝"), o("Lucky", "🍀"),
@@ -203,7 +203,34 @@ export function fitChoices(kind: Kind, choices: Record<string, string[]>): Recor
 }
 
 /** What a builder sends: choices are { groupId: [optionId, ...] } */
-export type BuildInput = { kind: Kind; choices: Record<string, string[]>; difficulty?: number; text?: string };
+export type BuildInput = {
+  kind: Kind;
+  choices: Record<string, string[]>;
+  difficulty?: number;
+  text?: string;
+  drawing?: string; // a new drawing, as a JPEG data URL
+  drawingPath?: string; // a drawing already uploaded (when changing buttons on an earlier card)
+};
+
+/** Fills any group the kid skipped with random picks, so pressing Build alone still makes something. */
+export function fillRandom(kind: Kind, choices: Record<string, string[]>): Record<string, string[]> {
+  const out: Record<string, string[]> = {};
+  for (const g of GROUPS[kind]) {
+    const picked = choices[g.id] ?? [];
+    if (picked.length) {
+      out[g.id] = picked;
+      continue;
+    }
+    const pool = [...allOptions(g)];
+    const count = g.max === 1 ? 1 : 1 + Math.floor(Math.random() * Math.min(2, g.max));
+    const chosen: string[] = [];
+    while (chosen.length < count && pool.length) {
+      chosen.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0].id);
+    }
+    out[g.id] = chosen;
+  }
+  return out;
+}
 
 /** Checks a build request against the button rules and returns readable labels. */
 export function validateChoices(input: BuildInput): { ok: true; labels: Record<string, string[]> } | { ok: false; error: string } {

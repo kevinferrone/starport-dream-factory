@@ -17,6 +17,9 @@ export const PHRASES = {
   grownUps: "Grown-ups",
   print: "Print",
   pdf: "Download PDF",
+  addDrawing: "Add my drawing",
+  removeDrawing: "Remove drawing",
+  surprise: "Surprise me!",
 };
 
 export const pickFirst = (title: string) => `Pick ${title.toLowerCase()} first`;

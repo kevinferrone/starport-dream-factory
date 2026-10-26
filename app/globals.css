@@ -521,3 +521,26 @@ table.admin td, table.admin th { padding: 8px; border-bottom: 2px solid var(--li
 .shelf-head h2 img { height: 56px; width: auto; }
 .shelf-head h2 .count { font-size: 18px; font-weight: 700; color: var(--ink-soft); }
 .shelf-empty { color: var(--ink-soft); margin: 0 0 8px; }
+
+/* Drawing upload */
+.drawing-pick { width: 220px; min-height: 150px; font-size: 18px; }
+.drawing-pick .emoji { font-size: 60px; }
+.drawing-preview { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; }
+.drawing-preview img {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  border-radius: var(--r-mid);
+  border: 3px solid var(--line);
+  background: #fff;
+}
+.drawing-actions { display: flex; flex-direction: column; gap: 12px; }
+.drawing-actions label { cursor: pointer; }
+.surprise-note {
+  margin: 0 0 10px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: #ffffffd9;
+  font-weight: 700;
+  display: inline-block;
+}

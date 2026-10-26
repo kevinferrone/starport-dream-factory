@@ -22,15 +22,25 @@ export default async function BuildPage({
   if (!access.parentConfirmed) redirect("/login?step=parent");
 
   // "Change my buttons" — start from an earlier card's choices.
-  let initial: { choices: Record<string, string[]>; difficulty?: number; text?: string } | undefined;
+  let initial:
+    | { choices: Record<string, string[]>; difficulty?: number; text?: string; drawingPath?: string; drawingUrl?: string }
+    | undefined;
   if (from) {
     const { data } = await supabase.from("creations").select("kind, choices, prompt_text").eq("id", from).single();
     if (data && data.kind === kind) {
-      const { difficulty, ...rest } = data.choices as { difficulty?: number | null; [k: string]: unknown };
+      const { difficulty, drawing_path, ...rest } = data.choices as {
+        difficulty?: number | null;
+        drawing_path?: string | null;
+        [k: string]: unknown;
+      };
       initial = {
         choices: fitChoices(kind as Kind, rest as Record<string, string[]>),
         difficulty: difficulty ?? undefined,
         text: data.prompt_text ?? undefined,
+        drawingPath: drawing_path ?? undefined,
+        drawingUrl: drawing_path
+          ? supabase.storage.from("card-images").getPublicUrl(drawing_path).data.publicUrl
+          : undefined,
       };
     }
   }
