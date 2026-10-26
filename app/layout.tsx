@@ -23,7 +23,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <div className="wrap">
           <header className="topbar">
             <Link href="/" className="brand">
-              <span aria-hidden>🏭</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="mascot" src="/flummox.webp" alt="" aria-hidden />
               <span className="text">Dream Factory</span>
             </Link>
             {user && (

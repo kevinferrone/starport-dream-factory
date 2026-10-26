@@ -72,7 +72,7 @@ button { font: inherit; color: inherit; }
   text-decoration: none;
   margin-right: auto;
 }
-.topbar .brand span:first-child { font-size: 30px; }
+.topbar .brand .mascot { height: 46px; width: auto; filter: drop-shadow(0 3px 0 #ffffff99); }
 .icon-link {
   display: inline-flex;
   align-items: center;
@@ -544,3 +544,8 @@ table.admin td, table.admin th { padding: 8px; border-bottom: 2px solid var(--li
   font-weight: 700;
   display: inline-block;
 }
+
+/* Flummox, the Dream Factory mascot */
+.btn-mascot { height: 50px; width: auto; margin: -8px 0; }
+.machine .core img { width: 130px; height: auto; }
+.machine .core { inset: 30px; }

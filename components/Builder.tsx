@@ -286,7 +286,8 @@ export default function Builder({ kind, remaining, initial }: Props) {
               disabled={busy}
               onMouseEnter={() => speak(k.button)}
             >
-              <span className="emoji" aria-hidden>🏭</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="btn-mascot" src="/flummox.webp" alt="" aria-hidden />
               {k.button}
             </button>
           )}
@@ -302,7 +303,10 @@ export default function Builder({ kind, remaining, initial }: Props) {
                   <span key={i}>{i}</span>
                 ))}
               </div>
-              <div className="core" aria-hidden>✨</div>
+              <div className="core" aria-hidden>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/flummox.webp" alt="" />
+              </div>
             </div>
             <p>{preview ? "Bringing your drawing to life…" : "The Dream Factory is building…"}</p>
             <small>Drawing the picture takes about a minute</small>
