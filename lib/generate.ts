@@ -217,7 +217,7 @@ async function reviewRules(kind: Kind, card: AnyCard, readingLevel?: number | nu
   try {
     const prompt =
       `Here is a finished Starport ${kind} card:\n${JSON.stringify(card, null, 2)}\n\n` +
-      `Review ONLY the rules text (${RULE_FIELDS[kind]}). For each one, ask: could a parent who has never played run this at the table instantly, without asking what anything means? Does it follow the RULES TEXT rules (direct game terms only, no invented number systems or jargon, no flavor inside the rule${kind === "equipment" ? ", no mention of whether it uses a turn" : ""})?\n` +
+      `Review ONLY the rules text (${RULE_FIELDS[kind]}). For each one, ask: could a parent who has never played run this at the table instantly, without asking what anything means? Does it follow the RULES TEXT rules (direct game terms only, no invented number systems or jargon, no flavor inside the rule${kind === "equipment" ? ", no mention of whether it uses a turn" : ""})? Does it break any of the RULES THAT CAN NEVER BE BROKEN (for example, triggering when a Player runs out of tokens, restoring tokens above the maximum, creatures rolling dice, or an effect that could do nothing)?\n` +
       (kind === "creature" ? `Difficulty: ${(card as CreatureCard).difficulty} (keep it).\n` : "") +
       `Rewrite any rule that fails into one or two short, direct sentences with the same strength and the same structure (who it affects, what roll, what happens). Leave rules that already pass exactly as they are. Keep every other field identical. Call the ${TOOLS[kind].name} tool with the full card.`;
     const reviewed = (await askClaude(kind, prompt, readingLevel)) as AnyCard;
@@ -320,6 +320,59 @@ export async function rerollCard(
   const card = await askClaude(kind, prompt, readingLevel);
   const fresh = { ...card, name: old.name, description: old.description, image_prompt: old.image_prompt };
   return reviewRules(kind, fresh, readingLevel);
+}
+
+/**
+ * After the picture is drawn, Claude looks at it and rewrites the description (and the
+ * picture notes) to match what was actually drawn. The picture is what kids see.
+ */
+export async function matchToPicture(kind: Kind, card: AnyCard, imageUrl: string, readingLevel?: number | null): Promise<AnyCard> {
+  const tool: Anthropic.Tool = {
+    name: "match_picture",
+    description: "Return the description and image notes rewritten to match the picture.",
+    input_schema: {
+      type: "object",
+      properties: {
+        description: { type: "string", description: "1-2 sentences, same personality and humor, matching the picture" },
+        image_prompt: { type: "string", description: "What the picture actually shows" },
+      },
+      required: ["description", "image_prompt"],
+    },
+  };
+  try {
+    const res = await anthropic().messages.create({
+      model: process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5",
+      max_tokens: 600,
+      system: readingGuide(readingLevel),
+      tools: [tool],
+      tool_choice: { type: "auto" },
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "image", source: { type: "url", url: imageUrl } },
+            {
+              type: "text",
+              text:
+                `This picture was drawn for a Starport ${kind} card named "${card.name}".\n` +
+                `Card description: "${card.description}"\n\n` +
+                `Compare the description with the picture. If any look detail disagrees (colors, number of eyes, legs, wings or tentacles, fur vs scales, size, what kind of thing it is), rewrite the description to match the PICTURE exactly, keeping the same personality, humor and length. If it already matches, return it unchanged. Also describe what the picture actually shows in image_prompt. Call match_picture.`,
+            },
+          ],
+        },
+      ],
+    });
+    const block = res.content.find((b) => b.type === "tool_use");
+    if (block && block.type === "tool_use") {
+      const out = block.input as { description?: string; image_prompt?: string };
+      if (out.description?.trim()) {
+        return { ...card, description: out.description.trim(), image_prompt: out.image_prompt?.trim() || card.image_prompt };
+      }
+    }
+  } catch (e) {
+    console.error("matchToPicture", e);
+  }
+  return card; // if the check fails, keep the original words
 }
 
 /** Screens the kid's free-text box. Returns true if it's OK. */

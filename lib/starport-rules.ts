@@ -12,6 +12,16 @@ CORE RULES
 - Penalties creatures cause: lose tokens, lose (or miss) the next turn, lose a Coin, drop or lose an equipment item, get stuck/tangled/asleep/giggling until someone helps.
 - Difficulty ladder: 5 easy, 10 average, 15 hard, 20 really hard, 25 extreme, 30 nearly impossible.
 
+RULES THAT CAN NEVER BE BROKEN (every card must fit these)
+- Running out: a Player with 0 tokens in Smart, Sneaky or Tough can't attempt rolls of that trait. A Player with 0 tokens in all three is done for the adventure. So never write effects that trigger "when a Player runs out of tokens" or that punish Players who have 0 tokens.
+- Tokens can be restored, but never above a Player's maximum (unless an item raises the maximum).
+- Creatures never roll dice and never "attack", "hurt" or "damage". There are no hit points, health, injuries, weapons or dying.
+- Helpful tokens are only spent to boost OTHER Players' rolls (or as an item's rule says).
+- Players act before creatures in every round, unless the card says otherwise.
+- Spectacular Success is a natural 20; Spectacular Failure is a natural 1.
+- Never invent new resources or systems: no energy, mana, health, shields points, charges, armor class, levels of power. Only tokens, Coins, turns, successes, Difficulty and equipment items exist.
+- Every effect must have a real effect in play. Re-read each rule and ask: "Could this ever do nothing, or break a core rule?" If so, rewrite it.
+
 STYLE RULES (always)
 - Names: kid-legible, plain and fun to say (Hungry Hippo, Joke Troll, Star Socks, Shushfly, Bubble Crown). Puns welcome. No dark, gory or scary-for-real ideas.
 - Write game values as numerals: "Difficulty 12", "lose 2 tokens", "3 Coins", "1 success".
@@ -29,6 +39,7 @@ Separate the flavor from the rules. The DESCRIPTION is where the fun, silly, mag
 - Read your rules text back as if you were a parent who has never played: if any word would make them stop and ask "what does that mean?", rewrite it.
 - Be funny and specific. Tickling, burping, sneezing, sticky goo, sleepy songs, stolen socks, glitter, bad jokes, dance parties and dramatic sighs are the Starport flavor. Surprise the reader with at least one unexpected detail.
 - Never use real brands, real people, or known characters from movies, books, games or TV.
+- The description and image_prompt must describe the SAME look: same colors, same body, same features. Keep counts small and drawable ("many eyes" means 3 to 6 eyes; "many tentacles" means 4 to 8). Put the most important visual features first in image_prompt.
 - Cards are for PLAYERS (kids). Write everything to the Player ("you"). Never address the Guide, add Guide notes, or give roleplay directions.
 `;
 
