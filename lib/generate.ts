@@ -61,7 +61,11 @@ const TOOLS: Record<Kind, Anthropic.Tool> = {
         successes: { type: "integer", description: "1-7, usually 2-4" },
         abilities: { type: "array", items: named, minItems: 2, maxItems: 2 },
         special: named,
-        image_prompt: { type: "string", description: "What the creature looks like, for the illustrator. No names of real characters." },
+        image_prompt: {
+          type: "string",
+          description:
+            "For the illustrator, specific and vivid: what it is based on (an animal, plant, object or mix), its 2-3 main colors, body shape and size, its most distinctive features, and its pose. Never generic. No names of real characters.",
+        },
       },
       required: ["name", "description", "difficulty", "successes", "abilities", "special", "image_prompt"],
     },
@@ -78,7 +82,11 @@ const TOOLS: Record<Kind, Anthropic.Tool> = {
         type: { type: "string", enum: ["permanent", "consumable"] },
         effect: { type: "string", description: "The rules text, 1-3 sentences" },
         uses_turn: { type: "boolean", description: "Does using it take the Player's turn?" },
-        image_prompt: { type: "string" },
+        image_prompt: {
+          type: "string",
+          description:
+            "For the illustrator, specific and vivid: what it is based on (an animal, plant, object or mix), its 2-3 main colors, body shape and size, its most distinctive features, and its pose. Never generic. No names of real characters.",
+        },
       },
       required: ["name", "description", "cost", "type", "effect", "uses_turn", "image_prompt"],
     },
@@ -94,7 +102,11 @@ const TOOLS: Record<Kind, Anthropic.Tool> = {
         cost: { type: "integer", description: "1-50 Coins" },
         bonuses: { type: "string", description: "e.g. +2 to your maximum Smart tokens" },
         power: named,
-        image_prompt: { type: "string" },
+        image_prompt: {
+          type: "string",
+          description:
+            "For the illustrator, specific and vivid: what it is based on (an animal, plant, object or mix), its 2-3 main colors, body shape and size, its most distinctive features, and its pose. Never generic. No names of real characters.",
+        },
       },
       required: ["name", "description", "cost", "bonuses", "power", "image_prompt"],
     },
@@ -103,6 +115,60 @@ const TOOLS: Record<Kind, Anthropic.Tool> = {
 
 /** A kid's drawing, ready to show to Claude and the illustrator. */
 export type Drawing = { data: Buffer; mediaType: "image/jpeg" | "image/png" | "image/webp" };
+
+// ---------- Variety: random inspiration so pictures never fall back to one "default" look ----------
+const pick = <T,>(list: T[]) => list[Math.floor(Math.random() * list.length)];
+
+const BASES: Record<Kind, string[]> = {
+  creature: [
+    "an axolotl", "a teapot", "a cactus", "a jellyfish", "a moth", "an armadillo", "a storm cloud", "a mushroom",
+    "a snail", "an owl", "a toaster", "a hedgehog", "a pumpkin", "a hermit crab", "a paper lantern", "a platypus",
+    "a beetle", "a sloth", "a kite", "a seahorse", "a walrus", "a pinecone", "a chameleon", "a goat", "a rubber duck",
+    "a bat", "a pangolin", "a starfish", "a narwhal", "a llama", "a frog", "a rock with legs", "a candle", "a dandelion",
+  ],
+  equipment: [],
+  pet: [],
+};
+const PALETTES = [
+  "tangerine and teal", "lemon yellow and plum", "mint and coral", "sky blue and sunflower", "lavender and lime",
+  "cherry red and cream", "peacock blue and gold", "bubblegum pink and navy", "moss green and peach", "rust and turquoise",
+  "periwinkle and orange", "charcoal and hot pink", "seafoam and magenta", "butterscotch and violet",
+];
+const POSES = [
+  "mid-jump", "waving hello", "tiptoeing", "doing a silly dance", "peeking out shyly", "striking a proud pose",
+  "spinning in a circle", "sitting and grinning", "stretching a big yawn", "leaning in curiously",
+];
+const BACKDROPS = ["pale mint", "soft peach", "light lavender", "butter yellow", "baby blue", "blush pink", "pale aqua"];
+
+function inspiration(kind: Kind, labels: Record<string, string[]>, hasDrawing: boolean) {
+  if (hasDrawing) return "";
+  const has = (title: string) => (labels[title]?.length ?? 0) > 0;
+  const lines: string[] = [];
+  if (kind === "creature" && !has("Looks")) lines.push(`- Start from ${pick(BASES.creature)} and make it weird and wonderful`);
+  const colorPicked =
+    (labels["Looks"] ?? []).some((l) => /red|orange|yellow|green|blue|purple|rainbow/i.test(l));
+  if (!colorPicked) lines.push(`- Main colors: ${pick(PALETTES)}`);
+  if (kind !== "equipment") lines.push(`- Pose: ${pick(POSES)}`);
+  return lines.length
+    ? `\n\nINSPIRATION for anything the kid didn't pick (their buttons always win over these):\n${lines.join("\n")}`
+    : "";
+}
+
+/** Short look notes from the latest cards on the site, so new ones look different. */
+async function recentLooks(): Promise<string[]> {
+  try {
+    const { data } = await createAdminClient()
+      .from("creations")
+      .select("card")
+      .order("created_at", { ascending: false })
+      .limit(15);
+    return (data ?? [])
+      .map((r) => String((r.card as { image_prompt?: string })?.image_prompt ?? "").slice(0, 140))
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
+}
 
 const RULES: Record<Kind, string> = {
   creature: CREATURE_RULES,
@@ -248,7 +314,21 @@ export async function writeCard(
   drawing?: Drawing,
   plan?: string
 ): Promise<AnyCard> {
-  const card = await askClaude(kind, describeRequest(kind, labels, difficulty, text, !!drawing, plan), readingLevel, drawing);
+  const recent = await recentLooks();
+  const variety =
+    inspiration(kind, labels, !!drawing) +
+    `\n\nVARIETY: Never fall back on a generic look like a little green alien or a plain round blob${
+      labels["Pet type"]?.includes("Alien") ? " (an alien is fine here, but make it an unusual one)" : ""
+    }.` +
+    (recent.length && !drawing
+      ? ` Make this clearly different (body shape, colors and kind of being) from these recent cards:\n${recent.map((r) => `- ${r}`).join("\n")}`
+      : "");
+  const card = await askClaude(
+    kind,
+    describeRequest(kind, labels, difficulty, text, !!drawing, plan) + variety,
+    readingLevel,
+    drawing
+  );
   return reviewRules(kind, card, readingLevel);
 }
 
@@ -404,7 +484,7 @@ export async function drawPicture(userId: string, card: AnyCard, drawing?: Drawi
       })
     : await openai().images.generate({
         model,
-        prompt: `${IMAGE_STYLE}\n\nSubject: ${card.image_prompt}`,
+        prompt: `${IMAGE_STYLE} Background color: ${pick(BACKDROPS)}.\n\nSubject: ${card.image_prompt}`,
         size: "1024x1024",
         quality,
         n: 1,
