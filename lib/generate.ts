@@ -304,7 +304,7 @@ export async function checkDrawing(d: Drawing, dataUrl: string): Promise<string 
   }
 }
 
-/** "Shake up the stats": same name, look and picture; new rules. */
+/** "Change the stats": same name, look and picture; new rules. */
 export async function rerollCard(
   kind: Kind,
   labels: Record<string, string[]>,

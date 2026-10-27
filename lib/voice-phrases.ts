@@ -7,7 +7,7 @@ export const KIND_SPOKEN: Record<Kind, string> = { creature: "Creatures", equipm
 export const PHRASES = {
   readAloudOn: "Read aloud is on",
   building: "Building!",
-  shaking: "Shaking up the stats",
+  shaking: "Change the stats",
   saved: "Saved!",
   saveCard: "Save my card",
   readCard: "Read my card",

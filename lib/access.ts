@@ -12,7 +12,7 @@ export const PLANS: Record<
   pro: { name: "Superstar", price: "$9.99/month", limit: 100, period: "month", blurb: "100 creations every month" },
 };
 
-/** Free "Shake up the stats" re-rolls allowed per card (stats are cheap; pictures count). */
+/** Free "Change the stats" re-rolls allowed per card (stats are cheap; pictures count). */
 export const MAX_REROLLS_PER_CARD = 10;
 
 const RANK: Record<Tier, number> = { free: 0, plus: 1, pro: 2 };

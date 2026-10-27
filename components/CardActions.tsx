@@ -156,16 +156,18 @@ export default function CardActions(props: Props) {
           onMouseEnter={() => speak(PHRASES.shaking)}
         >
           <span className="emoji" aria-hidden>🎲</span>
-          {busy === "shake" ? "Shaking…" : "Shake up the stats"}
+          {busy === "shake" ? "Changing…" : "Change the stats"}
         </button>
-        <Link
-          className="big-btn small plain"
-          href={`/build/${props.kind}?from=${props.id}`}
-          onMouseEnter={() => speak(PHRASES.changeButtons)}
-        >
-          <span className="emoji" aria-hidden>🔁</span>
-          Change my buttons
-        </Link>
+        {props.kind !== "creature" && (
+          <Link
+            className="big-btn small plain"
+            href={`/build/${props.kind}?from=${props.id}`}
+            onMouseEnter={() => speak(PHRASES.changeButtons)}
+          >
+            <span className="emoji" aria-hidden>🔁</span>
+            Change my buttons
+          </Link>
+        )}
         {!saved ? (
           <button
             className="big-btn small mint"
@@ -203,8 +205,8 @@ export default function CardActions(props: Props) {
       </div>
 
       <p className="note">
-        Shaking up the stats keeps your picture and is free ({rerollsLeft} shakes left).
-        Changing your buttons makes a brand-new picture and uses 1 creation.
+        Changing the stats keeps your picture and is free ({rerollsLeft} changes left).
+        {props.kind !== "creature" && " Changing your buttons makes a brand-new picture and uses 1 creation."}
       </p>
       {saved && (
         <button className="icon-link no-print" onClick={remove}>

@@ -9,7 +9,7 @@ import { rerollCard, type AnyCard } from "@/lib/generate";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-// "Shake up the stats" — free, keeps the picture.
+// "Change the stats": free, keeps the picture.
 export async function POST(req: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     .single();
   if (!row) return NextResponse.json({ error: "Card not found." }, { status: 404 });
   if (row.reroll_count >= MAX_REROLLS_PER_CARD) {
-    return NextResponse.json({ error: "That's a lot of shaking! Try changing your buttons instead." }, { status: 429 });
+    return NextResponse.json({ error: "You've changed the stats a lot on this card! Try building a new one." }, { status: 429 });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
