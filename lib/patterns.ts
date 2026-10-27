@@ -96,7 +96,7 @@ export const EQUIPMENT_ONCE: Pattern[] = [
   { id: "double-up", name: "Double up", tier: "rare", price: "10 Coins", rule: "Use right after a successful action roll: double the successes it earned.", boosts: ["thunder", "dragon", "mirror"] },
   { id: "zoom-home", name: "Zoom home", tier: "rare", price: "10 Coins", rule: "Teleport you and your friends to a place you've been before.", boosts: ["portal", "time"] },
   { id: "quick-power", name: "Quick power", tier: "rare", price: "5 Coins", rule: "For 1 minute you can [fly, turn invisible, or breathe underwater].", boosts: ["ghost", "wind", "water", "bubble"] },
-  { id: "everybody-freeze", name: "Everybody freeze", tier: "rare", price: "5 Coins", rule: "Everyone, creatures and Players, misses their next turn (or everyone re-rolls turn order).", boosts: ["stinky", "sneeze", "giggle", "time"] },
+  { id: "everybody-freeze", name: "Everybody freeze", tier: "rare", price: "5 Coins", rule: "Every creature misses its next turn. Each Player (including you) must succeed on a Tough roll (Difficulty 15) or miss their next turn too.", boosts: ["stinky", "sneeze", "giggle", "time"] },
 ];
 
 // ---------------------------------------------------------------- pets
