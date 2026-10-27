@@ -3,6 +3,9 @@ import { NextResponse, type NextRequest } from "next/server";
 
 // Keeps the login session fresh and sends logged-out visitors to /login.
 export async function middleware(request: NextRequest) {
+  // Sign-in pages manage the session themselves; touching it here could put the old one back.
+  if (request.nextUrl.pathname.startsWith("/auth")) return NextResponse.next({ request });
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(

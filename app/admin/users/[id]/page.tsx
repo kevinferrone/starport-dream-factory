@@ -8,22 +8,9 @@ import { requireAdmin, when } from "@/lib/admin";
 import { logActivity } from "@/lib/activity";
 import { stripeCustomerUrl } from "@/lib/stripe";
 import ActivityTable from "@/components/admin/ActivityTable";
+import LoginAsButton from "@/components/admin/LoginAsButton";
 
 // ---------- Support actions ----------
-
-/** Signs YOUR browser in as this user, to see exactly what they see. */
-async function loginAs(formData: FormData) {
-  "use server";
-  const adminId = await requireAdmin();
-  const id = String(formData.get("id"));
-  const db = createAdminClient();
-  const { data: p } = await db.from("profiles").select("email").eq("id", id).single();
-  if (!p?.email) return;
-  const { data, error } = await db.auth.admin.generateLink({ type: "magiclink", email: p.email });
-  if (error || !data?.properties?.hashed_token) throw new Error("Couldn't make a sign-in link for this user.");
-  await logActivity({ userId: id, actorId: adminId, kind: "admin_login_as" });
-  redirect(`/auth/confirm?token_hash=${data.properties.hashed_token}&type=magiclink`);
-}
 
 /** Emails the user a fresh sign-in link. */
 async function sendSignInLink(formData: FormData) {
@@ -193,11 +180,7 @@ export default async function UserPage({
       <section className="panel">
         <h2>Help this user</h2>
         <div className="admin-actions">
-          <form action={loginAs}>
-            <input type="hidden" name="id" value={id} />
-            <button className="big-btn small" type="submit">Log in as this user</button>
-            <p className="hint">Signs you out of your own account. Sign back in as yourself when you&apos;re done.</p>
-          </form>
+          <LoginAsButton id={id} />
           <form action={sendSignInLink}>
             <input type="hidden" name="id" value={id} />
             <button className="big-btn small plain" type="submit">Email them a sign-in link</button>

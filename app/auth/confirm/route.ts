@@ -15,6 +15,8 @@ export async function GET(request: Request) {
   if (!tokenHash || !type) return back("The sign-in link was incomplete. Please ask for a new one.");
 
   const supabase = await createClient();
+  // Switching accounts (admin "Log in as"): drop the current session in this browser first.
+  if (searchParams.get("switch")) await supabase.auth.signOut({ scope: "local" });
   const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
   if (error) return back("That sign-in link has expired or was already used. Please ask for a new one.");
 

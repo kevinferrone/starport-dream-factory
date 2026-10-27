@@ -19,21 +19,42 @@ export async function POST(req: Request) {
   const site = process.env.NEXT_PUBLIC_SITE_URL || new URL(req.url).origin;
   const s = stripe();
 
-  // Already subscribed? Switching plans happens in Stripe's billing portal.
-  if (profile?.stripe_customer_id && ["active", "trialing", "past_due"].includes(profile.subscription_status ?? "")) {
-    const portal = await s.billingPortal.sessions.create({
-      customer: profile.stripe_customer_id,
-      return_url: `${site}/plans`,
-    });
-    return NextResponse.redirect(portal.url, { status: 303 });
-  }
-
   // Safety check: make sure the price ID in Vercel really is this plan's price.
   const priceId = priceFor(tier);
   const price = priceId ? await s.prices.retrieve(priceId).catch(() => null) : null;
   if (!price || price.unit_amount !== EXPECTED_CENTS[tier] || !price.recurring) {
     console.error(`Stripe price for ${tier} is wrong: ${priceId} = ${price?.unit_amount}`);
     return NextResponse.redirect(new URL("/plans?error=price", req.url), { status: 303 });
+  }
+
+  // Already subscribed? Switch plans in Stripe's billing portal, straight to confirming the plan they picked.
+  if (profile?.stripe_customer_id && ["active", "trialing", "past_due"].includes(profile.subscription_status ?? "")) {
+    let url: string | null = null;
+    try {
+      const sub = profile.stripe_subscription_id ? await s.subscriptions.retrieve(profile.stripe_subscription_id) : null;
+      const item = sub?.items.data[0];
+      if (sub && item) {
+        // A cancelled-but-still-active plan has to be un-cancelled before it can switch.
+        if (sub.cancel_at_period_end) await s.subscriptions.update(sub.id, { cancel_at_period_end: false });
+        const portal = await s.billingPortal.sessions.create({
+          customer: profile.stripe_customer_id,
+          return_url: `${site}/plans`,
+          flow_data: {
+            type: "subscription_update_confirm",
+            subscription_update_confirm: { subscription: sub.id, items: [{ id: item.id, price: priceId, quantity: 1 }] },
+            after_completion: { type: "redirect", redirect: { return_url: `${site}/plans?welcome=1` } },
+          },
+        });
+        url = portal.url;
+      }
+    } catch (e) {
+      console.error("plan switch", e);
+    }
+    if (!url) {
+      const portal = await s.billingPortal.sessions.create({ customer: profile.stripe_customer_id, return_url: `${site}/plans` });
+      url = portal.url;
+    }
+    return NextResponse.redirect(url, { status: 303 });
   }
 
   let customerId = profile?.stripe_customer_id as string | null;
