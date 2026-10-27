@@ -53,7 +53,7 @@ Names, prices and limits live in one place: `PLANS` in `lib/access.ts`.
 
 ## Sign-in
 Google, emailed link, or password (set on the Grown-ups page).
-- Google uses Google's own button (`app/login/GoogleButton.tsx`, Google Identity Services, then Supabase `signInWithIdToken`), so Google's screen shows our domain instead of the long supabase.co address. It needs `NEXT_PUBLIC_GOOGLE_CLIENT_ID` in Vercel. Without it, the button falls back to the old Supabase redirect. Parents confirm they're a grown-up on first sign-in.
+- Google uses Google's own button (`app/login/GoogleButton.tsx`, Google Identity Services, then Supabase `signInWithIdToken`), so Google's screen shows our domain instead of the long supabase.co address. It needs `NEXT_PUBLIC_GOOGLE_CLIENT_ID` in Vercel. Without it, the button falls back to the old Supabase redirect. starportdreamfactory.com is verified in Google Search Console (TXT record in Vercel DNS). Google branding is verified (Oct 27), and supabase.co was removed from the authorized domains and redirect URIs. Parents confirm they're a grown-up on first sign-in.
 
 ## Kid-facing features
 - Home tiles: Joke Troll (Creatures), magical backpack (Equipment), Chatter (Pets)
