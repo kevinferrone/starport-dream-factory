@@ -173,8 +173,15 @@ function fit(doc: jsPDF, item: Item, W: number, H: number) {
     const f = base * s;
     if (layout(doc, item, 0, 0, W, f, r, false) + footRoom(W, f) <= H) return { f, r };
   }
-  const [r, s] = FITS[FITS.length - 1];
-  return { f: base * s, r };
+  // Very wordy (older) cards: keep shrinking until everything fits, never spill off the card.
+  let r = 0.5;
+  let f = base * FITS[FITS.length - 1][1];
+  while (f > 0.3) {
+    r = Math.max(0.4, r - 0.03);
+    f -= 0.02;
+    if (layout(doc, item, 0, 0, W, f, r, false) + footRoom(W, f) <= H) break;
+  }
+  return { f, r };
 }
 
 /** Draws one tarot card with its top-left corner at (x0, y0). */
