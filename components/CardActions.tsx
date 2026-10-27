@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import type { Kind } from "@/lib/options";
 import type { AnyCard } from "@/lib/generate";
 import Card from "@/components/Card";
-import Link from "next/link";
 import { speak } from "@/components/ReadAloud";
 import { PHRASES } from "@/lib/voice-phrases";
 import { readingRate } from "@/lib/reading-level";
@@ -173,16 +172,6 @@ export default function CardActions(props: Props) {
           <span className="emoji" aria-hidden>🎲</span>
           {busy === "shake" ? "Changing…" : "Change the stats"}
         </button>
-        {props.kind !== "creature" && (
-          <Link
-            className="big-btn small plain"
-            href={`/build/${props.kind}?from=${props.id}`}
-            onMouseEnter={() => speak(PHRASES.changeButtons)}
-          >
-            <span className="emoji" aria-hidden>🔁</span>
-            Change my buttons
-          </Link>
-        )}
         {!saved ? (
           <button
             className="big-btn small mint"
@@ -221,7 +210,6 @@ export default function CardActions(props: Props) {
 
       <p className="note">
         Changing the stats keeps your picture and is free ({rerollsLeft} changes left).
-        {props.kind !== "creature" && " Changing your buttons makes a brand-new picture and uses 1 creation."}
       </p>
       {saved && (
         <button className="icon-link no-print" onClick={remove}>
