@@ -109,6 +109,12 @@ Google, emailed link, or password (set on the Grown-ups page). Parents confirm t
 4. Optional: an Admin "Email them an invite" button (offered, not yet requested).
 5. Possible later: iOS/Android app (discussed only).
 
+## Picture accuracy and no weapons (Oct 27)
+- The bug: a frog pet came out as the same little green alien in a space suit holding a laser. The word "Starport" in the picture style made the picture model reach for space aliens, so it's gone from `IMAGE_STYLE`.
+- The picture prompt now starts with MUST SHOW (the kid's look buttons), then the subject, then the style, then `IMAGE_NEVER` (no weapons or sharp things, nothing held unless asked, no space suits).
+- After drawing, Claude checks the picture: right kind of thing, every pick visible, no weapon, no unasked space suit. If it fails, the picture is redrawn with the fix, up to 2 times.
+- Card text: weapons and sharp things are banned in the unbreakable rules, and a code check (`WEAPONS` regex in checkCard) rejects any card that mentions one.
+
 ## Cost savings (Oct 27)
 - The rules part of Claude's instructions uses prompt caching.
 - The drawing check and the picture match use the small model (`ANTHROPIC_FAST_MODEL`, default claude-haiku-5-5). Writing and rules review stay on `ANTHROPIC_MODEL`.

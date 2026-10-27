@@ -5,10 +5,10 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getAccess } from "@/lib/access";
 import { validateChoices, fillRandom, pickedItem, type BuildInput } from "@/lib/options";
 import { drawPlan } from "@/lib/patterns";
-import { writeCard, drawPicture, textIsSafe, checkDrawing, matchToPicture, type Drawing } from "@/lib/generate";
+import { writeCard, drawPicture, mustShow, textIsSafe, checkDrawing, matchToPicture, type Drawing } from "@/lib/generate";
 
 export const runtime = "nodejs";
-export const maxDuration = 150; // pictures can take up to a minute
+export const maxDuration = 300; // a picture can take up to a minute, and a wrong one is redrawn (up to 2 times)
 
 const MAX_DRAWING_BYTES = 3_000_000;
 
@@ -94,7 +94,7 @@ export async function POST(req: Request) {
     if (input.kind === "equipment" && plan.consumable !== undefined) {
       (card as { type: string }).type = plan.consumable ? "consumable" : "permanent";
     }
-    const drawn = await drawPicture(user.id, card, drawing);
+    const drawn = await drawPicture(user.id, card, drawing, mustShow(check.labels));
     const picture = drawn;
     // Make the words match what was actually drawn.
     const matched = await matchToPicture(input.kind, card, drawn.url, profile?.reading_level);

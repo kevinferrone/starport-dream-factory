@@ -27,6 +27,7 @@ RULES THAT CAN NEVER BE BROKEN (every card must fit these)
 - Running out: a Player with 0 tokens in Smart, Sneaky or Tough can't attempt rolls of that trait. A Player with 0 tokens in all three is done for the adventure. So never write effects that trigger "when a Player runs out of tokens" or that punish Players who have 0 tokens.
 - Tokens can be restored, but never above a Player's maximum (unless an item raises the maximum).
 - Creatures never roll dice and never "attack", "hurt" or "damage". There are no hit points, health, injuries, weapons or dying.
+- NO WEAPONS OR SHARP THINGS, ever, anywhere on a card (name, description, rules, image_prompt): no guns, lasers, blasters, ray guns, swords, knives, daggers, spears, arrows, axes or anything sharp or meant to hurt. Space and sci-fi ideas use gadgets like bubble wands, nets, flashlights or umbrellas instead.
 - Helpful tokens are only spent to boost OTHER Players' rolls (or as an item's rule says).
 - Players act before creatures in every round, unless the card says otherwise.
 - Spectacular Success is a natural 20; Spectacular Failure is a natural 1.
@@ -152,5 +153,10 @@ PET PRICE LADDER (2e prices — match these)
 - Size matters for flavor: tiny pets hide in pockets; big pets can be ridden.
 `;
 
+// Note: no "Starport" here. The word makes the picture model reach for space aliens in space suits.
 export const IMAGE_STYLE =
-  "Whimsical children's storybook illustration for the Starport kids' game. Bright saturated colors, soft clean outlines, friendly expressive face, cute and funny, never scary. One character or object centered, full body visible, on a simple soft pastel background with a few sparkles. No text, no letters, no words, no frame.";
+  "Whimsical children's storybook illustration for a kids' game. Bright saturated colors, soft clean outlines, friendly expressive face, cute and funny, never scary. One character or object centered, full body visible, on a simple soft pastel background with a few sparkles. No text, no letters, no words, no frame.";
+
+/** Always added to the picture prompt. */
+export const IMAGE_NEVER =
+  "Never draw weapons or sharp things: no guns, lasers, blasters, ray guns, swords, knives, spears, arrows or axes. Hands and paws hold nothing unless the subject says so. No space suits or helmets unless the subject says so.";

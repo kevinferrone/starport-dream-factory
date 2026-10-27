@@ -10,6 +10,7 @@ import {
   EQUIPMENT_RULES,
   PET_RULES,
   IMAGE_STYLE,
+  IMAGE_NEVER,
 } from "@/lib/starport-rules";
 
 // ---------- Card shapes ----------
@@ -67,7 +68,7 @@ const TOOLS: Record<Kind, Anthropic.Tool> = {
         image_prompt: {
           type: "string",
           description:
-            "For the illustrator, specific and vivid: what it is based on (an animal, plant, object or mix), its 2-3 main colors, body shape and size, its most distinctive features, and its pose. Never generic. No names of real characters.",
+            "For the illustrator, specific and vivid. Start with what it is (the kid's chosen animal, item or base), then its 2-3 main colors, body shape and size, exact counts of legs, eyes, wings or tentacles, and every look button the kid picked. Then its pose. Never generic, never a little alien unless the kid picked Alien. Never holding a weapon or anything sharp. No names of real characters.",
         },
       },
       required: ["name", "description", "difficulty", "successes", "abilities", "special", "image_prompt"],
@@ -88,7 +89,7 @@ const TOOLS: Record<Kind, Anthropic.Tool> = {
         image_prompt: {
           type: "string",
           description:
-            "For the illustrator, specific and vivid: what it is based on (an animal, plant, object or mix), its 2-3 main colors, body shape and size, its most distinctive features, and its pose. Never generic. No names of real characters.",
+            "For the illustrator, specific and vivid. Start with what it is (the kid's chosen animal, item or base), then its 2-3 main colors, body shape and size, exact counts of legs, eyes, wings or tentacles, and every look button the kid picked. Then its pose. Never generic, never a little alien unless the kid picked Alien. Never holding a weapon or anything sharp. No names of real characters.",
         },
       },
       required: ["name", "description", "cost", "type", "effect", "uses_turn", "image_prompt"],
@@ -108,7 +109,7 @@ const TOOLS: Record<Kind, Anthropic.Tool> = {
         image_prompt: {
           type: "string",
           description:
-            "For the illustrator, specific and vivid: what it is based on (an animal, plant, object or mix), its 2-3 main colors, body shape and size, its most distinctive features, and its pose. Never generic. No names of real characters.",
+            "For the illustrator, specific and vivid. Start with what it is (the kid's chosen animal, item or base), then its 2-3 main colors, body shape and size, exact counts of legs, eyes, wings or tentacles, and every look button the kid picked. Then its pose. Never generic, never a little alien unless the kid picked Alien. Never holding a weapon or anything sharp. No names of real characters.",
         },
       },
       required: ["name", "description", "cost", "bonuses", "power", "image_prompt"],
@@ -242,8 +243,12 @@ function describeRequest(
 }
 
 /** Returns a problem description, or null if the card follows the rules. */
+const WEAPONS = /\b(guns?|laser ?guns?|ray ?guns?|blasters?|pistols?|rifles?|swords?|knife|knives|daggers?|spears?|arrows?|axes?|blades?|lasers?)\b/i;
+
 function checkCard(kind: Kind, card: AnyCard, difficulty?: number): string | null {
   if (!card.name || !card.description) return "Missing name or description.";
+  if (WEAPONS.test(JSON.stringify(card)))
+    return "No weapons or sharp things anywhere on the card (guns, lasers, blasters, swords, knives, spears, arrows, axes). Replace them with something harmless and silly.";
   if (kind === "creature") {
     const c = card as CreatureCard;
     if (c.difficulty !== difficulty) return `Difficulty must be exactly ${difficulty}.`;
@@ -515,33 +520,119 @@ export async function textIsSafe(text: string | undefined): Promise<boolean> {
   }
 }
 
-/** Draws the picture (from the kid's drawing when there is one) and stores it. */
-export async function drawPicture(userId: string, card: AnyCard, drawing?: Drawing) {
+/** The look buttons the kid pressed, which the picture has to show. */
+export function mustShow(labels: Record<string, string[]>): string {
+  const explain: Record<string, string> = {
+    "Extra legs": "extra legs (more than 4 legs, matching the count in the subject)",
+    "Many eyes": "many eyes (3 to 6, matching the count in the subject)",
+  };
+  const parts = ["Pet type", "Item", "Size", "Looks"].flatMap((g) => labels[g] ?? []);
+  return parts.map((p) => explain[p] ?? p.toLowerCase()).join("; ");
+}
+
+/** Looks at a finished picture: does it show what the kid picked, and is it free of weapons? */
+async function checkPicture(
+  b64: string,
+  card: AnyCard,
+  musts: string
+): Promise<string | null> {
+  const tool: Anthropic.Tool = {
+    name: "picture_check",
+    description: "Report whether the picture can be used.",
+    input_schema: {
+      type: "object",
+      properties: {
+        ok: { type: "boolean" },
+        problems: { type: "string", description: "If not ok: what is wrong, as short instructions for the illustrator." },
+      },
+      required: ["ok"],
+    },
+  };
+  try {
+    const res = await anthropic().messages.create({
+      model: process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5",
+      max_tokens: 300,
+      tools: [tool],
+      tool_choice: { type: "auto" },
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "image", source: { type: "base64", media_type: "image/png", data: b64 } },
+            {
+              type: "text",
+              text:
+                `This picture is for a kids' game card. It was supposed to show: ${card.image_prompt}\n` +
+                (musts ? `The child picked these, and each one MUST be clearly visible: ${musts}.\n` : "") +
+                `ok = false if ANY of these are true:\n` +
+                `- It shows a different kind of thing than asked (for example a little alien or a person instead of a frog).\n` +
+                (musts ? `- Any of the child's picks is missing or wrong (kind of animal or item, color, fur/scales/feathers, extra legs, many eyes, wings, size).\n` : "") +
+                `- Anything that looks like a weapon or sharp object: gun, laser, blaster, ray gun, sword, knife, spear, arrow, axe.\n` +
+                `- A space suit or helmet that wasn't asked for.\n` +
+                `Otherwise ok = true. Small style differences are fine. Call picture_check.`,
+            },
+          ],
+        },
+      ],
+    });
+    const block = res.content.find((b) => b.type === "tool_use");
+    if (block && block.type === "tool_use") {
+      const out = block.input as { ok?: boolean; problems?: string };
+      if (out.ok === false) return out.problems?.trim() || "The picture didn't match the card.";
+    }
+  } catch (e) {
+    console.error("checkPicture", e);
+  }
+  return null;
+}
+
+/**
+ * Draws the picture (from the kid's drawing when there is one), checks it shows
+ * what the kid picked with no weapons, redraws up to twice if not, and stores it.
+ */
+export async function drawPicture(userId: string, card: AnyCard, drawing?: Drawing, musts = "") {
   const model = process.env.OPENAI_IMAGE_MODEL || "gpt-image-1.5";
   const quality = (process.env.OPENAI_IMAGE_QUALITY as "low" | "medium" | "high") || "medium";
-  const res = drawing
-    ? await openai().images.edit({
-        model,
-        image: await toFile(drawing.data, `drawing.${drawing.mediaType.split("/")[1]}`, { type: drawing.mediaType }),
-        prompt:
-          `${IMAGE_STYLE}\n\nThis is a child's own drawing. Bring it to life as a finished illustration in the style above, ` +
-          `keeping THEIR design: the same body shape, colors, number of eyes and limbs, features, and pose, as close to the drawing as possible. ` +
-          `Clean it up and make it look amazing, but don't add or remove main features. Do not include paper, pencils, hands or the background of the photo.\n\nSubject: ${card.image_prompt}`,
-        size: "1024x1024",
-        quality,
-        n: 1,
-      })
-    : await openai().images.generate({
-        model,
-        prompt: `${IMAGE_STYLE} Background color: ${pick(BACKDROPS)}.\n\nSubject: ${card.image_prompt}${
-          card.palette ? `\n\nMain colors of the subject: ${card.palette}.` : ""
-        }`,
-        size: "1024x1024",
-        quality,
-        n: 1,
-      });
-  const b64 = res.data?.[0]?.b64_json;
-  if (!b64) throw new Error("No picture came back. Please try again.");
+  const backdrop = pick(BACKDROPS);
+
+  const draw = async (fix: string) => {
+    const fixNote = fix ? `\n\nIMPORTANT, the last try was wrong. Fix this: ${fix}` : "";
+    const res = drawing
+      ? await openai().images.edit({
+          model,
+          image: await toFile(drawing.data, `drawing.${drawing.mediaType.split("/")[1]}`, { type: drawing.mediaType }),
+          prompt:
+            `${IMAGE_STYLE}\n\nThis is a child's own drawing. Bring it to life as a finished illustration in the style above, ` +
+            `keeping THEIR design: the same body shape, colors, number of eyes and limbs, features, and pose, as close to the drawing as possible. ` +
+            `Clean it up and make it look amazing, but don't add or remove main features. Do not include paper, pencils, hands or the background of the photo.\n\n` +
+            `Subject: ${card.image_prompt}\n\n${IMAGE_NEVER}${fixNote}`,
+          size: "1024x1024",
+          quality,
+          n: 1,
+        })
+      : await openai().images.generate({
+          model,
+          // What it is comes first: picture models pay the most attention to the start.
+          prompt:
+            (musts ? `MUST SHOW: ${musts}.\n\n` : "") +
+            `Subject: ${card.image_prompt}` +
+            (card.palette ? `\nMain colors of the subject: ${card.palette}.` : "") +
+            `\n\nStyle: ${IMAGE_STYLE} Background color: ${backdrop}.\n\n${IMAGE_NEVER}${fixNote}`,
+          size: "1024x1024",
+          quality,
+          n: 1,
+        });
+    const b64 = res.data?.[0]?.b64_json;
+    if (!b64) throw new Error("No picture came back. Please try again.");
+    return b64;
+  };
+
+  let b64 = await draw("");
+  for (let tries = 0; tries < 2; tries++) {
+    const problem = await checkPicture(b64, card, drawing ? "" : musts);
+    if (!problem) break;
+    b64 = await draw(problem);
+  }
 
   const path = `${userId}/${randomUUID()}.png`;
   const db = createAdminClient();
