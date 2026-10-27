@@ -274,13 +274,16 @@ async function askClaude(kind: Kind, userText: string, readingLevel?: number | n
     const res = await anthropic().messages.create({
       model: process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5",
       max_tokens: 1500,
-      system:
-        CORE_RULES +
-        "\n" +
-        RULES[kind] +
-        "\n\n" +
-        readingGuide(readingLevel) +
-        `\n\nALWAYS deliver your answer by calling the ${tool.name} tool exactly once. Never answer in plain text.`,
+      // The rulebook part never changes, so it's cached: repeat sends cost a fraction.
+      system: [
+        { type: "text", text: CORE_RULES + "\n" + RULES[kind], cache_control: { type: "ephemeral" } },
+        {
+          type: "text",
+          text:
+            readingGuide(readingLevel) +
+            `\n\nALWAYS deliver your answer by calling the ${tool.name} tool exactly once. Never answer in plain text.`,
+        },
+      ],
       tools: [tool],
       tool_choice: { type: "auto" },
       messages,
@@ -402,7 +405,7 @@ export async function checkDrawing(d: Drawing, dataUrl: string): Promise<string 
         input: [{ type: "image_url", image_url: { url: dataUrl } }],
       }),
       anthropic().messages.create({
-        model: process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5",
+        model: process.env.ANTHROPIC_FAST_MODEL || "claude-haiku-5-5", // simple yes/no check: the small model is plenty
         max_tokens: 200,
         tools: [tool],
         tool_choice: { type: "auto" },
@@ -467,7 +470,7 @@ export async function matchToPicture(kind: Kind, card: AnyCard, imageUrl: string
   };
   try {
     const res = await anthropic().messages.create({
-      model: process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5",
+      model: process.env.ANTHROPIC_FAST_MODEL || "claude-haiku-5-5", // describing a picture: the small model is plenty
       max_tokens: 600,
       system: readingGuide(readingLevel),
       tools: [tool],

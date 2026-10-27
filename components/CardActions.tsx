@@ -9,6 +9,9 @@ import { speak } from "@/components/ReadAloud";
 import { PHRASES } from "@/lib/voice-phrases";
 import { readingRate } from "@/lib/reading-level";
 
+/** "Change the stats" is built and working but hidden for now (MVP). Set to true to bring it back. */
+const SHOW_CHANGE_STATS = false;
+
 type Props = {
   id: string;
   kind: Kind;
@@ -163,6 +166,7 @@ export default function CardActions(props: Props) {
       {error && <p className="error no-print" role="alert">{error}</p>}
 
       <div className="actions">
+        {SHOW_CHANGE_STATS && (
         <button
           className="big-btn small"
           onClick={shake}
@@ -172,6 +176,7 @@ export default function CardActions(props: Props) {
           <span className="emoji" aria-hidden>🎲</span>
           {busy === "shake" ? "Changing…" : "Change the stats"}
         </button>
+        )}
         {!saved ? (
           <button
             className="big-btn small mint"
@@ -208,9 +213,11 @@ export default function CardActions(props: Props) {
         </button>
       </div>
 
-      <p className="note">
-        Changing the stats keeps your picture and is free ({rerollsLeft} changes left).
-      </p>
+      {SHOW_CHANGE_STATS && (
+        <p className="note">
+          Changing the stats keeps your picture and is free ({rerollsLeft} changes left).
+        </p>
+      )}
       {saved && (
         <button className="icon-link no-print" onClick={remove}>
           <span className="emoji" aria-hidden>🗑️</span>

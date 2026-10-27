@@ -45,7 +45,7 @@ Google, emailed link, or password (set on the Grown-ups page). Parents confirm t
 - Creature and pet personality: pick 1.
 - **Drawing upload**: the kid's drawing is the main reference for the picture.
 - **Cards are tarot size (2.75 x 4.75 in).** The picture shrinks to make room for words (down to about half its height), then the text shrinks. Download PDF is one card on a tarot-size page (ready for a print shop). Print opens that same PDF. The print sheet is 6 per letter page, edge to edge with cut marks. Card text is capped: description 25 words or fewer, each rule 30 words or fewer.
-- Card actions: Read my card, Change the stats, Save, Print, Download PDF, Throw away.
+- Card actions: Read my card, Save, Print, Download PDF, Throw away. "Change the stats" still works but its button is hidden for the MVP; `SHOW_CHANGE_STATS` in components/CardActions.tsx brings it back.
 - My cards page is grouped by kind, with a 6-per-page print sheet.
 - Kind badge (troll / backpack / Chatter) on every card.
 
@@ -108,6 +108,11 @@ Google, emailed link, or password (set on the Grown-ups page). Parents confirm t
 3. Take Stripe live (steps given earlier; clear test billing fields in Supabase first).
 4. Optional: an Admin "Email them an invite" button (offered, not yet requested).
 5. Possible later: iOS/Android app (discussed only).
+
+## Cost savings (Oct 27)
+- The rules part of Claude's instructions uses prompt caching.
+- The drawing check and the picture match use the small model (`ANTHROPIC_FAST_MODEL`, default claude-haiku-5-5). Writing and rules review stay on `ANTHROPIC_MODEL`.
+- Kevin is testing `OPENAI_IMAGE_QUALITY=low`.
 
 ## Bugs already fixed (don't reintroduce)
 - `tool_choice` must be `auto`; forcing a tool errors on this model.
