@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getAccess } from "@/lib/access";
+import { getAccess, RESTING_MESSAGE } from "@/lib/access";
 import { KINDS, type Kind } from "@/lib/options";
 import { SpeakingLink } from "@/components/ReadAloud";
 import { KIND_SPOKEN } from "@/lib/voice-phrases";
@@ -39,7 +39,7 @@ export default async function Home() {
 
       <div className="meter">
         <span aria-hidden>⭐</span>
-        <span>{access.summary}</span>
+        <span>{access.resting ? RESTING_MESSAGE : access.summary}</span>
         {access.tier !== "unlimited" && <Link href="/plans">Get more</Link>}
       </div>
     </>

@@ -620,3 +620,15 @@ table.admin .nowrap, .nowrap { white-space: nowrap; }
 .admin-filters a.on { background: var(--ink); color: #fff; border-color: var(--ink); }
 .ok-msg { background: #d9fbef !important; color: #0d6b4e !important; }
 .gsi-box { min-height: 44px; display: flex; justify-content: center; }
+.resting-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 14px 22px;
+  border-radius: 999px;
+  background: #fff6d6;
+  color: var(--ink);
+  font-size: 20px;
+  font-weight: 700;
+}

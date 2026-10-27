@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { RESTING_MESSAGE } from "@/lib/messages";
 import {
   GROUPS,
   KINDS,
@@ -20,6 +21,7 @@ import { PHRASES, difficultyPhrase } from "@/lib/voice-phrases";
 type Props = {
   kind: Kind;
   remaining: number;
+  resting?: boolean;
   initial?: {
     choices: Record<string, string[]>;
     difficulty?: number;
@@ -50,7 +52,7 @@ const MACHINE_ICONS: Record<Kind, string[]> = {
   pet: ["🐱", "🐸", "🦉", "🐰"],
 };
 
-export default function Builder({ kind, remaining, initial }: Props) {
+export default function Builder({ kind, remaining, resting = false, initial }: Props) {
   const router = useRouter();
   const groups = GROUPS[kind];
   const k = KINDS[kind];
@@ -270,12 +272,16 @@ export default function Builder({ kind, remaining, initial }: Props) {
       <div className="build-bar">
         <div style={{ textAlign: "center" }}>
           {error && <p className="error" role="alert">{error}</p>}
-          {nothingPicked && !outOfBuilds && (
+          {nothingPicked && !outOfBuilds && !resting && (
             <p className="surprise-note">
               <span aria-hidden>🎲</span> Nothing picked? The factory will surprise you!
             </p>
           )}
-          {outOfBuilds ? (
+          {resting ? (
+            <p className="resting-note" role="status">
+              <span aria-hidden>😴</span> {RESTING_MESSAGE}
+            </p>
+          ) : outOfBuilds ? (
             <Link className="big-btn gum" href="/plans">
               <span className="emoji" aria-hidden>⭐</span> Get more creations
             </Link>

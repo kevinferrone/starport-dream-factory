@@ -45,5 +45,5 @@ export default async function BuildPage({
     }
   }
 
-  return <Builder kind={kind as Kind} initial={initial} remaining={access.remaining} />;
+  return <Builder kind={kind as Kind} initial={initial} remaining={access.remaining} resting={access.resting} />;
 }

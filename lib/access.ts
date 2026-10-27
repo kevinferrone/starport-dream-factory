@@ -11,6 +11,8 @@ export const PAID_TIERS: PaidTier[] = ["plus", "pro", "max", "unlimited"];
  * Plan rules. Change the numbers or names here and everything else follows.
  * limit null = no monthly limit. daily = most creations in any 24 hours.
  */
+export { RESTING_MESSAGE } from "@/lib/messages";
+
 export const PLANS: Record<
   Tier,
   { name: string; icon: string; price: string; cents: number; limit: number | null; daily?: number; period: "total" | "month"; blurb: string }
@@ -27,7 +29,7 @@ export const PLANS: Record<
     limit: null,
     daily: 50,
     period: "month",
-    blurb: "Unlimited creations (up to 50 a day)",
+    blurb: "Unlimited creations", // the daily limit is hidden: kids just see a gentle "come back tomorrow"
   },
 };
 
@@ -47,6 +49,8 @@ export type Access = {
   usedToday: number;
   daily?: number;
   remaining: number;
+  /** Hit the hidden daily limit: the factory is resting until tomorrow. */
+  resting: boolean;
   /** One line for the meter, e.g. "12 of 20 creations left this month". */
   summary: string;
   isAdmin: boolean;
@@ -103,9 +107,10 @@ export async function getAccess(userId: string): Promise<Access> {
   if (plan.daily) left.push(plan.daily - usedToday);
   const remaining = Math.max(0, Math.min(...left));
 
+  const resting = !!plan.daily && usedToday >= plan.daily;
   const summary =
     plan.limit === null
-      ? `Unlimited creations (${remaining} of ${plan.daily} left today)`
+      ? "Unlimited creations"
       : `${remaining} of ${plan.limit} creations left${plan.period === "month" ? " this month" : ""}`;
 
   return {
@@ -117,6 +122,7 @@ export async function getAccess(userId: string): Promise<Access> {
     usedToday,
     daily: plan.daily,
     remaining,
+    resting,
     summary,
     isAdmin: !!profile?.is_admin,
     parentConfirmed: !!profile?.parent_confirmed,

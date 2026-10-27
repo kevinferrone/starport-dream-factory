@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getAccess, PLANS, TIERS } from "@/lib/access";
+import { getAccess, PLANS, TIERS, RESTING_MESSAGE } from "@/lib/access";
 import SetPassword from "./SetPassword";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -48,7 +48,7 @@ export default async function PlansPage({ searchParams }: { searchParams: Promis
       {limit && (
         <p className="error" style={{ textAlign: "center" }}>
           {access.tier === "unlimited"
-            ? "That's the most for one day. Come back tomorrow for more!"
+            ? RESTING_MESSAGE
             : "You've used all your creations for now. Pick a plan to keep building."}
         </p>
       )}

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAccess } from "@/lib/access";
+import { getAccess, RESTING_MESSAGE } from "@/lib/access";
 import { validateChoices, fillRandom, pickedItem, type BuildInput } from "@/lib/options";
 import { drawPlan } from "@/lib/patterns";
 import { logActivity } from "@/lib/activity";
@@ -59,6 +59,9 @@ export async function POST(req: Request) {
   const access = await getAccess(user.id);
   if (!access.parentConfirmed) {
     return NextResponse.json({ error: "A grown-up needs to finish setting up this account first.", code: "parent" }, { status: 403 });
+  }
+  if (access.resting) {
+    return NextResponse.json({ error: RESTING_MESSAGE, code: "rest" }, { status: 429 });
   }
   if (access.remaining <= 0) {
     return NextResponse.json({ error: "You've used all your creations for now!", code: "limit" }, { status: 402 });

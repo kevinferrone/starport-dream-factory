@@ -31,7 +31,7 @@ Names, prices and limits live in one place: `PLANS` in `lib/access.ts`.
 - **Star** (`plus`): $4.99/month, 20 creations
 - **Superstar** (`pro`): $9.99/month, 50 creations (changed from 100 on Oct 27)
 - **Supernova** (`max`): $19.99/month, 100 creations
-- **Galaxy** (`unlimited`): $99/month, unlimited, but no more than 50 in any 24 hours
+- **Galaxy** (`unlimited`): $99/month, shown as unlimited. A hidden limit of 50 in any 24 hours applies; when it's hit, kids see "The Dream Factory needs to rest. Come back tomorrow for more creations!" (`lib/messages.ts`).
 - Stripe price IDs go in the Vercel variables `STRIPE_PRICE_PLUS`, `STRIPE_PRICE_PRO`, `STRIPE_PRICE_MAX` and `STRIPE_PRICE_UNLIMITED`. Checkout verifies each price's amount, and the webhook grants the plan by the amount charged.
 - Cancelling keeps the plan until the end of the paid period. The Stripe Customer portal must be set to "Cancel at end of billing period."
 - The Stripe webhook must use the **www** address (`https://www.starportdreamfactory.com/api/stripe/webhook`). The bare domain gives a 308 redirect, and Stripe doesn't follow it.
