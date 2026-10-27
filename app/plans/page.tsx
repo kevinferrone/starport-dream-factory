@@ -19,8 +19,8 @@ async function saveReadingLevel(formData: FormData) {
   redirect("/plans?level=saved");
 }
 
-export default async function PlansPage({ searchParams }: { searchParams: Promise<{ welcome?: string; limit?: string; level?: string }> }) {
-  const { welcome, limit, level } = await searchParams;
+export default async function PlansPage({ searchParams }: { searchParams: Promise<{ welcome?: string; limit?: string; level?: string; error?: string }> }) {
+  const { welcome, limit, level, error } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -43,6 +43,11 @@ export default async function PlansPage({ searchParams }: { searchParams: Promis
       </div>
 
       {welcome && <p className="error" style={{ background: "#d9fbef", color: "#0d6b4e", textAlign: "center" }}>Thank you! Your plan is ready. It can take a few seconds to show up here.</p>}
+      {error === "price" && (
+        <p className="error" style={{ textAlign: "center" }}>
+          Checkout is being set up and isn&apos;t ready yet. Please try again later.
+        </p>
+      )}
       {limit && <p className="error" style={{ textAlign: "center" }}>You&apos;ve used all your creations for now. Pick a plan to keep building.</p>}
       {access.source === "comp" && <p className="note">Your account has free {PLANS[access.tier].name} access.</p>}
       {access.source === "site" && <p className="note">Dream Factory is free for everyone right now!</p>}

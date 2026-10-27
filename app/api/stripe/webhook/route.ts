@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { stripe, tierForPrice } from "@/lib/stripe";
+import { stripe, tierForPrice, EXPECTED_CENTS } from "@/lib/stripe";
 
 export const runtime = "nodejs";
 
@@ -21,7 +21,10 @@ export async function POST(req: Request) {
   const applySubscription = async (sub: Stripe.Subscription) => {
     const customerId = typeof sub.customer === "string" ? sub.customer : sub.customer.id;
     const ended = ["canceled", "unpaid", "incomplete_expired"].includes(sub.status);
-    const tier = ended ? "free" : tierForPrice(sub.items.data[0]?.price.id);
+    // Decide the plan by what is actually being charged, so a mixed-up setting can't grant the wrong plan.
+    const cents = sub.items.data[0]?.price.unit_amount;
+    const byAmount = cents === EXPECTED_CENTS.pro ? "pro" : cents === EXPECTED_CENTS.plus ? "plus" : null;
+    const tier = ended ? "free" : byAmount ?? tierForPrice(sub.items.data[0]?.price.id);
     await db
       .from("profiles")
       .update({ tier, subscription_status: sub.status, stripe_subscription_id: sub.id })
