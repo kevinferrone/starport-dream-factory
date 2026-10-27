@@ -53,6 +53,8 @@ export async function POST(req: Request) {
       profile?.reading_level,
       plan.text
     );
+    const oldPalette = (row.card as AnyCard).palette;
+    if (oldPalette) card.palette = oldPalette; // same picture, same colors
     if (kind === "equipment" && plan.consumable !== undefined) {
       (card as { type: string }).type = plan.consumable ? "consumable" : "permanent";
     }

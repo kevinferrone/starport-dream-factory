@@ -40,7 +40,10 @@ export type PetCard = {
   roleplay?: string; // older cards only; no longer shown or generated
   image_prompt: string;
 };
-export type AnyCard = CreatureCard | EquipmentCard | PetCard;
+export type AnyCard = (CreatureCard | EquipmentCard | PetCard) & {
+  /** The main colors chosen for the picture, kept so the next cards can pick different ones. */
+  palette?: string;
+};
 
 const named = {
   type: "object",
@@ -133,25 +136,65 @@ const PALETTES = [
   "tangerine and teal", "lemon yellow and plum", "mint and coral", "sky blue and sunflower", "lavender and lime",
   "cherry red and cream", "peacock blue and gold", "bubblegum pink and navy", "moss green and peach", "rust and turquoise",
   "periwinkle and orange", "charcoal and hot pink", "seafoam and magenta", "butterscotch and violet",
+  "fire-engine red and sky blue", "copper and mint", "cobalt and lemon", "watermelon pink and green-apple",
+  "sunset orange and deep blue", "honey gold and berry red", "silver and candy red", "chocolate brown and pink",
+  "ocean blue and tangerine", "cream and cherry", "jade and coral", "black and electric yellow",
 ];
+/** Colors are judged by their main color words, so "lavender and lime" counts as purple + green. */
+const HUE: [RegExp, string][] = [
+  [/red|cherry|watermelon|berry|rust/i, "red"], [/orange|tangerine|copper|butterscotch/i, "orange"],
+  [/yellow|lemon|sunflower|gold|honey/i, "yellow"], [/green|lime|mint|moss|jade|seafoam|apple/i, "green"],
+  [/blue|teal|turquoise|cobalt|navy|periwinkle|aqua/i, "blue"], [/purple|plum|lavender|violet|magenta/i, "purple"],
+  [/pink|coral|bubblegum/i, "pink"], [/brown|chocolate/i, "brown"], [/black|charcoal|silver|cream/i, "neutral"],
+];
+const hues = (s: string) => new Set(HUE.filter(([re]) => re.test(s)).map(([, h]) => h));
+
+/** A palette that shares no main color with the last few cards made on the site. */
+function freshPalette(recentPalettes: string[]) {
+  const used = new Set<string>();
+  recentPalettes.slice(0, 2).forEach((p) => hues(p).forEach((h) => used.add(h)));
+  const fresh = PALETTES.filter((p) => ![...hues(p)].some((h) => used.has(h) && h !== "neutral"));
+  const notSame = PALETTES.filter((p) => !recentPalettes.slice(0, 8).includes(p));
+  return pick(fresh.length ? fresh : notSame.length ? notSame : PALETTES);
+}
+
 const POSES = [
   "mid-jump", "waving hello", "tiptoeing", "doing a silly dance", "peeking out shyly", "striking a proud pose",
   "spinning in a circle", "sitting and grinning", "stretching a big yawn", "leaning in curiously",
 ];
 const BACKDROPS = ["pale mint", "soft peach", "light lavender", "butter yellow", "baby blue", "blush pink", "pale aqua"];
 
-function inspiration(kind: Kind, labels: Record<string, string[]>, hasDrawing: boolean) {
+/** The kid picked a color button. */
+const colorPicked = (labels: Record<string, string[]>) =>
+  (labels["Looks"] ?? []).some((l) => /red|orange|yellow|green|blue|purple|rainbow/i.test(l));
+
+function inspiration(kind: Kind, labels: Record<string, string[]>, hasDrawing: boolean, palette?: string) {
   if (hasDrawing) return "";
   const has = (title: string) => (labels[title]?.length ?? 0) > 0;
   const lines: string[] = [];
   if (kind === "creature" && !has("Looks")) lines.push(`- Start from ${pick(BASES.creature)} and make it weird and wonderful`);
-  const colorPicked =
-    (labels["Looks"] ?? []).some((l) => /red|orange|yellow|green|blue|purple|rainbow/i.test(l));
-  if (!colorPicked) lines.push(`- Main colors: ${pick(PALETTES)}`);
   if (kind !== "equipment") lines.push(`- Pose: ${pick(POSES)}`);
-  return lines.length
+  const parts = lines.length
     ? `\n\nINSPIRATION for anything the kid didn't pick (their buttons always win over these):\n${lines.join("\n")}`
     : "";
+  return palette
+    ? parts +
+        `\n\nCOLORS (required): the ${kind === "equipment" ? "item" : "character"} itself is mainly ${palette}. ` +
+        `Use exactly these as its main colors in image_prompt, even for magic or nature powers (show those with sparkles, glow or shapes, not by switching colors). Don't default to purple and green.`
+    : parts;
+}
+
+async function recentPalettes(): Promise<string[]> {
+  try {
+    const { data } = await createAdminClient()
+      .from("creations")
+      .select("card")
+      .order("created_at", { ascending: false })
+      .limit(8);
+    return (data ?? []).map((r) => String((r.card as { palette?: string })?.palette ?? "")).filter(Boolean);
+  } catch {
+    return [];
+  }
 }
 
 /** Short look notes from the latest cards on the site, so new ones look different. */
@@ -314,9 +357,10 @@ export async function writeCard(
   drawing?: Drawing,
   plan?: string
 ): Promise<AnyCard> {
-  const recent = await recentLooks();
+  const [recent, palettes] = await Promise.all([recentLooks(), recentPalettes()]);
+  const palette = !drawing && !colorPicked(labels) ? freshPalette(palettes) : undefined;
   const variety =
-    inspiration(kind, labels, !!drawing) +
+    inspiration(kind, labels, !!drawing, palette) +
     `\n\nVARIETY: Never fall back on a generic look like a little green alien or a plain round blob${
       labels["Pet type"]?.includes("Alien") ? " (an alien is fine here, but make it an unusual one)" : ""
     }.` +
@@ -329,7 +373,9 @@ export async function writeCard(
     readingLevel,
     drawing
   );
-  return reviewRules(kind, card, readingLevel);
+  const reviewed: AnyCard = await reviewRules(kind, card, readingLevel);
+  if (palette) reviewed.palette = palette;
+  return reviewed;
 }
 
 /**
@@ -484,7 +530,9 @@ export async function drawPicture(userId: string, card: AnyCard, drawing?: Drawi
       })
     : await openai().images.generate({
         model,
-        prompt: `${IMAGE_STYLE} Background color: ${pick(BACKDROPS)}.\n\nSubject: ${card.image_prompt}`,
+        prompt: `${IMAGE_STYLE} Background color: ${pick(BACKDROPS)}.\n\nSubject: ${card.image_prompt}${
+          card.palette ? `\n\nMain colors of the subject: ${card.palette}.` : ""
+        }`,
         size: "1024x1024",
         quality,
         n: 1,
