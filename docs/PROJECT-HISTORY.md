@@ -114,3 +114,10 @@ Google, emailed link, or password (set on the Grown-ups page). Parents confirm t
 - No "everyone loses their turn" items.
 - No trapping effects without an escape.
 - Supabase Site URL must include `https://`, with no extra path.
+- Email templates link to `{{ .SiteURL }}/auth/confirm?token_hash=…` (our domain), not `{{ .ConfirmationURL }}` (supabase.co). The mismatched link made Google delay mail from the new domain.
+
+## Done Oct 27, 2026
+- Bought starportdreamfactory.com in Vercel; www added as a second Production domain.
+- Resend verified the domain (auto-configured in Vercel DNS) and a DMARC record was added. Supabase sends mail through Resend SMTP as hello@starportdreamfactory.com; the limit is 100/hour.
+- Site URL updated in Vercel, Supabase, Google OAuth and Branding, and the Stripe test webhook.
+- Polaris Google Workspace: starportdreamfactory.com is on an approved-senders spam bypass rule.
