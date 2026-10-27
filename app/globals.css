@@ -352,9 +352,14 @@ button { font: inherit; color: inherit; }
 
 /* ---------- Trading card ---------- */
 .card-stage { display: grid; justify-items: center; gap: 22px; padding: 10px 0 40px; }
+/* Tarot proportions (2.75 x 4.75). The picture fills whatever room the words leave,
+   down to about 2/3 of square; a very wordy card grows taller instead of cutting off. */
 .tcard {
   --c: var(--creature);
-  width: min(420px, 100%);
+  width: min(400px, 100%);
+  aspect-ratio: 2.75 / 4.75;
+  display: flex;
+  container-type: inline-size;
   padding: 14px;
   border-radius: 26px;
   background: var(--c);
@@ -363,8 +368,16 @@ button { font: inherit; color: inherit; }
 }
 .tcard.equipment { --c: var(--equipment); }
 .tcard.pet { --c: var(--pet); }
-.tcard .inner { background: #fff; border-radius: 16px; overflow: hidden; }
-.tcard .art { aspect-ratio: 1 / 1; background: #f4f2ff; display: block; width: 100%; object-fit: cover; }
+.tcard .inner { background: #fff; border-radius: 16px; overflow: hidden; flex: 1; display: flex; flex-direction: column; }
+.tcard .art {
+  flex: 1 1 0;
+  min-height: 62cqw;
+  max-height: 100cqw;
+  background: #f4f2ff;
+  display: block;
+  width: 100%;
+  object-fit: cover;
+}
 .tcard .banner {
   display: flex;
   align-items: center;
@@ -375,9 +388,9 @@ button { font: inherit; color: inherit; }
   color: var(--ink);
 }
 .tcard.equipment .banner { color: #fff; }
-.tcard .banner h3 { margin: 0; font-size: 25px; line-height: 1.05; font-weight: 800; }
+.tcard .banner h3 { margin: 0; font-size: 23px; line-height: 1.05; font-weight: 800; }
 .tcard .banner .kindmark { height: 44px; width: auto; flex: none; filter: drop-shadow(0 2px 0 #0002); }
-.tcard .body { padding: 12px 16px 16px; font-size: 15.5px; line-height: 1.4; }
+.tcard .body { padding: 10px 15px 4px; font-size: 14.5px; line-height: 1.35; }
 .tcard .desc { margin: 0 0 10px; font-style: italic; color: var(--ink-soft); }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
 .chip {
@@ -391,8 +404,9 @@ button { font: inherit; color: inherit; }
 }
 .chip b { font-size: 20px; }
 .rule { margin: 0 0 8px; }
-.rule strong { display: block; font-size: 16.5px; }
+.rule strong { display: block; font-size: 15.5px; }
 .tcard .foot {
+  margin-top: auto;
   padding: 6px 14px 2px;
   font-size: 12px;
   font-weight: 700;
@@ -475,24 +489,28 @@ table.admin td, table.admin th { padding: 8px; border-bottom: 2px solid var(--li
   .topbar, .actions, .note, .no-print, .read-btn, .error, .tap-hint { display: none !important; }
   .wrap { width: auto; }
   .card-stage { display: block; padding: 0; }
-  /* One card, always on one page: 4 inches wide, never split across pages. */
+  /* Fallback if someone uses the browser's own print: one tarot-size card. */
   .tcard {
-    width: 4in;
+    width: 2.75in;
     margin: 0 auto;
-    padding: 0.12in;
+    padding: 0.09in;
+    border-radius: 0;
     box-shadow: none;
     break-inside: avoid;
     page-break-inside: avoid;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
-  .tcard .art { max-height: 3.76in; }
-  .tcard .banner h3 { font-size: 18pt; }
-  .tcard .banner .kindmark { height: 0.45in; }
-  .tcard .body { font-size: 10.5pt; padding: 0.1in 0.14in 0.12in; }
-  .tcard .rule strong { font-size: 11.5pt; }
-  .tcard .chip { font-size: 10pt; }
-  .tcard .chip b { font-size: 12pt; }
+  .tcard .inner { border-radius: 8px; }
+  .tcard .banner { padding: 0.05in 0.09in; }
+  .tcard .banner h3 { font-size: 12pt; }
+  .tcard .banner .kindmark { height: 0.3in; }
+  .tcard .body { font-size: 7.5pt; padding: 0.06in 0.09in 0.02in; }
+  .tcard .rule strong { font-size: 8.5pt; }
+  .tcard .rule.small, .tcard .rule.small strong { font-size: 7pt; }
+  .tcard .chip { font-size: 7pt; padding: 1px 6px; }
+  .tcard .chip b { font-size: 8pt; }
+  .tcard .foot { font-size: 6pt; padding: 2px 0.09in 0; }
   .tcard .w.on { background: none; box-shadow: none; }
 }
 

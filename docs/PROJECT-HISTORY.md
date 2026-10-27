@@ -44,6 +44,7 @@ Google, emailed link, or password (set on the Grown-ups page). Parents confirm t
 - No button is required. Pressing Build with nothing picked fills in random choices.
 - Creature and pet personality: pick 1.
 - **Drawing upload**: the kid's drawing is the main reference for the picture.
+- **Cards are tarot size (2.75 x 4.75 in).** The picture shrinks to make room for words (down to about half its height), then the text shrinks. Download PDF is one card on a tarot-size page (ready for a print shop). Print opens that same PDF. The print sheet is 6 per letter page, edge to edge with cut marks. Card text is capped: description 25 words or fewer, each rule 30 words or fewer.
 - Card actions: Read my card, Change the stats, Change my buttons (not on creatures), Save, Print, Download PDF, Throw away.
 - My cards page is grouped by kind, with a 6-per-page print sheet.
 - Kind badge (troll / backpack / Chatter) on every card.

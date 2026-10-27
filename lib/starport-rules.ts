@@ -47,6 +47,7 @@ STYLE RULES (always)
 - Names: kid-legible, plain and fun to say (Hungry Hippo, Joke Troll, Star Socks, Shushfly, Bubble Crown). Puns welcome. No dark, gory or scary-for-real ideas.
 - Write game values as numerals: "Difficulty 12", "lose 2 tokens", "3 Coins", "1 success".
 - Effects must be short and concrete enough for a parent to run at the table without a rules lookup. One or two sentences each.
+- Cards print at tarot size (2.75 x 4.75 inches), so every word counts. Description: 25 words or fewer. Each ability, special, power or effect: 30 words or fewer. Never cut a rule's who/what roll/what happens to save words; cut flavor instead.
 
 RULES TEXT (the most important rule)
 Separate the flavor from the rules. The DESCRIPTION is where the fun, silly, magical details go. Every EFFECT, ABILITY and SPECIAL is plain rules text: say exactly what happens in game terms, directly, the way a parent would explain it at the table.

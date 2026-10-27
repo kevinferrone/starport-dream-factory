@@ -25,7 +25,7 @@ export default function CardActions(props: Props) {
   const [card, setCard] = useState(props.card);
   const [saved, setSaved] = useState(props.saved);
   const [rerollsLeft, setRerollsLeft] = useState(props.rerollsLeft);
-  const [busy, setBusy] = useState<null | "shake" | "save" | "pdf" | "read">(null);
+  const [busy, setBusy] = useState<null | "shake" | "save" | "pdf" | "read" | "print">(null);
   const [error, setError] = useState<string | null>(null);
   const [highlight, setHighlight] = useState<number | null>(null);
   const [reading, setReading] = useState(false);
@@ -126,6 +126,21 @@ export default function CardActions(props: Props) {
     }
   };
 
+  // Print the exact tarot-size card. The tab opens during the click so it isn't blocked.
+  const print = async () => {
+    const win = window.open("", "_blank");
+    setBusy("print");
+    try {
+      const { printCard } = await import("@/lib/card-pdf");
+      await printCard(win, props.kind, card, props.imageUrl);
+    } catch {
+      win?.close();
+      setError("Couldn't get the card ready to print. Try Download PDF.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
   const remove = async () => {
     if (!confirm("Throw this card away?")) return;
     await post("/api/delete");
@@ -186,12 +201,12 @@ export default function CardActions(props: Props) {
         )}
         <button
           className="big-btn small gum"
-          onClick={() => window.print()}
+          onClick={print}
           disabled={!!busy}
           onMouseEnter={() => speak(PHRASES.print)}
         >
           <span className="emoji" aria-hidden>🖨️</span>
-          Print
+          {busy === "print" ? "Getting ready…" : "Print"}
         </button>
         <button
           className="big-btn small plain"
