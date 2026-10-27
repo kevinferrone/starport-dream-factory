@@ -69,7 +69,7 @@ export const EQUIPMENT_KEEP: Pattern[] = [
   { id: "token-saver", name: "Token saver", tier: "common", price: "10 Coins", rule: "Once per encounter, when you lose tokens, lose 1 fewer.", boosts: ["bubble", "cotton-candy", "brave", "plant"] },
   { id: "token-swap", name: "Token swap", tier: "common", price: "10 Coins", rule: "Once per encounter, you may spend one kind of token as if it were another kind.", boosts: ["rainbow", "mirror", "sparkle"] },
   { id: "natural-luck", name: "Natural luck", tier: "common", price: "10 Coins", rule: "Any time you roll a natural 20 or a natural 1 on an action roll, gain 1 [trait] token (up to your maximum).", boosts: ["lucky", "star", "fortune"] },
-  { id: "go-first", name: "Go first", tier: "uncommon", price: "10 Coins", rule: "You always take the first turn in turn-based encounters.", boosts: ["fast", "wind", "thunder", "socks"] },
+  { id: "go-first", name: "Go first", tier: "uncommon", price: "3 Coins (cheap: a small benefit)", rule: "You always take the first turn in turn-based encounters, even before a creature that would normally go first.", boosts: ["fast", "wind", "thunder", "socks"] },
   { id: "help-friend", name: "Help a friend", tier: "uncommon", price: "10 Coins", rule: "When you succeed on a roll, you may spend 1 Helpful token to give a friend back 1 lost token.", boosts: ["helpful", "friendship", "happy"] },
   { id: "shield", name: "Shield", tier: "uncommon", price: "15–20 Coins", rule: "Once per adventure, when a creature uses an ability on you, it fails.", boosts: ["brave", "mirror", "rock"] },
   { id: "double-tokens", name: "Double tokens", tier: "uncommon", price: "25–35 Coins", rule: "Each [trait] token you spend counts as 2.", boosts: ["strong", "dragon", "friendship"] },

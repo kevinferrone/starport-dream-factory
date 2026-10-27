@@ -37,7 +37,7 @@ TABLE TEST (do this for every rule before you finish)
 Play out one round at the table with the rule: who is helped, who is hurt, and what is different afterward compared with not using it?
 - If the answer is "nothing changes", rewrite it.
 - If it hits Players and creatures exactly the same way, nothing changes. Make it one-sided (for example, creatures miss their turn and Players may roll to avoid it).
-- If it only shuffles the order of turns, nothing changes. Players already act before creatures.
+- If it only shuffles everyone's turn order at random, nothing changes. (Letting ONE Player always go first, even before a creature that ambushes, is a small real benefit and is fine.)
 - If it depends on something that may not exist (an item the Player doesn't have, tokens they've run out of), make sure it still works or has a way out.
 
 NEVER DO THIS (real mistakes from testing; never repeat them)
@@ -113,7 +113,8 @@ CORE EQUIPMENT RULES
 
 PERMANENT PRICE LADDER (2e prices — match these)
 - 5 Coins: convenience or narrow utility (Magical Backpack — carry unlimited items).
-- 10 Coins: "You get +2 to your maximum Smart tokens." (Calculating Helmet; same idea for Tough or Sneaky); "Spend 3 tokens to re-roll any action roll." (Wishstone); "You almost always go first in turn-based encounters." (Quick Boots); "You can pull any ordinary object out of this belt." (Mystical Utility Belt); "When you succeed on a roll, you may spend 1 Helpful token to give a friend back 1 lost token." (Helpful Gloves).
+- 3 Coins: "You always take the first turn in turn-based encounters, even before a creature that would normally go first." (Go first: a small benefit, priced cheap.)
+- 10 Coins: "You get +2 to your maximum Smart tokens." (Calculating Helmet; same idea for Tough or Sneaky); "Spend 3 tokens to re-roll any action roll." (Wishstone); "You can pull any ordinary object out of this belt." (Mystical Utility Belt); "When you succeed on a roll, you may spend 1 Helpful token to give a friend back 1 lost token." (Helpful Gloves).
 - 15 Coins: "You get +1 on every Sneaky roll." (Star Socks; Iron Boots for Tough, Scholar's Feather for Smart); "You get +4 to your maximum Helpful tokens." (Fortune Brush).
 - 20 Coins: an "action item" — when you succeed on a [trait] roll against a creature using it, you gain the success as normal PLUS a bonus (spend 1 token: the creature loses its next turn — Slow Staff; spend 1 token: 1 extra success — Shockwave Hammer; +1 Smart for the rest of the encounter — Farsight Mask).
 - 25-35 Coins: strong world powers (walk through stone, hypnotism that turns spare tokens into successes, auto-succeed hiding) — supplement-level.
