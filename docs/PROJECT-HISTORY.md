@@ -94,6 +94,7 @@ Google, emailed link, or password (set on the Grown-ups page). Parents confirm t
 
 ### Pictures
 - Random inspiration (body base, palette, pose, backdrop), plus a list of recent looks to avoid, so the same picture doesn't repeat (the repeated green alien bug).
+- Colors: unless the kid picks a color button, the code picks a palette that shares no main color with the last 2 cards on the site. The palette is required in the picture prompt and saved on the card as `palette`. This fixed back-to-back purple-and-green equipment.
 - The description is checked against the finished picture, so a card can't say "13 eyes" over a 2-eyed picture.
 
 ## Open / next
