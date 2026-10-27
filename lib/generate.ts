@@ -628,10 +628,13 @@ export async function drawPicture(userId: string, card: AnyCard, drawing?: Drawi
   };
 
   let b64 = await draw("");
+  let pictures = 1;
   for (let tries = 0; tries < 2; tries++) {
     const problem = await checkPicture(b64, card, drawing ? "" : musts);
     if (!problem) break;
+    console.log("picture redraw:", problem);
     b64 = await draw(problem);
+    pictures++;
   }
 
   const path = `${userId}/${randomUUID()}.png`;
@@ -641,5 +644,5 @@ export async function drawPicture(userId: string, card: AnyCard, drawing?: Drawi
     .upload(path, Buffer.from(b64, "base64"), { contentType: "image/png" });
   if (error) throw new Error("Couldn't save the picture.");
   const { data } = db.storage.from("card-images").getPublicUrl(path);
-  return { url: data.publicUrl, path };
+  return { url: data.publicUrl, path, pictures, quality };
 }

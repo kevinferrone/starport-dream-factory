@@ -105,7 +105,7 @@ export async function POST(req: Request) {
       .insert({
         user_id: user.id,
         kind: input.kind,
-        choices: { ...choices, difficulty: input.difficulty ?? null, drawing_path: drawingPath },
+        choices: { ...choices, difficulty: input.difficulty ?? null, drawing_path: drawingPath, pictures: drawn.pictures, quality: drawn.quality },
         prompt_text: input.text?.trim() || null,
         card,
         image_url: picture.url,
