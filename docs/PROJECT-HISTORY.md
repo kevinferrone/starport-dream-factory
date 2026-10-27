@@ -26,12 +26,30 @@ A web app where kids press picture buttons to build Starport **Creatures, Equipm
 Secret keys live only in Vercel environment variables and Kevin's private note — never in chat or the repo.
 
 ## Plans
+Names, prices and limits live in one place: `PLANS` in `lib/access.ts`.
 - **Free**: 3 creations total
-- **Star**: $4.99/month, 20 creations
-- **Superstar**: $9.99/month, capped at 100
-- "Change the stats" is free, up to 10 times per card. Thrown-away cards still count.
-- Admin page: comp specific emails a plan, or make the whole site free. Only kevin.ferrone@gmail.com is admin.
-- Stripe grants the plan by the **amount charged** (499 / 999 cents) and checkout verifies prices, after a bug where the wrong price ID gave Superstar for $4.99.
+- **Star** (`plus`): $4.99/month, 20 creations
+- **Superstar** (`pro`): $9.99/month, 50 creations (changed from 100 on Oct 27)
+- **Supernova** (`max`): $19.99/month, 100 creations
+- **Galaxy** (`unlimited`): $99/month, unlimited, but no more than 50 in any 24 hours
+- Stripe price IDs go in the Vercel variables `STRIPE_PRICE_PLUS`, `STRIPE_PRICE_PRO`, `STRIPE_PRICE_MAX` and `STRIPE_PRICE_UNLIMITED`. Checkout verifies each price's amount, and the webhook grants the plan by the amount charged.
+- Cancelling keeps the plan until the end of the paid period. The Stripe Customer portal must be set to "Cancel at end of billing period."
+- The Stripe webhook must use the **www** address (`https://www.starportdreamfactory.com/api/stripe/webhook`). The bare domain gives a 308 redirect, and Stripe doesn't follow it.
+- "Change the stats" is free, up to 10 times per card. Thrown-away cards still count; creations restored by an admin don't.
+
+## Admin panel (/admin; only kevin.ferrone@gmail.com)
+- **Overview**: accounts, paying subscribers, estimated monthly revenue, cards made, pictures per card, subscribers by plan, latest activity. Also the site-wide free switch and free access by email.
+- **Users**: search by email; plan, cards this month and in total, last card, last sign-in.
+- **User page**:
+  - Log in as this user (signs the admin out of their own account).
+  - Email them a sign-in link.
+  - Give back their last N creations, or restore a single card.
+  - Set free access.
+  - Link to the customer in Stripe.
+  - Their cards and their activity.
+- **Subscriptions**: active (or all) with status, renew/end date, a "cancelling" flag, and a Stripe link. Refunds and cancelling on someone's behalf happen in Stripe.
+- **Activity**: the newest cards with thumbnails, plus a log of sign-ups, cards, billing events and admin actions (the `activity` table).
+- SQL for these: `supabase/2026-10-27-plans-and-admin.sql`.
 
 ## Sign-in
 Google, emailed link, or password (set on the Grown-ups page). Parents confirm they're a grown-up on first sign-in.

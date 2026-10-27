@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getAccess, PLANS } from "@/lib/access";
+import { getAccess } from "@/lib/access";
 import { KINDS, type Kind } from "@/lib/options";
 import { SpeakingLink } from "@/components/ReadAloud";
 import { KIND_SPOKEN } from "@/lib/voice-phrases";
@@ -14,7 +14,6 @@ export default async function Home() {
   const access = await getAccess(user.id);
   if (!access.parentConfirmed) redirect("/login?step=parent");
 
-  const plan = PLANS[access.tier];
   const kinds = Object.entries(KINDS) as [Kind, (typeof KINDS)[Kind]][];
 
   return (
@@ -40,11 +39,8 @@ export default async function Home() {
 
       <div className="meter">
         <span aria-hidden>⭐</span>
-        <span>
-          {access.remaining} of {plan.limit} creations left
-          {plan.period === "month" ? " this month" : ""}
-        </span>
-        {access.tier !== "pro" && <Link href="/plans">Get more</Link>}
+        <span>{access.summary}</span>
+        {access.tier !== "unlimited" && <Link href="/plans">Get more</Link>}
       </div>
     </>
   );

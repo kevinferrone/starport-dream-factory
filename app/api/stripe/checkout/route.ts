@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { stripe, PRICE_FOR, EXPECTED_CENTS } from "@/lib/stripe";
+import { stripe, priceFor, EXPECTED_CENTS } from "@/lib/stripe";
+import { isPaidTier } from "@/lib/access";
 
 // Grown-up picks a plan on /plans → this sends them to Stripe's payment page.
 export async function POST(req: Request) {
@@ -11,7 +12,7 @@ export async function POST(req: Request) {
 
   const form = await req.formData();
   const tier = form.get("tier");
-  if (tier !== "plus" && tier !== "pro") return NextResponse.redirect(new URL("/plans", req.url), { status: 303 });
+  if (!isPaidTier(tier)) return NextResponse.redirect(new URL("/plans", req.url), { status: 303 });
 
   const db = createAdminClient();
   const { data: profile } = await db.from("profiles").select("*").eq("id", user.id).single();
@@ -28,8 +29,8 @@ export async function POST(req: Request) {
   }
 
   // Safety check: make sure the price ID in Vercel really is this plan's price.
-  const priceId = PRICE_FOR[tier]();
-  const price = await s.prices.retrieve(priceId).catch(() => null);
+  const priceId = priceFor(tier);
+  const price = priceId ? await s.prices.retrieve(priceId).catch(() => null) : null;
   if (!price || price.unit_amount !== EXPECTED_CENTS[tier] || !price.recurring) {
     console.error(`Stripe price for ${tier} is wrong: ${priceId} = ${price?.unit_amount}`);
     return NextResponse.redirect(new URL("/plans?error=price", req.url), { status: 303 });

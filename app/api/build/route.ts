@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getAccess } from "@/lib/access";
 import { validateChoices, fillRandom, pickedItem, type BuildInput } from "@/lib/options";
 import { drawPlan } from "@/lib/patterns";
+import { logActivity } from "@/lib/activity";
 import { writeCard, drawPicture, mustShow, textIsSafe, checkDrawing, matchToPicture, type Drawing } from "@/lib/generate";
 
 export const runtime = "nodejs";
@@ -114,6 +115,7 @@ export async function POST(req: Request) {
       .select("id")
       .single();
     if (error) throw error;
+    await logActivity({ userId: user.id, kind: "build", detail: `${input.kind}: ${card.name}` });
 
     return NextResponse.json({ id: data.id });
   } catch (e) {

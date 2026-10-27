@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getAccess, PLANS, type Tier } from "@/lib/access";
+import { getAccess, PLANS, TIERS } from "@/lib/access";
 import SetPassword from "./SetPassword";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -27,8 +27,6 @@ export default async function PlansPage({ searchParams }: { searchParams: Promis
   const access = await getAccess(user.id);
   const { data: profile } = await supabase.from("profiles").select("stripe_customer_id, tier, reading_level").eq("id", user.id).single();
 
-  const tiers: Tier[] = ["free", "plus", "pro"];
-  const icons: Record<Tier, string> = { free: "🌱", plus: "⭐", pro: "🌟" };
 
   return (
     <>
@@ -37,8 +35,7 @@ export default async function PlansPage({ searchParams }: { searchParams: Promis
           <span aria-hidden>🔑</span> Grown-ups
         </h1>
         <p>
-          Signed in as {user.email}. {access.remaining} of {access.limit} creations left
-          {access.period === "month" ? " this month" : ""}.
+          Signed in as {user.email}. {access.summary}.
         </p>
       </div>
 
@@ -48,17 +45,23 @@ export default async function PlansPage({ searchParams }: { searchParams: Promis
           Checkout is being set up and isn&apos;t ready yet. Please try again later.
         </p>
       )}
-      {limit && <p className="error" style={{ textAlign: "center" }}>You&apos;ve used all your creations for now. Pick a plan to keep building.</p>}
+      {limit && (
+        <p className="error" style={{ textAlign: "center" }}>
+          {access.tier === "unlimited"
+            ? "That's the most for one day. Come back tomorrow for more!"
+            : "You've used all your creations for now. Pick a plan to keep building."}
+        </p>
+      )}
       {access.source === "comp" && <p className="note">Your account has free {PLANS[access.tier].name} access.</p>}
       {access.source === "site" && <p className="note">Dream Factory is free for everyone right now!</p>}
 
       <div className="plans">
-        {tiers.map((t) => {
+        {TIERS.map((t) => {
           const p = PLANS[t];
           const current = access.tier === t;
           return (
             <div key={t} className={`plan${current ? " current" : ""}`}>
-              <div style={{ fontSize: 52 }} aria-hidden>{icons[t]}</div>
+              <div style={{ fontSize: 52 }} aria-hidden>{p.icon}</div>
               <h2 style={{ margin: 0 }}>{p.name}</h2>
               <div className="price">{p.price}</div>
               <p className="hint">{p.blurb}</p>
