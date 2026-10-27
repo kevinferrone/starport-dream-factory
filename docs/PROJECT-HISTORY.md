@@ -52,7 +52,8 @@ Names, prices and limits live in one place: `PLANS` in `lib/access.ts`.
 - SQL for these: `supabase/2026-10-27-plans-and-admin.sql`.
 
 ## Sign-in
-Google, emailed link, or password (set on the Grown-ups page). Parents confirm they're a grown-up on first sign-in.
+Google, emailed link, or password (set on the Grown-ups page).
+- Google uses Google's own button (`app/login/GoogleButton.tsx`, Google Identity Services, then Supabase `signInWithIdToken`), so Google's screen shows our domain instead of the long supabase.co address. It needs `NEXT_PUBLIC_GOOGLE_CLIENT_ID` in Vercel. Without it, the button falls back to the old Supabase redirect. Parents confirm they're a grown-up on first sign-in.
 
 ## Kid-facing features
 - Home tiles: Joke Troll (Creatures), magical backpack (Equipment), Chatter (Pets)
