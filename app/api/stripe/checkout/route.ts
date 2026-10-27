@@ -33,9 +33,8 @@ export async function POST(req: Request) {
     try {
       const sub = profile.stripe_subscription_id ? await s.subscriptions.retrieve(profile.stripe_subscription_id) : null;
       const item = sub?.items.data[0];
-      if (sub && item) {
-        // A cancelled-but-still-active plan has to be un-cancelled before it can switch.
-        if (sub.cancel_at_period_end) await s.subscriptions.update(sub.id, { cancel_at_period_end: false });
+      // A plan that's set to cancel can't switch directly; those go to the regular portal (renew, then switch).
+      if (sub && item && !sub.cancel_at_period_end && !sub.cancel_at) {
         const portal = await s.billingPortal.sessions.create({
           customer: profile.stripe_customer_id,
           return_url: `${site}/plans`,
