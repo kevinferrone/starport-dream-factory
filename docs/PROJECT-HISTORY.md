@@ -108,6 +108,28 @@ Google, emailed link, or password (set on the Grown-ups page).
 - Powers (common and uncommon are combined, equal odds): trick, treasure sniffer, scout, protector (blocks 1 creature's ability once per adventure), do-over, distraction, digger, ride (Big pets only)
 - Rare: future seer, teleporter, pocket shop, vanishing
 
+### Coin value (equipment and pets, approved Oct 27)
+- An optional slider from 1 to 50 Coins, defaulting to "The factory picks." When set, the card's cost is exactly that value, and `coinPlan` in `lib/patterns.ts` picks the rarity and number of powers. The item keeps its own type.
+- Keep forever:
+  - 1–4: 1 small power
+  - 5–14: 1 common
+  - 15–24: 1 common or uncommon
+  - 25–39: 1 strong uncommon, or 2 powers
+  - 40–50: 2 powers, 1 of them rare
+- Use once:
+  - 1–4: 1 small
+  - 5–9: 1 common
+  - 10–19: 1 common or uncommon
+  - 20–34: 2 powers, or 1 rare
+  - 35–50: 2 powers, 1 of them rare
+- Pets:
+  - 1–9: Bonus only (+1, then +2)
+  - 10–19: Bonus of +1 or +2, plus 1 main power
+  - 20–34: about +4, plus 1 main power
+  - 35–50: +6 to +8, plus 1 rare power and a small perk
+  - Ride stays Big-only.
+- With two powers, the effect may run up to 45 words.
+
 ### Logic guards (`lib/starport-rules.ts`)
 - Every build runs these checks: rules that can never be broken, a **table test**, and a **never-do** list (`KNOWN_MISTAKES`).
 - Then a second review pass checks the result.

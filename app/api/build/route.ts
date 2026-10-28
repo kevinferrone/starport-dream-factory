@@ -84,7 +84,8 @@ export async function POST(req: Request) {
       input.kind,
       choices,
       input.difficulty,
-      item ? { once: !!item.once, boosts: item.boosts ?? [] } : null
+      item ? { once: !!item.once, boosts: item.boosts ?? [] } : null,
+      input.coins ?? undefined
     );
     const card = await writeCard(
       input.kind,
@@ -98,6 +99,8 @@ export async function POST(req: Request) {
     if (input.kind === "equipment" && plan.consumable !== undefined) {
       (card as { type: string }).type = plan.consumable ? "consumable" : "permanent";
     }
+    // The kid picked the price, so it's exactly that.
+    if (input.coins && input.kind !== "creature") (card as { cost: number }).cost = input.coins;
     const drawn = await drawPicture(user.id, card, drawing, mustShow(check.labels));
     const picture = drawn;
     // Make the words match what was actually drawn.
@@ -109,7 +112,7 @@ export async function POST(req: Request) {
       .insert({
         user_id: user.id,
         kind: input.kind,
-        choices: { ...choices, difficulty: input.difficulty ?? null, drawing_path: drawingPath, pictures: drawn.pictures, quality: drawn.quality },
+        choices: { ...choices, difficulty: input.difficulty ?? null, coins: input.coins ?? null, drawing_path: drawingPath, pictures: drawn.pictures, quality: drawn.quality },
         prompt_text: input.text?.trim() || null,
         card,
         image_url: picture.url,

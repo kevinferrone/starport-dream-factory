@@ -655,3 +655,16 @@ table.admin .nowrap, .nowrap { white-space: nowrap; }
 .edit-group { border: 3px dashed var(--line); border-radius: 16px; padding: 10px 14px 14px; display: grid; gap: 10px; margin: 0; }
 .edit-group legend { font-weight: 800; padding: 0 6px; }
 .card-editor .actions { justify-content: flex-start; }
+.chip-toggle {
+  margin-top: 12px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 3px solid var(--line);
+  background: #fff;
+  font: inherit;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.chip-toggle.on { background: var(--sun, #ffd84d); border-color: var(--sun, #ffd84d); }

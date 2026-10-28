@@ -1,4 +1,4 @@
-import { GROUPS, KINDS, DIFFICULTY_MIN, DIFFICULTY_MAX, difficultyFace, allOptions, type Kind } from "@/lib/options";
+import { GROUPS, KINDS, DIFFICULTY_MIN, DIFFICULTY_MAX, COINS_MIN, COINS_MAX, difficultyFace, allOptions, type Kind } from "@/lib/options";
 
 /** What the home tiles say out loud. */
 export const KIND_SPOKEN: Record<Kind, string> = { creature: "Creatures", equipment: "Equipment", pet: "Pets" };
@@ -21,9 +21,11 @@ export const PHRASES = {
   addDrawing: "Add my drawing",
   removeDrawing: "Remove drawing",
   surprise: "Surprise me!",
+  factoryPicks: "The factory picks",
 };
 
 export const pickFirst = (title: string) => `Pick ${title.toLowerCase()} first`;
+export const coinPhrase = (c: number) => `${c} ${c === 1 ? "Coin" : "Coins"}`;
 export const difficultyPhrase = (d: number) => `${difficultyFace(d).label}, ${d}`;
 
 /** Every phrase the voice is allowed to say. The voice service refuses anything else. */
@@ -38,5 +40,6 @@ export function allowedPhrases(): Set<string> {
     });
   });
   for (let d = DIFFICULTY_MIN; d <= DIFFICULTY_MAX; d++) s.add(difficultyPhrase(d));
+  for (let c = COINS_MIN; c <= COINS_MAX; c++) s.add(coinPhrase(c));
   return s;
 }

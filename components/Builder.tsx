@@ -8,6 +8,9 @@ import {
   GROUPS,
   KINDS,
   DIFFICULTY_MIN,
+  COINS_MIN,
+  COINS_MAX,
+  coinFace,
   DIFFICULTY_MAX,
   difficultyFace,
   type Kind,
@@ -16,7 +19,7 @@ import {
   allOptions,
 } from "@/lib/options";
 import { speak, useSpeakOnHover, warmVoices } from "@/components/ReadAloud";
-import { PHRASES, difficultyPhrase } from "@/lib/voice-phrases";
+import { PHRASES, difficultyPhrase, coinPhrase } from "@/lib/voice-phrases";
 
 type Props = {
   kind: Kind;
@@ -59,6 +62,8 @@ export default function Builder({ kind, remaining, resting = false, initial }: P
 
   const [choices, setChoices] = useState<Record<string, string[]>>(initial?.choices ?? {});
   const [difficulty, setDifficulty] = useState<number>(initial?.difficulty ?? 10);
+  // null = the factory picks the Coin value.
+  const [coins, setCoins] = useState<number | null>(null);
   const [text, setText] = useState(initial?.text ?? "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -121,6 +126,7 @@ export default function Builder({ kind, remaining, resting = false, initial }: P
           kind,
           choices,
           difficulty: kind === "creature" ? difficulty : undefined,
+          coins: kind !== "creature" && coins ? coins : undefined,
           text,
           drawing: drawing ?? undefined,
           drawingPath: !drawing && keptDrawing ? keptDrawing.path : undefined,
@@ -251,6 +257,41 @@ export default function Builder({ kind, remaining, resting = false, initial }: P
               onKeyUp={(e) => speak(difficultyPhrase(Number(e.currentTarget.value)))}
             />
           </div>
+        </section>
+      )}
+
+      {kind !== "creature" && (
+        <section className="panel">
+          <h2>
+            <span className="emoji" aria-hidden>🪙</span>
+            How many Coins is it worth?
+          </h2>
+          <p className="hint">More Coins make it more powerful.</p>
+          <div className="dial">
+            <span className="face" aria-hidden>{coins ? coinFace(coins).icon : "🎲"}</span>
+            <span className="num">{coins ?? "?"}</span>
+            <input
+              type="range"
+              min={COINS_MIN}
+              max={COINS_MAX}
+              value={coins ?? 10}
+              aria-label="Coin value"
+              onChange={(e) => setCoins(Number(e.target.value))}
+              onPointerUp={(e) => speak(coinPhrase(Number(e.currentTarget.value)))}
+              onKeyUp={(e) => speak(coinPhrase(Number(e.currentTarget.value)))}
+            />
+          </div>
+          <button
+            type="button"
+            className={`chip-toggle${coins === null ? " on" : ""}`}
+            onClick={() => {
+              setCoins(null);
+              speak(PHRASES.factoryPicks);
+            }}
+            aria-pressed={coins === null}
+          >
+            🎲 The factory picks
+          </button>
         </section>
       )}
 

@@ -151,11 +151,15 @@ export function drawPlan(
   kind: Kind,
   choices: Record<string, string[]>,
   difficulty?: number,
-  itemInfo?: ItemInfo | null
+  itemInfo?: ItemInfo | null,
+  coins?: number
 ): Plan {
   const picked = new Set(Object.values(choices).flat());
   const fmt = (label: string, p: Pattern) =>
     `${label}: "${p.name}": ${p.rule}${p.price ? ` (usual price: ${p.price})` : ""}`;
+
+  // The kid set a Coin value: it decides how strong the item or pet is and how many powers it has.
+  if (coins && (kind === "equipment" || kind === "pet")) return coinPlan(kind, coins, picked, itemInfo ?? null, fmt);
 
   if (kind === "creature") {
     const d = difficulty ?? 10;
@@ -207,4 +211,102 @@ export function drawPlan(
     patternIds: [bonus.id, power.id],
     text: [fmt("Bonus", bonus), fmt("Power", power)].join("\n"),
   };
+}
+
+// ---------------------------------------------------------------- Coin value (equipment and pets)
+// Approved Oct 27: the Coin value picks the rarity and number of powers; the item keeps its type.
+
+/** The lowest number in a pattern's usual price ("15–20 Coins" → 15). */
+const basePrice = (p: Pattern) => Number(/\d+/.exec(p.price ?? "")?.[0] ?? 0);
+const within = (pool: Pattern[], lo: number, hi: number) => pool.filter((p) => basePrice(p) >= lo && basePrice(p) <= hi);
+const notRare = (pool: Pattern[]) => pool.filter((p) => p.tier !== "rare");
+const rares = (pool: Pattern[]) => pool.filter((p) => p.tier === "rare");
+
+function coinPlan(
+  kind: "equipment" | "pet",
+  coins: number,
+  picked: Set<string>,
+  itemInfo: ItemInfo | null,
+  fmt: (label: string, p: Pattern) => string
+): Plan {
+  const costLine =
+    `COST: exactly ${coins} ${coins === 1 ? "Coin" : "Coins"}. The kid chose this, so the card's cost must be ${coins}. ` +
+    `Scale every number in the rules (tokens, bonuses, uses) so the whole card is fair for ${coins} Coins, using the price ladder.`;
+
+  if (kind === "pet") {
+    const big = picked.has("big");
+    const noRide = big ? new Set<string>() : new Set(["ride"]);
+    const main = PET_POWERS.filter((p) => p.tier !== "rare");
+    const bonusId = coins < 10 ? "little-buddy" : coins < 20 ? (Math.random() < 0.5 ? "little-buddy" : "all-rounder") : coins < 35 ? "all-rounder" : "big-bonus";
+    const bonus = PET_BONUSES.find((b) => b.id === bonusId)!;
+    const size =
+      coins < 5 ? "+1 to your maximum tokens in one trait" :
+      coins < 10 ? "+2 to your maximum tokens" :
+      coins < 20 ? "+1 or +2 to your maximum tokens" :
+      coins < 35 ? "about +4 to your maximum tokens, spread out" :
+      "+6 to +8 to your maximum tokens";
+    const lines = [fmt("Bonus", bonus), `Bonus size for ${coins} Coins: ${size}.`];
+    const ids = [bonus.id];
+    if (coins < 10) {
+      lines.push("Power: none. At this price the pet gives only its Bonus (write the power as a small, fun flavor perk with no game effect).");
+    } else if (coins < 35) {
+      const power = draw(main, picked, [], noRide);
+      lines.push(fmt("Power", power));
+      ids.push(power.id);
+    } else {
+      const power = draw(rares(PET_POWERS), picked);
+      lines.push(fmt("Power", power), "Also add one small extra perk in the power text (like it can fly, or you can ride it if it's Big).");
+      ids.push(power.id);
+    }
+    return { kind, patternIds: ids, text: [costLine, ...lines].join("\n") };
+  }
+
+  // Equipment: the picked item keeps its type; with no item, a cheap coin flip decides.
+  const once = itemInfo ? itemInfo.once : Math.random() < 0.4;
+  const boosts = itemInfo?.boosts ?? [];
+  const pool = once ? EQUIPMENT_ONCE : EQUIPMENT_KEEP;
+  const one = (from: Pattern[], exclude = new Set<string>()) => draw(from.length ? from : notRare(pool), picked, boosts, exclude);
+  const chosen: Pattern[] = [];
+
+  if (!once) {
+    if (coins <= 4) chosen.push(one(within(pool, 0, 5).concat(notRare(within(pool, 6, 10)))));
+    else if (coins <= 14) chosen.push(one(notRare(within(pool, 0, 14))));
+    else if (coins <= 24) chosen.push(one(notRare(within(pool, 10, 24))));
+    else if (coins <= 39) {
+      if (Math.random() < 0.5) chosen.push(one(notRare(within(pool, 20, 35))));
+      else {
+        const a = one(notRare(within(pool, 5, 20)));
+        chosen.push(a, one(notRare(within(pool, 5, 20)), new Set([a.id])));
+      }
+    } else {
+      const r = one(rares(pool));
+      chosen.push(r, one(notRare(within(pool, 5, 20)), new Set([r.id])));
+    }
+  } else {
+    if (coins <= 4) chosen.push(one(within(pool, 0, 3)));
+    else if (coins <= 9) chosen.push(one(notRare(within(pool, 4, 7))));
+    else if (coins <= 19) chosen.push(one(notRare(within(pool, 5, 10))));
+    else if (coins <= 34) {
+      if (Math.random() < 0.5) chosen.push(one(rares(pool)));
+      else {
+        const a = one(notRare(pool));
+        chosen.push(a, one(notRare(pool), new Set([a.id])));
+      }
+    } else {
+      const r = one(rares(pool));
+      chosen.push(r, one(notRare(pool), new Set([r.id])));
+    }
+  }
+
+  const type = once ? "consumable (one-time use)" : "permanent (keep forever)";
+  const lines =
+    chosen.length === 1
+      ? [fmt("Effect", chosen[0])]
+      : [
+          fmt("Effect part 1", chosen[0]),
+          fmt("Effect part 2", chosen[1]),
+          "This item has BOTH powers. Write them together in the effect as two short sentences (up to 45 words in all).",
+        ];
+  if (coins <= 4) lines.push(`At ${coins} Coins this is a small power: use the smallest numbers (for example +1, or once per adventure).`);
+  return { kind, consumable: once, patternIds: chosen.map((p) => p.id), text: [costLine, ...lines, `Type: ${type}`].join("\n") };
 }

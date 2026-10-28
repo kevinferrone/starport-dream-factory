@@ -29,8 +29,9 @@ export async function POST(req: Request) {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { difficulty, drawing_path, ...rest } = row.choices as {
+  const { difficulty, drawing_path, coins, ...rest } = row.choices as {
     difficulty?: number | null;
+    coins?: number | null;
     drawing_path?: string | null;
     [k: string]: unknown;
   };
@@ -43,7 +44,7 @@ export async function POST(req: Request) {
     const { data: profile } = await db.from("profiles").select("reading_level").eq("id", user.id).single();
     // A fresh draw from the pattern banks, so a shake-up really changes the rules.
     const item = pickedItem(choices);
-    const plan = drawPlan(kind, choices, difficulty ?? undefined, item ? { once: !!item.once, boosts: item.boosts ?? [] } : null);
+    const plan = drawPlan(kind, choices, difficulty ?? undefined, item ? { once: !!item.once, boosts: item.boosts ?? [] } : null, coins ?? undefined);
     const card = await rerollCard(
       kind,
       check.labels,

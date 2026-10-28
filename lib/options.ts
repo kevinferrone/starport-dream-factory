@@ -240,6 +240,17 @@ export function difficultyFace(d: number) {
   return { icon: "😱", label: "Super hard" };
 }
 
+/** Equipment and pets: an optional Coin value from 1 to 50 that sets how strong it is. */
+export const COINS_MIN = 1;
+export const COINS_MAX = 50;
+export function coinFace(c: number) {
+  if (c <= 4) return { icon: "🪙", label: "A little" };
+  if (c <= 14) return { icon: "💰", label: "Some" };
+  if (c <= 24) return { icon: "💎", label: "A lot" };
+  if (c <= 39) return { icon: "👑", label: "Super" };
+  return { icon: "🌟", label: "Legendary" };
+}
+
 export function allOptions(group: OptionGroup): Option[] {
   return group.options ?? group.sections?.flatMap((s) => s.options) ?? [];
 }
@@ -256,6 +267,7 @@ export type BuildInput = {
   kind: Kind;
   choices: Record<string, string[]>;
   difficulty?: number;
+  coins?: number; // equipment and pets; leave out to let the factory pick
   text?: string;
   drawing?: string; // a new drawing, as a JPEG data URL
   drawingPath?: string; // a drawing already uploaded (when changing buttons on an earlier card)
@@ -303,6 +315,12 @@ export function validateChoices(input: BuildInput): { ok: true; labels: Record<s
     const d = Number(input.difficulty);
     if (!Number.isInteger(d) || d < DIFFICULTY_MIN || d > DIFFICULTY_MAX) {
       return { ok: false, error: "Difficulty must be 5 to 20" };
+    }
+  }
+  if (input.coins !== undefined && input.coins !== null) {
+    const c = Number(input.coins);
+    if (input.kind === "creature" || !Number.isInteger(c) || c < COINS_MIN || c > COINS_MAX) {
+      return { ok: false, error: "Coin value must be 1 to 50" };
     }
   }
   if (input.text && input.text.length > 300) return { ok: false, error: "Description is too long" };
