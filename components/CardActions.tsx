@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { Kind } from "@/lib/options";
 import type { AnyCard } from "@/lib/generate";
 import Card from "@/components/Card";
+import CardEditor from "@/components/CardEditor";
 import { speak } from "@/components/ReadAloud";
 import { PHRASES } from "@/lib/voice-phrases";
 import { readingRate } from "@/lib/reading-level";
@@ -27,7 +28,8 @@ export default function CardActions(props: Props) {
   const [card, setCard] = useState(props.card);
   const [saved, setSaved] = useState(props.saved);
   const [rerollsLeft, setRerollsLeft] = useState(props.rerollsLeft);
-  const [busy, setBusy] = useState<null | "shake" | "save" | "pdf" | "read" | "print">(null);
+  const [busy, setBusy] = useState<null | "shake" | "save" | "pdf" | "read" | "print" | "edit">(null);
+  const [editing, setEditing] = useState<AnyCard | null>(null); // the card as it was before editing
   const [error, setError] = useState<string | null>(null);
   const [highlight, setHighlight] = useState<number | null>(null);
   const [reading, setReading] = useState(false);
@@ -71,6 +73,36 @@ export default function CardActions(props: Props) {
       frame.current = requestAnimationFrame(tick);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Couldn't read this card right now.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const startEdit = () => {
+    stopReading();
+    setError(null);
+    setEditing(card);
+  };
+  const cancelEdit = () => {
+    if (editing) setCard(editing);
+    setEditing(null);
+    setError(null);
+  };
+  const saveEdit = async () => {
+    setBusy("edit");
+    setError(null);
+    try {
+      const res = await fetch("/api/edit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: props.id, card }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Couldn't save your changes.");
+      setCard(data.card);
+      setEditing(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't save your changes.");
     } finally {
       setBusy(null);
     }
@@ -153,6 +185,20 @@ export default function CardActions(props: Props) {
     <div className="card-stage">
       <Card kind={props.kind} card={card} imageUrl={props.imageUrl} highlight={highlight} />
 
+      {editing ? (
+        <>
+          {error && <p className="error no-print" role="alert">{error}</p>}
+          <CardEditor
+            kind={props.kind}
+            card={card}
+            onChange={setCard}
+            onSave={saveEdit}
+            onCancel={cancelEdit}
+            busy={busy === "edit"}
+          />
+        </>
+      ) : (
+      <>
       <button
         className={`big-btn read-btn${reading ? " gum" : ""}`}
         onClick={readCard}
@@ -177,6 +223,15 @@ export default function CardActions(props: Props) {
           {busy === "shake" ? "Changing…" : "Change the stats"}
         </button>
         )}
+        <button
+          className="big-btn small plain"
+          onClick={startEdit}
+          disabled={!!busy}
+          onMouseEnter={() => speak(PHRASES.editCard)}
+        >
+          <span className="emoji" aria-hidden>✏️</span>
+          Edit my card
+        </button>
         {!saved ? (
           <button
             className="big-btn small mint"
@@ -223,6 +278,8 @@ export default function CardActions(props: Props) {
           <span className="emoji" aria-hidden>🗑️</span>
           <span>Throw away</span>
         </button>
+      )}
+      </>
       )}
     </div>
   );

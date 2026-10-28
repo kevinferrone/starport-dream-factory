@@ -144,10 +144,6 @@ export const EQUIPMENT_GROUPS: OptionGroup[] = [
         options: [o("Cotton Candy", "🍭"), o("Bubble", "🫧"), o("Cookie", "🍪"), o("Giggle", "😂"), o("Sneeze", "🤧"), o("Socks", "🧦"), o("Stinky", "💨")],
       },
       {
-        title: "Feelings",
-        options: [o("Sleepy", "😴"), o("Happy", "😊"), o("Grumpy", "😠"), o("Friendship", "💖"), o("Brave", "🦁")],
-      },
-      {
         title: "Weird",
         options: [o("Ghost", "👻"), o("Robot", "🤖"), o("Dragon", "🐉"), o("Music", "🎵"), o("Time", "⏰"), o("Mirror", "🪞"), o("Sticky", "🧲")],
       },

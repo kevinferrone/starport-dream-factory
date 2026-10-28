@@ -632,3 +632,26 @@ table.admin .nowrap, .nowrap { white-space: nowrap; }
   font-size: 20px;
   font-weight: 700;
 }
+
+/* Card editor */
+.card-editor { width: min(560px, 100%); display: grid; gap: 12px; margin: 0; }
+.card-editor h2 { margin: 0; }
+.card-editor .hint { margin: 0; }
+.edit-field { display: grid; gap: 4px; font-weight: 700; font-size: 15px; }
+.edit-field input, .edit-field textarea, .edit-field select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 3px solid var(--line);
+  font: inherit;
+  font-weight: 500;
+  font-size: 17px;
+  background: #fff;
+  color: var(--ink);
+}
+.edit-field textarea { resize: vertical; line-height: 1.35; }
+.edit-row { display: flex; flex-wrap: wrap; gap: 12px; }
+.edit-row .edit-field { flex: 1 1 140px; }
+.edit-group { border: 3px dashed var(--line); border-radius: 16px; padding: 10px 14px 14px; display: grid; gap: 10px; margin: 0; }
+.edit-group legend { font-weight: 800; padding: 0 6px; }
+.card-editor .actions { justify-content: flex-start; }

@@ -11,6 +11,7 @@ export const PHRASES = {
   saved: "Saved!",
   saveCard: "Save my card",
   readCard: "Read my card",
+  editCard: "Edit my card",
   changeButtons: "Change my buttons",
   home: "Home",
   myCards: "My cards",

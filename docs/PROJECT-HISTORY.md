@@ -64,6 +64,8 @@ Google, emailed link, or password (set on the Grown-ups page).
 - Creature and pet personality: pick 1.
 - **Drawing upload**: the kid's drawing is the main reference for the picture.
 - **Cards are tarot size (2.75 x 4.75 in).** The picture shrinks to make room for words (down to about half its height), then the text shrinks. Download PDF is one card on a tarot-size page (ready for a print shop). Print opens that same PDF. The print sheet is 6 per letter page, edge to edge with cut marks. Card text is capped: description 25 words or fewer, each rule 30 words or fewer.
+- **Edit my card**: change any words or numbers on a card (name, description, Difficulty and Successes, abilities and special, Cost, Type, whether it takes a turn, Bonus, Power). The card updates live as you type. Saving is free (no AI, no new picture) and still runs the weapons check and the moderation check. Code: `components/CardEditor.tsx`, `lib/card-edit.ts`, `/api/edit`.
+- Equipment no longer has the Feelings power buttons (removed Oct 27).
 - Card actions: Read my card, Save, Print, Download PDF, Throw away. "Change the stats" still works but its button is hidden for the MVP; `SHOW_CHANGE_STATS` in components/CardActions.tsx brings it back.
 - My cards page is grouped by kind, with a 6-per-page print sheet.
 - Kind badge (troll / backpack / Chatter) on every card.

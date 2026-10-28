@@ -45,6 +45,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     PHRASES.myCards,
                     PHRASES.grownUps,
                     PHRASES.saveCard,
+                    PHRASES.editCard,
                     PHRASES.saved,
                     PHRASES.print,
                     PHRASES.pdf,

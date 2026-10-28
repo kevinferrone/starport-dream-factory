@@ -4,6 +4,7 @@ import { randomUUID } from "crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Kind } from "@/lib/options";
 import { readingGuide } from "@/lib/reading-level";
+import { WEAPONS } from "@/lib/safety";
 import {
   CORE_RULES,
   CREATURE_RULES,
@@ -243,7 +244,6 @@ function describeRequest(
 }
 
 /** Returns a problem description, or null if the card follows the rules. */
-const WEAPONS = /\b(guns?|laser ?guns?|ray ?guns?|blasters?|pistols?|rifles?|swords?|knife|knives|daggers?|spears?|arrows?|axes?|blades?|lasers?)\b/i;
 
 function checkCard(kind: Kind, card: AnyCard, difficulty?: number): string | null {
   if (!card.name || !card.description) return "Missing name or description.";
