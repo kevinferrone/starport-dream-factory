@@ -668,3 +668,32 @@ table.admin .nowrap, .nowrap { white-space: nowrap; }
   cursor: pointer;
 }
 .chip-toggle.on { background: var(--sun, #ffd84d); border-color: var(--sun, #ffd84d); }
+
+/* Jump to any builder from any page */
+.maker-bar { display: flex; justify-content: center; gap: 10px; margin: -4px 0 14px; flex-wrap: wrap; }
+.maker {
+  --c: #ffd25e;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 16px 4px 6px;
+  border-radius: 999px;
+  background: var(--c);
+  color: var(--ink);
+  font-weight: 800;
+  font-size: 17px;
+  text-decoration: none;
+  box-shadow: 0 4px 0 #0002;
+  border: 3px solid transparent;
+}
+.maker.equipment { --c: var(--equipment); color: #fff; }
+.maker.pet { --c: #7fe3dc; }
+.maker img { height: 40px; width: 40px; object-fit: contain; }
+.maker.here { border-color: var(--ink); }
+.maker:active { transform: translateY(3px); box-shadow: 0 1px 0 #0002; }
+@media (max-width: 520px) {
+  .maker-bar { gap: 8px; flex-wrap: nowrap; }
+  .maker { padding: 4px 12px; }
+  .maker span { display: none; } /* pictures only on phones; the voice still says the name */
+  .maker img { height: 40px; width: 40px; }
+}

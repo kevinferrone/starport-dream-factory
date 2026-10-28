@@ -5,6 +5,7 @@ import "./globals.css";
 import { createClient } from "@/lib/supabase/server";
 import { ReadAloudToggle, SpeakingLink, WarmVoices } from "@/components/ReadAloud";
 import { PHRASES, KIND_SPOKEN } from "@/lib/voice-phrases";
+import MakerBar from "@/components/MakerBar";
 
 const baloo = Baloo_2({ subsets: ["latin"], weight: ["500", "700", "800"], variable: "--font-baloo" });
 
@@ -59,6 +60,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </>
             )}
           </header>
+          {user && <MakerBar />}
           <main>{children}</main>
         </div>
       </body>
