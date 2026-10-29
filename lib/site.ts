@@ -2,5 +2,6 @@
 export const COMPANY = "Wider Path, LLC";
 export const CONTACT_EMAIL = "info@widerpathgames.com";
 export const UPDATED = "October 29, 2026";
-// The Starport game (rpgforkids.com redirects to the Wider Path store page). Linked from the homepage, Grown-ups page and footer.
-export const STARPORT_URL = "https://rpgforkids.com";
+// The Starport game's page on the Wider Path store. Linked from the homepage, Grown-ups page and footer.
+// (Printed cards use the short address rpgforkids.com instead; see lib/card-pdf.ts.)
+export const STARPORT_URL = "https://www.widerpathgames.com/products/starport";
