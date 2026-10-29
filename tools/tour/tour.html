@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="globals.css">
+<style>
+  @font-face { font-family: "Baloo 2"; src: url("Baloo2.ttf") format("truetype"); font-weight: 400 800; }
+  :root { --font-baloo: "Baloo 2"; }
+  html, body { width: 1280px; height: 720px; overflow: hidden; }
+  /* Everything is driven frame by frame, so switch off the site's own animations. */
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .screen { position: fixed; inset: 0; overflow: hidden; display: none; }
+  .screen.on { display: block; }
+  .screen > .scroller { position: absolute; left: 0; right: 0; top: 0; will-change: transform; }
+  .build-bar { position: static; }
+
+  /* Cursor, click ring, captions */
+  #cursor { position: fixed; left: 0; top: 0; z-index: 1000; width: 34px; height: 34px; pointer-events: none; filter: drop-shadow(0 3px 3px #0005); }
+  #ring { position: fixed; z-index: 999; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%; border: 5px solid #ffc93c; opacity: 0; pointer-events: none; }
+  #cap {
+    position: fixed; z-index: 1001; left: 50%; bottom: 26px; transform: translateX(-50%);
+    width: max-content; max-width: 1100px; padding: 12px 30px 10px; border-radius: 26px;
+    background: #23205aee; color: #fff; font-size: 29px; font-weight: 700; line-height: 1.25; text-align: center;
+    box-shadow: 0 10px 0 #0003; opacity: 0;
+  }
+  #cap b { color: #ffc93c; }
+  #say {
+    position: fixed; z-index: 1002; padding: 6px 14px; border-radius: 999px; background: #fff; color: #23205a;
+    font-size: 20px; font-weight: 800; box-shadow: 0 4px 0 #0002; opacity: 0; white-space: nowrap;
+  }
+  .title-card { position: fixed; inset: 0; display: none; place-items: center; text-align: center; z-index: 900;
+    background: linear-gradient(to bottom, #7cc8f7, #a9defc 45%, #d8f1ff); }
+  .title-card.on { display: grid; }
+  .title-card img.logo { width: 620px; filter: drop-shadow(0 6px 0 #ffffff99); }
+  .title-card .line2 { font-size: 84px; font-weight: 800; line-height: 1; transform: rotate(-2deg); text-shadow: 0 5px 0 #fff; }
+  .title-card .sub { font-size: 34px; font-weight: 700; color: #5b588f; margin-top: 18px; }
+  .title-card .flum { width: 170px; margin-top: 8px; }
+  .pdfdemo { display: grid; place-items: center; position: fixed; inset: 0; z-index: 800; background: #23205acc; }
+  .pdfpage { background: #fff; width: 300px; height: 518px; display: grid; place-items: center; border-radius: 6px; box-shadow: 0 20px 40px #0006; }
+  .pdfpage .tcard { width: 260px; }
+</style>
+</head>
+<body>
+<div id="screens"></div>
+<div class="title-card" id="intro">
+  <div>
+    <img class="logo" src="starport-logo.png" alt="">
+    <div class="line2">Dream Factory</div>
+    <div class="sub">A quick tour</div>
+    <img class="flum" src="flummox.webp" alt="">
+  </div>
+</div>
+<div class="title-card" id="outro">
+  <div>
+    <img class="logo" src="starport-logo.png" alt="">
+    <div class="line2">Dream Factory</div>
+    <div class="sub">Start building at <b style="color:#23205a">starportdreamfactory.com</b></div>
+    <img class="flum" src="flummox.webp" alt="">
+  </div>
+</div>
+<div id="ring"></div>
+<svg id="cursor" viewBox="0 0 24 24"><path d="M4 2 L4 20 L8.6 15.6 L11.6 22.4 L14.6 21.1 L11.7 14.5 L18 14.5 Z" fill="#fff" stroke="#23205a" stroke-width="1.7" stroke-linejoin="round"/></svg>
+<div id="say"></div>
+<div id="cap"></div>
+<script src="tour.js"></script>
+</body>
+</html>
