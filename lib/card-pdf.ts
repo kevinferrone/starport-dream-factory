@@ -5,9 +5,7 @@ import type { Kind } from "@/lib/options";
 import type { AnyCard } from "@/lib/generate";
 import { cardPieces } from "@/lib/card-text";
 
-const FRAME: Record<Kind, string> = { creature: "#ff8a3d", equipment: "#9b7bff", pet: "#2ed9a3" };
-// The frame's gradient (light at the top, deep at the bottom) and pattern, matching .tcard in globals.css.
-const FRAME_LT: Record<Kind, string> = { creature: "#ffb57e", equipment: "#bea9ff", pet: "#74ebc6" };
+// The frame's deep color and pattern, matching .tcard in globals.css.
 const FRAME_DK: Record<Kind, string> = { creature: "#e9682b", equipment: "#7b5af0", pet: "#1bbb88" };
 /** Pattern tile size in points (the screen card is 400px wide with 104/128/140px tiles; the PDF card is 198pt). */
 const PAT_PT: Record<Kind, number> = { creature: 51.5, equipment: 63.4, pet: 69.3 };
@@ -63,30 +61,15 @@ const pattern = (kind: Kind) =>
     .catch(() => null));
 
 const texCache: Record<string, string> = {};
-/**
- * The frame's look as a picture: gradient plus the kind's pattern, w x h points.
- * "frame" runs light (top) to deep (bottom); "banner" runs left to right like the screen card.
- */
-function texture(kind: Kind, pat: ImageBitmap, w: number, h: number, style: "frame" | "banner"): string {
-  const key = `${kind}:${style}:${w.toFixed(1)}x${h.toFixed(1)}`;
+/** The frame's look as a picture: the kind's deep color plus its pattern, w x h points. */
+function texture(kind: Kind, pat: ImageBitmap, w: number, h: number): string {
+  const key = `${kind}:${w.toFixed(1)}x${h.toFixed(1)}`;
   if (texCache[key]) return texCache[key];
   const c = document.createElement("canvas");
   c.width = Math.round(w * PX_PER_PT);
   c.height = Math.round(h * PX_PER_PT);
   const ctx = c.getContext("2d")!;
-  const grad =
-    style === "frame"
-      ? ctx.createLinearGradient(c.width * 0.33, 0, c.width * 0.67, c.height)
-      : ctx.createLinearGradient(0, 0, c.width, 0);
-  if (style === "frame") {
-    grad.addColorStop(0, FRAME_LT[kind]);
-    grad.addColorStop(0.48, FRAME[kind]);
-    grad.addColorStop(1, FRAME_DK[kind]);
-  } else {
-    grad.addColorStop(0, FRAME[kind]);
-    grad.addColorStop(1, FRAME_LT[kind]);
-  }
-  ctx.fillStyle = grad;
+  ctx.fillStyle = FRAME_DK[kind];
   ctx.fillRect(0, 0, c.width, c.height);
   const fill = ctx.createPattern(pat, "repeat");
   if (fill) {
@@ -137,10 +120,10 @@ function layout(doc: jsPDF, item: Item, x0: number, y0: number, W: number, f: nu
   const bannerH = Math.max(12 * g + titleLines.length * lineH, markW + 8 * g);
   if (draw) {
     if (pat) {
-      const tex = texture(kind, pat, innerW, bannerH, "banner");
+      const tex = texture(kind, pat, innerW, bannerH);
       doc.addImage(tex, "JPEG", ix, y, innerW, bannerH, `banner-${kind}-${bannerH.toFixed(1)}`);
     } else {
-      doc.setFillColor(FRAME[kind]);
+      doc.setFillColor(FRAME_DK[kind]);
       doc.rect(ix, y, innerW, bannerH, "F");
     }
     doc.setTextColor(kind === "equipment" ? "#ffffff" : INK);
@@ -248,9 +231,9 @@ function drawCard(doc: jsPDF, item: Item, x0: number, y0: number) {
   const { f, r } = fit(doc, item, W, H);
   // Square outer edge so it cuts cleanly; the colored frame runs right to the edge.
   if (item.pat) {
-    doc.addImage(texture(item.kind, item.pat, W, H, "frame"), "JPEG", x0, y0, W, H, `frame-${item.kind}`);
+    doc.addImage(texture(item.kind, item.pat, W, H), "JPEG", x0, y0, W, H, `frame-${item.kind}`);
   } else {
-    doc.setFillColor(FRAME[item.kind]);
+    doc.setFillColor(FRAME_DK[item.kind]);
     doc.rect(x0, y0, W, H, "F");
   }
   doc.setFillColor("#ffffff");

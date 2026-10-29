@@ -1,28 +1,13 @@
 /**
  * "My cards": a little fan of three Dream Factory cards (pet, equipment, creature colors) with a star.
- * Each card has the same frame look as the real cards: a light-to-deep gradient and the kind's
- * faint pattern (paws, sparkles, scales). The ids are shared on purpose: every copy of the icon
- * defines identical gradients and patterns, so whichever one the browser finds first is correct.
+ * Each card has the same frame look as the real cards: the kind's deep color and its faint
+ * pattern (paws, sparkles, scales). The ids are shared on purpose: every copy of the icon
+ * defines identical patterns, so whichever one the browser finds first is correct.
  */
 export default function CardsIcon({ size = 30 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden className="cards-icon">
       <defs>
-        <linearGradient id="ci-g-creature" x1="0.33" y1="0" x2="0.67" y2="1">
-          <stop offset="0" stopColor="#ffb57e" />
-          <stop offset="0.48" stopColor="#ff8a3d" />
-          <stop offset="1" stopColor="#e9682b" />
-        </linearGradient>
-        <linearGradient id="ci-g-equipment" x1="0.33" y1="0" x2="0.67" y2="1">
-          <stop offset="0" stopColor="#bea9ff" />
-          <stop offset="0.48" stopColor="#9b7bff" />
-          <stop offset="1" stopColor="#7b5af0" />
-        </linearGradient>
-        <linearGradient id="ci-g-pet" x1="0.33" y1="0" x2="0.67" y2="1">
-          <stop offset="0" stopColor="#74ebc6" />
-          <stop offset="0.48" stopColor="#2ed9a3" />
-          <stop offset="1" stopColor="#1bbb88" />
-        </linearGradient>
         {/* Creature: scales */}
         <pattern id="ci-p-creature" width="5" height="5" patternUnits="userSpaceOnUse">
           <path d="M0 2.5a2.5 2.5 0 0 1 5 0M-2.5 5a2.5 2.5 0 0 1 5 0M2.5 5a2.5 2.5 0 0 1 5 0" fill="none" stroke="#fff" strokeOpacity="0.35" strokeWidth="0.5" />
@@ -44,14 +29,14 @@ export default function CardsIcon({ size = 30 }: { size?: number }) {
       </defs>
       <g strokeLinejoin="round">
         <g transform="rotate(-16 16 25)">
-          <rect x="6" y="11" width="20" height="28" rx="4" fill="url(#ci-g-pet)" />
+          <rect x="6" y="11" width="20" height="28" rx="4" fill="#1bbb88" />
           <rect x="6" y="11" width="20" height="28" rx="4" fill="url(#ci-p-pet)" stroke="#23205a" strokeWidth="2.5" />
         </g>
         <g transform="rotate(16 32 25)">
-          <rect x="22" y="11" width="20" height="28" rx="4" fill="url(#ci-g-equipment)" />
+          <rect x="22" y="11" width="20" height="28" rx="4" fill="#7b5af0" />
           <rect x="22" y="11" width="20" height="28" rx="4" fill="url(#ci-p-equipment)" stroke="#23205a" strokeWidth="2.5" />
         </g>
-        <rect x="14" y="7" width="20" height="30" rx="4" fill="url(#ci-g-creature)" />
+        <rect x="14" y="7" width="20" height="30" rx="4" fill="#e9682b" />
         <rect x="14" y="7" width="20" height="30" rx="4" fill="url(#ci-p-creature)" stroke="#23205a" strokeWidth="2.5" />
         <rect x="17.5" y="10.5" width="13" height="11" rx="2.5" fill="#fff6d6" stroke="#ffd76a" strokeWidth="0.8" />
         <path
