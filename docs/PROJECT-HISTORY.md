@@ -146,6 +146,7 @@ Google, emailed link, or password (set on the Grown-ups page).
 - The description is checked against the finished picture, so a card can't say "13 eyes" over a 2-eyed picture.
 
 ## Open / next
+- Parked (Oct 29): printed cards. Option 1: order in-app through QPMN's API (no minimum, tarot 2.75×4.75 decks of 1–160 cards, drop-shipped, about $18–21 for 78 cards). Option 2: print-ready file download (300 dpi with 1/8" bleed, plus a card back). Both need a card back design and a test print, since picture quality is currently set to "low".
 1. **New domain starportdreamfactory.com** (in progress):
    - Bought in Vercel, then connected to the project.
    - Set up Resend for it (DNS records plus DMARC).
