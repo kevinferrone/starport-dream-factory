@@ -241,7 +241,7 @@ export default function Builder({ kind, remaining, resting = false, initial }: P
         <section className="panel">
           <h2>
             <span className="emoji" aria-hidden>🎯</span>
-            How hard to beat?
+            Creature difficulty
           </h2>
           <div className="dial">
             <span className="face" aria-hidden>{face.icon}</span>
