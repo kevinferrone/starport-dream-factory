@@ -57,6 +57,16 @@ Names, prices and limits live in one place: `PLANS` in `lib/access.ts`.
 - Each message is logged in Activity. Limit: 10 per day per user.
 - Needs `RESEND_API_KEY` in Vercel. Code: `components/FeedbackButtons.tsx`, `/api/feedback`.
 
+## Meta ads measurement (Oct 29)
+- Server-side Conversions API only (`lib/meta.ts`). There's no Pixel and no cookies, and nothing is sent from kids' pages.
+- Events:
+  - `CompleteRegistration`: when a parent finishes the grown-up step, once per account.
+  - `Subscribe`: on Stripe `customer.subscription.created`, with the price as its value.
+- Each event carries a hashed email and a hashed user id, plus an event_id so retries aren't double-counted.
+- Off until `META_PIXEL_ID` and `META_CAPI_TOKEN` are set in Vercel. `META_TEST_EVENT_CODE` is for testing only.
+- The privacy policy now lists Meta.
+- Plan: Kevin connects Meta (Adspirer Social Ads connector, or Claude in Chrome). Campaigns launch paused; Kevin approves all spend and budget changes; there's an account spending limit; a weekly review runs as a scheduled task.
+
 ## Grown-up check (Oct 29)
 - The Grown-ups page, plan checkout, Manage my plan, and Admin all ask a multiplication question first (6–9 × 6–12, typed answer, never read aloud).
 - Passing unlocks it on that device for 10 minutes, using a signed cookie (`lib/grownup.ts`, `/grownups`).

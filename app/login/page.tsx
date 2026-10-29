@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { sendMetaEvent } from "@/lib/meta";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import EmailLogin from "./EmailLogin";
@@ -9,7 +10,10 @@ async function confirmParent(formData: FormData) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+  const { data: before } = await createAdminClient().from("profiles").select("parent_confirmed").eq("id", user.id).single();
   await createAdminClient().from("profiles").update({ parent_confirmed: true }).eq("id", user.id);
+  // A new grown-up account, counted once.
+  if (!before?.parent_confirmed) await sendMetaEvent({ name: "CompleteRegistration", email: user.email, userId: user.id, eventId: `reg-${user.id}` });
   redirect("/");
 }
 

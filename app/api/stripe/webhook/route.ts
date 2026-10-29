@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { stripe, tierForPrice, tierForCents } from "@/lib/stripe";
 import { PLANS, isTier } from "@/lib/access";
 import { logActivity } from "@/lib/activity";
+import { sendMetaEvent } from "@/lib/meta";
 
 export const runtime = "nodejs";
 
@@ -48,7 +49,19 @@ export async function POST(req: Request) {
 
     const userId = rows?.[0]?.id ?? null;
     const name = isTier(tier) ? PLANS[tier].name : tier;
-    if (event.type === "customer.subscription.created") await logActivity({ userId, kind: "subscribed", detail: name });
+    if (event.type === "customer.subscription.created") {
+      await logActivity({ userId, kind: "subscribed", detail: name });
+      if (userId && !ended) {
+        const { data: who } = await db.from("profiles").select("email").eq("id", userId).single();
+        await sendMetaEvent({
+          name: "Subscribe",
+          email: who?.email,
+          userId,
+          value: (item?.price.unit_amount ?? 0) / 100,
+          eventId: `sub-${sub.id}`,
+        });
+      }
+    }
     else if (event.type === "customer.subscription.deleted") await logActivity({ userId, kind: "subscription_ended" });
     else if (prev) {
       if ("cancel_at_period_end" in prev || "cancel_at" in prev) {
