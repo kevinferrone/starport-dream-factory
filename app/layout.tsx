@@ -7,6 +7,7 @@ import { ReadAloudToggle, SpeakingLink, WarmVoices } from "@/components/ReadAlou
 import { PHRASES, KIND_SPOKEN } from "@/lib/voice-phrases";
 import MakerBar from "@/components/MakerBar";
 import CardsIcon from "@/components/CardsIcon";
+import FeedbackButtons from "@/components/FeedbackButtons";
 import { COMPANY } from "@/lib/site";
 
 const baloo = Baloo_2({ subsets: ["latin"], weight: ["500", "700", "800"], variable: "--font-baloo" });
@@ -70,6 +71,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <Link href="/terms">Terms</Link>
             <Link href="/contact">Contact</Link>
           </footer>
+          {user && <FeedbackButtons />}
         </div>
       </body>
     </html>

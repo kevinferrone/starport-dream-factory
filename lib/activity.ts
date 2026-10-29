@@ -13,7 +13,8 @@ export type ActivityKind =
   | "admin_restore"
   | "admin_unrestore"
   | "admin_comp"
-  | "admin_signin_link";
+  | "admin_signin_link"
+  | "feedback";
 
 /** Records something that happened, for the admin Activity page. Never blocks the main action. */
 export async function logActivity(a: { userId: string | null; kind: ActivityKind; detail?: string; actorId?: string | null }) {
@@ -40,4 +41,5 @@ export const ACTIVITY_LABEL: Record<ActivityKind, string> = {
   admin_unrestore: "Admin undid a restore",
   admin_comp: "Admin changed free access",
   admin_signin_link: "Admin sent a sign-in link",
+  feedback: "Sent feedback",
 };

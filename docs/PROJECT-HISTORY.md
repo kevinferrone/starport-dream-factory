@@ -51,6 +51,12 @@ Names, prices and limits live in one place: `PLANS` in `lib/access.ts`.
 - **Activity**: the newest cards with thumbnails, plus a log of sign-ups, cards, billing events and admin actions (the `activity` table).
 - SQL for these: `supabase/2026-10-27-plans-and-admin.sql`.
 
+## Feedback buttons (Oct 29)
+- Signed-in pages (not login or admin) show "Report a bug" and "Request a feature" in the bottom-right corner.
+- Each opens a form. The message is emailed to info@widerpathgames.com through Resend, from hello@starportdreamfactory.com, with reply-to set to the parent's email.
+- Each message is logged in Activity. Limit: 10 per day per user.
+- Needs `RESEND_API_KEY` in Vercel. Code: `components/FeedbackButtons.tsx`, `/api/feedback`.
+
 ## Grown-up check (Oct 29)
 - The Grown-ups page, plan checkout, Manage my plan, and Admin all ask a multiplication question first (6–9 × 6–12, typed answer, never read aloud).
 - Passing unlocks it on that device for 10 minutes, using a signed cookie (`lib/grownup.ts`, `/grownups`).
