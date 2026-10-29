@@ -6,6 +6,7 @@ import SetPassword from "./SetPassword";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { READING_LEVELS, DEFAULT_READING_LEVEL } from "@/lib/reading-level";
+import { isGrownup } from "@/lib/grownup";
 
 async function saveReadingLevel(formData: FormData) {
   "use server";
@@ -14,16 +15,22 @@ async function saveReadingLevel(formData: FormData) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+  if (!(await isGrownup(user.id))) redirect("/grownups?next=/plans");
   await createAdminClient().from("profiles").update({ reading_level: level }).eq("id", user.id);
   revalidatePath("/plans");
   redirect("/plans?level=saved");
 }
 
 export default async function PlansPage({ searchParams }: { searchParams: Promise<{ welcome?: string; limit?: string; level?: string; error?: string }> }) {
-  const { welcome, limit, level, error } = await searchParams;
+  const params = await searchParams;
+  const { welcome, limit, level, error } = params;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+  if (!(await isGrownup(user.id))) {
+    const qs = new URLSearchParams(params as Record<string, string>).toString();
+    redirect(`/grownups?next=${encodeURIComponent(`/plans${qs ? `?${qs}` : ""}`)}`);
+  }
   const access = await getAccess(user.id);
   const { data: profile } = await supabase.from("profiles").select("stripe_customer_id, tier, reading_level").eq("id", user.id).single();
 

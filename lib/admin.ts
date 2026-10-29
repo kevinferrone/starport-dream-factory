@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { PLANS, isTier, type Tier } from "@/lib/access";
+import { isGrownup } from "@/lib/grownup";
 
 /** Only admins get past this. Returns the admin's user id. */
 export async function requireAdmin(): Promise<string> {
@@ -10,6 +11,7 @@ export async function requireAdmin(): Promise<string> {
   if (!user) redirect("/login");
   const { data } = await createAdminClient().from("profiles").select("is_admin").eq("id", user.id).single();
   if (!data?.is_admin) redirect("/");
+  if (!(await isGrownup(user.id))) redirect("/grownups?next=/admin");
   return user.id;
 }
 

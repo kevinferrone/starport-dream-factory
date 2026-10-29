@@ -710,3 +710,18 @@ table.admin .nowrap, .nowrap { white-space: nowrap; }
 }
 .site-foot a { color: var(--ink-soft); font-weight: 700; }
 .contact-email { font-size: 24px; font-weight: 800; color: var(--ink); overflow-wrap: anywhere; }
+
+/* Grown-up check */
+.gate { max-width: 460px; margin: 20px auto; text-align: center; }
+.gate h1 { margin: 0 0 6px; font-size: 32px; }
+.gate-form { display: grid; gap: 12px; justify-items: center; margin-top: 12px; }
+.gate-q { font-size: 30px; font-weight: 800; }
+.gate-form input[type="text"] {
+  width: 140px;
+  text-align: center;
+  font-size: 30px;
+  font-weight: 800;
+  padding: 8px;
+  border-radius: 16px;
+  border: 3px solid var(--line);
+}

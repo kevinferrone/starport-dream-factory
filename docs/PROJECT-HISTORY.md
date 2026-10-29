@@ -51,6 +51,11 @@ Names, prices and limits live in one place: `PLANS` in `lib/access.ts`.
 - **Activity**: the newest cards with thumbnails, plus a log of sign-ups, cards, billing events and admin actions (the `activity` table).
 - SQL for these: `supabase/2026-10-27-plans-and-admin.sql`.
 
+## Grown-up check (Oct 29)
+- The Grown-ups page, plan checkout, Manage my plan, and Admin all ask a multiplication question first (6–9 × 6–12, typed answer, never read aloud).
+- Passing unlocks it on that device for 10 minutes, using a signed cookie (`lib/grownup.ts`, `/grownups`).
+- Kevin chose this over a PIN so parents never get locked out by a forgotten PIN.
+
 ## Sign-in
 Google, emailed link, or password (set on the Grown-ups page).
 - Google uses Google's own button (`app/login/GoogleButton.tsx`, Google Identity Services, then Supabase `signInWithIdToken`), so Google's screen shows our domain instead of the long supabase.co address. It needs `NEXT_PUBLIC_GOOGLE_CLIENT_ID` in Vercel. Without it, the button falls back to the old Supabase redirect. starportdreamfactory.com is verified in Google Search Console (TXT record in Vercel DNS). Google branding is verified (Oct 27), and supabase.co was removed from the authorized domains and redirect URIs. Parents confirm they're a grown-up on first sign-in.
