@@ -199,9 +199,17 @@ function drawCard(doc: jsPDF, item: Item, x0: number, y0: number) {
   layout(doc, item, x0, y0, W, f, r, true);
   // Footer, pinned to the bottom of the card
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(8 * f);
   doc.setTextColor(SOFT);
-  doc.text("Starport Dream Factory", x0 + W - frame - 14 * g, y0 + H - frame - 7 * g, { align: "right" });
+  // Points players to the full game. Shrinks if needed so it never runs past the card's inner edge.
+  const foot = "Play it in Starport · widerpathgames.com";
+  const room = W - frame * 2 - 28 * g;
+  let size = 8 * f;
+  doc.setFontSize(size);
+  while (doc.getTextWidth(foot) > room && size > 5) {
+    size -= 0.25;
+    doc.setFontSize(size);
+  }
+  doc.text(foot, x0 + W - frame - 14 * g, y0 + H - frame - 7 * g, { align: "right" });
 }
 
 const fileName = (s: string) => `${clean(s).replace(/[^a-z0-9]+/gi, "-") || "cards"}.pdf`;

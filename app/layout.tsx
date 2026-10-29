@@ -8,7 +8,7 @@ import { PHRASES, KIND_SPOKEN } from "@/lib/voice-phrases";
 import MakerBar from "@/components/MakerBar";
 import CardsIcon from "@/components/CardsIcon";
 import FeedbackButtons from "@/components/FeedbackButtons";
-import { COMPANY } from "@/lib/site";
+import { COMPANY, STARPORT_URL } from "@/lib/site";
 
 const baloo = Baloo_2({ subsets: ["latin"], weight: ["500", "700", "800"], variable: "--font-baloo" });
 
@@ -70,6 +70,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <Link href="/privacy">Privacy policy</Link>
             <Link href="/terms">Terms</Link>
             <Link href="/contact">Contact</Link>
+            <a href={STARPORT_URL} target="_blank" rel="noopener noreferrer">Starport game</a>
           </footer>
           {user && <FeedbackButtons />}
         </div>

@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { READING_LEVELS, DEFAULT_READING_LEVEL } from "@/lib/reading-level";
 import { isGrownup } from "@/lib/grownup";
+import { STARPORT_URL } from "@/lib/site";
 
 async function saveReadingLevel(formData: FormData) {
   "use server";
@@ -109,6 +110,19 @@ export default async function PlansPage({ searchParams }: { searchParams: Promis
           </select>
           <button className="big-btn small" type="submit">Save reading level</button>
         </form>
+      </section>
+
+      <section className="panel" style={{ maxWidth: 560, margin: "0 auto 18px" }}>
+        <h2>
+          <span className="emoji" aria-hidden>🎲</span> Play the full game
+        </h2>
+        <p className="hint">
+          Every Dream Factory card is made for Starport, the tabletop roleplaying game for kids. Grab the
+          rulebook and bring your kid&apos;s creatures, equipment and pets to the table.
+        </p>
+        <a className="big-btn small" href={STARPORT_URL} target="_blank" rel="noopener noreferrer">
+          Get Starport →
+        </a>
       </section>
 
       <SetPassword />
