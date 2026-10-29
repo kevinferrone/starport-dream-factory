@@ -188,6 +188,17 @@ button { font: inherit; color: inherit; }
 }
 .meter a { color: #c2347a; }
 
+/* "These cards are made for Starport" line under the meter on the homepage */
+.made-for {
+  margin: -24px auto 40px;
+  max-width: 560px;
+  text-align: center;
+  font-size: 15px;
+  color: var(--ink);
+  opacity: 0.85;
+}
+.made-for a { color: #c2347a; font-weight: 700; white-space: nowrap; }
+
 /* ---------- Panels ---------- */
 .panel {
   background: var(--paper);

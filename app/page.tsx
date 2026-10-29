@@ -5,6 +5,7 @@ import { getAccess, RESTING_MESSAGE } from "@/lib/access";
 import { KINDS, type Kind } from "@/lib/options";
 import { SpeakingLink } from "@/components/ReadAloud";
 import { KIND_SPOKEN } from "@/lib/voice-phrases";
+import { STARPORT_URL } from "@/lib/site";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -42,6 +43,13 @@ export default async function Home() {
         <span>{access.resting ? RESTING_MESSAGE : access.summary}</span>
         {access.tier !== "unlimited" && <Link href="/plans">Get more</Link>}
       </div>
+
+      <p className="made-for">
+        These cards are made for <strong>Starport</strong>, the tabletop roleplaying game.{" "}
+        <a href={STARPORT_URL} target="_blank" rel="noopener noreferrer">
+          Learn more →
+        </a>
+      </p>
     </>
   );
 }
