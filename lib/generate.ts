@@ -467,6 +467,7 @@ export async function matchToPicture(kind: Kind, card: AnyCard, imageUrl: string
     input_schema: {
       type: "object",
       properties: {
+        name: { type: "string", description: "The card name. Unchanged unless it names a different kind of animal or thing than the picture shows." },
         description: { type: "string", description: "1-2 sentences, same personality and humor, matching the picture" },
         image_prompt: { type: "string", description: "What the picture actually shows" },
       },
@@ -475,7 +476,7 @@ export async function matchToPicture(kind: Kind, card: AnyCard, imageUrl: string
   };
   try {
     const res = await anthropic().messages.create({
-      model: process.env.ANTHROPIC_FAST_MODEL || "claude-haiku-5-5", // describing a picture: the small model is plenty
+      model: process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5", // the last check that words match the picture: worth the stronger model
       max_tokens: 600,
       system: readingGuide(readingLevel),
       tools: [tool],
@@ -490,7 +491,10 @@ export async function matchToPicture(kind: Kind, card: AnyCard, imageUrl: string
               text:
                 `This picture was drawn for a Starport ${kind} card named "${card.name}".\n` +
                 `Card description: "${card.description}"\n\n` +
-                `Compare the description with the picture. If any look detail disagrees (colors, number of eyes, legs, wings or tentacles, fur vs scales, size, what kind of thing it is), rewrite the description to match the PICTURE exactly, keeping the same personality, humor and length. If it already matches, return it unchanged. Also describe what the picture actually shows in image_prompt. Call match_picture.`,
+                `First decide what kind of animal, creature or object the picture shows. The PICTURE is the truth.\n` +
+                `If the description (or the name) says it is a different kind of thing (for example it says alpaca but the picture is a cat), rewrite it so it is clearly the kind of thing in the picture. ` +
+                `Also fix any other look detail that disagrees (colors, number of eyes, legs, wings or tentacles, fur vs scales, size), keeping the same personality, humor and length. ` +
+                `Only change the name if it names the wrong kind of thing. If everything already matches, return them unchanged. Describe what the picture actually shows in image_prompt. Call match_picture.`,
             },
           ],
         },
@@ -498,9 +502,14 @@ export async function matchToPicture(kind: Kind, card: AnyCard, imageUrl: string
     });
     const block = res.content.find((b) => b.type === "tool_use");
     if (block && block.type === "tool_use") {
-      const out = block.input as { description?: string; image_prompt?: string };
+      const out = block.input as { name?: string; description?: string; image_prompt?: string };
       if (out.description?.trim()) {
-        return { ...card, description: out.description.trim(), image_prompt: out.image_prompt?.trim() || card.image_prompt };
+        return {
+          ...card,
+          name: out.name?.trim() || card.name,
+          description: out.description.trim(),
+          image_prompt: out.image_prompt?.trim() || card.image_prompt,
+        };
       }
     }
   } catch (e) {
@@ -542,10 +551,12 @@ async function checkPicture(
     input_schema: {
       type: "object",
       properties: {
+        shows: { type: "string", description: "In a few words, what kind of animal, creature or object the picture actually shows (e.g. 'a cat', 'an alpaca', 'a teapot with legs')." },
+        same_kind: { type: "boolean", description: "True only if that is the same kind of thing the subject is based on." },
         ok: { type: "boolean" },
         problems: { type: "string", description: "If not ok: what is wrong, as short instructions for the illustrator." },
       },
-      required: ["ok"],
+      required: ["shows", "same_kind", "ok"],
     },
   };
   try {
@@ -564,8 +575,10 @@ async function checkPicture(
               text:
                 `This picture is for a kids' game card. It was supposed to show: ${card.image_prompt}\n` +
                 (musts ? `The child picked these, and each one MUST be clearly visible: ${musts}.\n` : "") +
+                `First say what kind of thing the picture shows, then whether it is the same kind of thing the subject is based on. ` +
+                `Be strict: an alpaca drawn so it looks like a cat, a frog that looks like a lizard, or a teapot creature that looks like a plain blob is NOT the same kind.\n` +
                 `ok = false if ANY of these are true:\n` +
-                `- It shows a different kind of thing than asked (for example a little alien or a person instead of a frog).\n` +
+                `- It shows a different kind of thing than asked (for example a cat instead of an alpaca, or a little alien instead of a frog).\n` +
                 (musts ? `- Any of the child's picks is missing or wrong (kind of animal or item, color, fur/scales/feathers, extra legs, many eyes, wings, size).\n` : "") +
                 `- Anything that looks like a weapon or sharp object: gun, laser, blaster, ray gun, sword, knife, spear, arrow, axe.\n` +
                 `- A space suit or helmet that wasn't asked for.\n` +
@@ -577,8 +590,11 @@ async function checkPicture(
     });
     const block = res.content.find((b) => b.type === "tool_use");
     if (block && block.type === "tool_use") {
-      const out = block.input as { ok?: boolean; problems?: string };
-      if (out.ok === false) return out.problems?.trim() || "The picture didn't match the card.";
+      const out = block.input as { ok?: boolean; same_kind?: boolean; shows?: string; problems?: string };
+      if (out.same_kind === false && out.ok !== false) {
+        return `It looks like ${out.shows ?? "the wrong thing"}. Draw exactly what the subject says, clearly that kind of animal or object.`;
+      }
+      if (out.ok === false) return out.problems?.trim() || `It looks like ${out.shows ?? "the wrong thing"}.`;
     }
   } catch (e) {
     console.error("checkPicture", e);

@@ -105,7 +105,7 @@ export async function POST(req: Request) {
     const picture = drawn;
     // Make the words match what was actually drawn.
     const matched = await matchToPicture(input.kind, card, drawn.url, profile?.reading_level);
-    Object.assign(card, { description: matched.description, image_prompt: matched.image_prompt });
+    Object.assign(card, { name: matched.name, description: matched.description, image_prompt: matched.image_prompt });
 
     const { data, error } = await db
       .from("creations")

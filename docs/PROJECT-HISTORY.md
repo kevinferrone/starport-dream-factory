@@ -155,12 +155,13 @@ Google, emailed link, or password (set on the Grown-ups page).
 ## Picture accuracy and no weapons (Oct 27)
 - The bug: a frog pet came out as the same little green alien in a space suit holding a laser. The word "Starport" in the picture style made the picture model reach for space aliens, so it's gone from `IMAGE_STYLE`.
 - The picture prompt now starts with MUST SHOW (the kid's look buttons), then the subject, then the style, then `IMAGE_NEVER` (no weapons or sharp things, nothing held unless asked, no space suits).
+- Oct 29: the picture check now names what the picture shows and must confirm it's the same kind of thing (an alpaca drawn as a cat fails). The final match can fix the name too, not just the description.
 - After drawing, Claude checks the picture: right kind of thing, every pick visible, no weapon, no unasked space suit. If it fails, the picture is redrawn with the fix, up to 2 times.
 - Card text: weapons and sharp things are banned in the unbreakable rules, and a code check (`WEAPONS` regex in checkCard) rejects any card that mentions one.
 
 ## Cost savings (Oct 27)
 - The rules part of Claude's instructions uses prompt caching.
-- The drawing check and the picture match use the small model (`ANTHROPIC_FAST_MODEL`, default claude-haiku-5-5). Writing and rules review stay on `ANTHROPIC_MODEL`.
+- The drawing check uses the small model (`ANTHROPIC_FAST_MODEL`, default claude-haiku-5-5). The picture match was moved back to `ANTHROPIC_MODEL` on Oct 29, after an "alpaca" description appeared on a cat picture.
 - Kevin is testing `OPENAI_IMAGE_QUALITY=low`.
 
 ## Bugs already fixed (don't reintroduce)
