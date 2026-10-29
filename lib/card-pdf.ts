@@ -201,7 +201,7 @@ function drawCard(doc: jsPDF, item: Item, x0: number, y0: number) {
   doc.setFont("helvetica", "bold");
   doc.setTextColor(SOFT);
   // Points players to the full game. Shrinks if needed so it never runs past the card's inner edge.
-  const foot = "Play it in Starport · widerpathgames.com";
+  const foot = "Play it in Starport · rpgforkids.com";
   const room = W - frame * 2 - 28 * g;
   let size = 8 * f;
   doc.setFontSize(size);
