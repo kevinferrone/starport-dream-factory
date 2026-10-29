@@ -62,7 +62,7 @@ export default function Privacy() {
         <li><b>Google</b> handles sign-in if you choose Continue with Google.</li>
         <li>
           <b>Meta</b> (Facebook and Instagram): when a grown-up creates an account or starts a paid plan, our
-          server tells Meta that it happened, with a scrambled (hashed) copy of the grown-up&apos;s email, so we can
+          server tells Meta that it happened, with a scrambled (hashed) copy of the grown-up&apos;s email and their browser type, so we can
           see which of our ads work. We never send Meta anything about kids or what they build, and we don&apos;t use
           the Meta Pixel or advertising cookies.
         </li>

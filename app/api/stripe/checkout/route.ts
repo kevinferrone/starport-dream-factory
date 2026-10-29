@@ -70,7 +70,7 @@ export async function POST(req: Request) {
     customer: customerId,
     client_reference_id: user.id,
     line_items: [{ price: priceId, quantity: 1 }],
-    subscription_data: { metadata: { tier } },
+    subscription_data: { metadata: { tier, ua: (req.headers.get("user-agent") ?? "").slice(0, 450) } },
     success_url: `${site}/plans?welcome=1`,
     cancel_url: `${site}/plans`,
     allow_promotion_codes: true,

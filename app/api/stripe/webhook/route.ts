@@ -59,6 +59,7 @@ export async function POST(req: Request) {
           userId,
           value: (item?.price.unit_amount ?? 0) / 100,
           eventId: `sub-${sub.id}`,
+          userAgent: sub.metadata?.ua || null,
         });
       }
     }

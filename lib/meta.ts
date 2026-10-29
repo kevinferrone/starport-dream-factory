@@ -11,6 +11,7 @@ export async function sendMetaEvent(e: {
   userId: string;
   value?: number; // dollars
   eventId: string; // unique per event, so a retry is never counted twice
+  userAgent?: string | null; // the parent's browser type (Meta requires it for website events)
 }) {
   const pixel = process.env.META_PIXEL_ID;
   const token = process.env.META_CAPI_TOKEN;
@@ -25,6 +26,7 @@ export async function sendMetaEvent(e: {
     user_data: {
       ...(e.email ? { em: [sha(e.email)] } : {}),
       external_id: [sha(e.userId)],
+      ...(e.userAgent ? { client_user_agent: e.userAgent.slice(0, 500) } : {}),
     },
     ...(e.value !== undefined ? { custom_data: { currency: "USD", value: e.value } } : {}),
   };
