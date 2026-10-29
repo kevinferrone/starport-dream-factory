@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ReadAloudToggle, SpeakingLink, WarmVoices } from "@/components/ReadAloud";
 import { PHRASES, KIND_SPOKEN } from "@/lib/voice-phrases";
 import MakerBar from "@/components/MakerBar";
+import CardsIcon from "@/components/CardsIcon";
 import { COMPANY } from "@/lib/site";
 
 const baloo = Baloo_2({ subsets: ["latin"], weight: ["500", "700", "800"], variable: "--font-baloo" });
@@ -36,7 +37,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   <span className="text">Home</span>
                 </SpeakingLink>
                 <SpeakingLink href="/cards" label={PHRASES.myCards} className="icon-link" title="My cards">
-                  <span className="emoji" aria-hidden>🗂️</span>
+                  <CardsIcon />
                   <span className="text">My cards</span>
                 </SpeakingLink>
                 <ReadAloudToggle />
