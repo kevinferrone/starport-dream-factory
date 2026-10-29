@@ -34,17 +34,43 @@ body {
   font-size: 18px;
   line-height: 1.45;
   color: var(--ink);
-  background-color: var(--sky);
-  /* soft puffy clouds over a daytime sky */
-  background-image:
-    radial-gradient(ellipse 160px 60px at 10% 14%, #ffffffd0 60%, transparent 62%),
-    radial-gradient(ellipse 110px 46px at 16% 10%, #ffffffd0 60%, transparent 62%),
-    radial-gradient(ellipse 190px 64px at 86% 30%, #ffffffb8 60%, transparent 62%),
-    radial-gradient(ellipse 120px 50px at 80% 26%, #ffffffb8 60%, transparent 62%),
-    radial-gradient(ellipse 170px 58px at 30% 78%, #ffffffa8 60%, transparent 62%),
-    radial-gradient(ellipse 150px 54px at 92% 88%, #ffffffa8 60%, transparent 62%),
-    linear-gradient(to bottom, var(--sky-top), var(--sky) 45%, var(--sky-low));
-  background-attachment: fixed;
+  /* Fallback while the painting loads */
+  background-color: #e9d9ee;
+}
+
+/* "Dreamy sky": the Memory Whale painting (Starport art), softened, with a glow behind
+   the content and a light paper grain. Pinned behind everything; a fixed layer instead
+   of background-attachment: fixed, which iPhones ignore. */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+body::before {
+  background:
+    radial-gradient(ellipse 760px 520px at 50% 26%, #ffffffb8 0%, #ffffff66 45%, #ffffff00 75%),
+    url("/bg/dreamy.jpg") center 35% / cover no-repeat,
+    #e9d9ee;
+}
+body::after {
+  background: url("/bg/grain.png") 0 0 / 256px 256px;
+  mix-blend-mode: multiply;
+  opacity: 0.45;
+}
+@media (max-width: 760px) {
+  body::before {
+    background:
+      radial-gradient(ellipse 520px 460px at 50% 22%, #ffffffbf 0%, #ffffff70 45%, #ffffff00 78%),
+      url("/bg/dreamy-small.jpg") 30% 35% / cover no-repeat,
+      #e9d9ee;
+  }
+}
+@media print {
+  body::before, body::after { display: none; }
+  body { background: #fff; }
 }
 
 a { color: inherit; }
