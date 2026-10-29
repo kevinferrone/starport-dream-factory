@@ -65,7 +65,19 @@ Names, prices and limits live in one place: `PLANS` in `lib/access.ts`.
 - Each event carries a hashed email and a hashed user id, plus an event_id so retries aren't double-counted.
 - Off until `META_PIXEL_ID` and `META_CAPI_TOKEN` are set in Vercel. `META_TEST_EVENT_CODE` is for testing only.
 - The privacy policy now lists Meta.
-- Plan: Kevin connects Meta (Adspirer Social Ads connector, or Claude in Chrome). Campaigns launch paused; Kevin approves all spend and budget changes; there's an account spending limit; a weekly review runs as a scheduled task.
+- Meta setup is done (Oct 29): business portfolio Wider Path, LLC; Starport Facebook Page plus Instagram; an ad account with a $200/month account spending limit; dataset 2648505965605314 (CAPI only, sending CompleteRegistration and Subscribe); `META_PIXEL_ID` and `META_CAPI_TOKEN` set in Vercel.
+- Kevin wants it as close to autopilot as possible. The plan: the Adspirer Social Ads connector (pending), with reviews twice a week (Mon/Thu) as a scheduled task. Each review pauses losers, shifts budget to winners, rotates kit posts and sends Kevin a summary.
+- Default guardrails:
+  - $6/day, under the $200 cap.
+  - Target under $4 per free signup at first, then under $15 per paying subscriber.
+  - Audience: US parents interested in tabletop, D&D, homeschool and reading.
+  - Placements: FB/IG feeds and Stories.
+  - Any spend above these needs Kevin's yes. The first campaign needs his sign-off.
+- **Supercharge rule (Kevin, Oct 29):** when an ad or ad set has 3 or more paying subscribers over 7 or more days AND (first-payment ROAS ≥ 1.0 OR cost per paying subscriber < $15):
+  - Flag it as "Ready to supercharge" at the top of the review and send a push notification, with spend, subscribers, cost per subscriber and ROAS.
+  - Recommend +20–30% budget every 3–4 days.
+  - Never raise the budget without Kevin's yes.
+- Organic posts aren't on autopilot (Adspirer handles ads only). Offered: schedule the 8 kit posts in Business Suite through Claude in Chrome.
 
 ## Grown-up check (Oct 29)
 - The Grown-ups page, plan checkout, Manage my plan, and Admin all ask a multiplication question first (6–9 × 6–12, typed answer, never read aloud).
