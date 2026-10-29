@@ -5,8 +5,15 @@ import CardActions from "@/components/CardActions";
 import type { Kind } from "@/lib/options";
 import type { AnyCard } from "@/lib/generate";
 
-export default async function CardPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function CardPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ new?: string }>;
+}) {
   const { id } = await params;
+  const { new: isNew } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -26,6 +33,7 @@ export default async function CardPage({ params }: { params: Promise<{ id: strin
       saved={data.status === "saved"}
       rerollsLeft={Math.max(0, MAX_REROLLS_PER_CARD - data.reroll_count)}
       readingLevel={profile?.reading_level ?? null}
+      reveal={isNew === "1"}
     />
   );
 }

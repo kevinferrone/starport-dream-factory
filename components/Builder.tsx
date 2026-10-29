@@ -20,6 +20,7 @@ import {
 } from "@/lib/options";
 import { speak, useSpeakOnHover, warmVoices } from "@/components/ReadAloud";
 import { PHRASES, difficultyPhrase, coinPhrase } from "@/lib/voice-phrases";
+import FactoryScene from "@/components/FactoryScene";
 
 type Props = {
   kind: Kind;
@@ -48,12 +49,6 @@ async function shrinkPhoto(file: File): Promise<string> {
   ctx.drawImage(bmp, 0, 0, canvas.width, canvas.height);
   return canvas.toDataURL("image/jpeg", 0.85);
 }
-
-const MACHINE_ICONS: Record<Kind, string[]> = {
-  creature: ["🦖", "🐙", "🦄", "👾"],
-  equipment: ["🪄", "👑", "🧪", "🥾"],
-  pet: ["🐱", "🐸", "🦉", "🐰"],
-};
 
 export default function Builder({ kind, remaining, resting = false, initial }: Props) {
   const router = useRouter();
@@ -137,7 +132,7 @@ export default function Builder({ kind, remaining, resting = false, initial }: P
         if (data.code === "limit") router.push("/plans?limit=1");
         throw new Error(data.error || "Something went wrong. Please try again.");
       }
-      router.push(`/cards/${data.id}`);
+      router.push(`/cards/${data.id}?new=1`);
     } catch (e) {
       setBusy(false);
       setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
@@ -145,6 +140,10 @@ export default function Builder({ kind, remaining, resting = false, initial }: P
   };
 
   const face = difficultyFace(difficulty);
+  // The kid's picks, by name, for the factory scene.
+  const pickLabels = groups.flatMap((g) =>
+    (choices[g.id] ?? []).map((id) => allOptions(g).find((o) => o.id === id)?.label).filter((l): l is string => !!l)
+  );
 
   return (
     <div className={`kind-${kind}`}>
@@ -339,25 +338,7 @@ export default function Builder({ kind, remaining, resting = false, initial }: P
         </div>
       </div>
 
-      {busy && (
-        <div className="machine" role="status" aria-live="polite">
-          <div>
-            <div className="orbit">
-              <div className="ring" aria-hidden>
-                {MACHINE_ICONS[kind].map((i) => (
-                  <span key={i}>{i}</span>
-                ))}
-              </div>
-              <div className="core" aria-hidden>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/flummox.webp" alt="" />
-              </div>
-            </div>
-            <p>{preview ? "Bringing your drawing to life…" : "The Dream Factory is building…"}</p>
-            <small>Drawing the picture takes about a minute</small>
-          </div>
-        </div>
-      )}
+      {busy && <FactoryScene kind={kind} picks={pickLabels} drawing={!!preview} />}
     </div>
   );
 }

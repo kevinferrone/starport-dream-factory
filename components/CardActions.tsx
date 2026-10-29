@@ -21,6 +21,14 @@ type Props = {
   saved: boolean;
   rerollsLeft: number;
   readingLevel: number | null;
+  /** True right after the factory builds this card: it flips over with a sparkle, once. */
+  reveal?: boolean;
+};
+
+const REVEAL_TITLE: Record<Kind, string> = {
+  creature: "Ta-da! Meet your creature!",
+  equipment: "Ta-da! Here's your new gear!",
+  pet: "Ta-da! Meet your new pet!",
 };
 
 export default function CardActions(props: Props) {
@@ -43,6 +51,11 @@ export default function CardActions(props: Props) {
     setHighlight(null);
   };
   useEffect(() => stopReading, []);
+
+  // Drop ?new=1 from the address so a reload or a shared link doesn't replay the reveal.
+  useEffect(() => {
+    if (props.reveal) window.history.replaceState(null, "", window.location.pathname);
+  }, [props.reveal]);
 
   // Reads the whole card aloud, lighting up each word as it's spoken.
   const readCard = async () => {
@@ -183,7 +196,31 @@ export default function CardActions(props: Props) {
 
   return (
     <div className="card-stage">
-      <Card kind={props.kind} card={card} imageUrl={props.imageUrl} highlight={highlight} />
+      {props.reveal ? (
+        <>
+          <h1 className="reveal-title no-print">{REVEAL_TITLE[props.kind]}</h1>
+          <div className="reveal">
+            <span className="reveal-glow" aria-hidden />
+            <span className="reveal-burst" aria-hidden>
+              {Array.from({ length: 10 }, (_, i) => (
+                <svg key={i} className={`spark s${i}`} viewBox="-10 -10 20 20">
+                  <path d="M0 -10 L2.4 -2.4 L10 0 L2.4 2.4 L0 10 L-2.4 2.4 L-10 0 L-2.4 -2.4 Z" />
+                </svg>
+              ))}
+            </span>
+            <div className="reveal-flip">
+              <div className="reveal-back" aria-hidden>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/starport-logo.png" alt="" />
+                <span>Dream Factory</span>
+              </div>
+              <Card kind={props.kind} card={card} imageUrl={props.imageUrl} highlight={highlight} />
+            </div>
+          </div>
+        </>
+      ) : (
+        <Card kind={props.kind} card={card} imageUrl={props.imageUrl} highlight={highlight} />
+      )}
 
       {editing ? (
         <>
