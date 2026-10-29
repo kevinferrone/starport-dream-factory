@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ReadAloudToggle, SpeakingLink, WarmVoices } from "@/components/ReadAloud";
 import { PHRASES, KIND_SPOKEN } from "@/lib/voice-phrases";
 import MakerBar from "@/components/MakerBar";
+import { COMPANY, CONTACT_EMAIL } from "@/lib/site";
 
 const baloo = Baloo_2({ subsets: ["latin"], weight: ["500", "700", "800"], variable: "--font-baloo" });
 
@@ -62,6 +63,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </header>
           {user && <MakerBar />}
           <main>{children}</main>
+          <footer className="site-foot no-print">
+            <span>© {new Date().getFullYear()} {COMPANY}</span>
+            <Link href="/privacy">Privacy policy</Link>
+            <Link href="/terms">Terms</Link>
+            <a href={`mailto:${CONTACT_EMAIL}`}>Contact</a>
+          </footer>
         </div>
       </body>
     </html>
