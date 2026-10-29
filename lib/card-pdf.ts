@@ -6,6 +6,13 @@ import type { AnyCard } from "@/lib/generate";
 import { cardPieces } from "@/lib/card-text";
 
 const FRAME: Record<Kind, string> = { creature: "#ff8a3d", equipment: "#9b7bff", pet: "#2ed9a3" };
+// The frame's gradient (light at the top, deep at the bottom) and pattern, matching .tcard in globals.css.
+const FRAME_LT: Record<Kind, string> = { creature: "#ffb57e", equipment: "#bea9ff", pet: "#74ebc6" };
+const FRAME_DK: Record<Kind, string> = { creature: "#e9682b", equipment: "#7b5af0", pet: "#1bbb88" };
+/** Pattern tile size in points (the screen card is 400px wide with 104/128/140px tiles; the PDF card is 198pt). */
+const PAT_PT: Record<Kind, number> = { creature: 51.5, equipment: 63.4, pet: 69.3 };
+const GOLD = "#ffd76a";
+const PX_PER_PT = 4; // frame textures render at about 288 dpi
 const INK = "#23205a";
 const SOFT = "#5b588f";
 const CHIP = "#f1efff";
@@ -48,6 +55,49 @@ function cropped(img: Img, r: number): string {
   return (img.crops![key] = c.toDataURL("image/jpeg", 0.9));
 }
 
+const patCache: Partial<Record<Kind, Promise<ImageBitmap | null>>> = {};
+const pattern = (kind: Kind) =>
+  (patCache[kind] ??= fetch(`/frames/${kind}.png`)
+    .then((r) => r.blob())
+    .then((b) => createImageBitmap(b))
+    .catch(() => null));
+
+const texCache: Record<string, string> = {};
+/**
+ * The frame's look as a picture: gradient plus the kind's pattern, w x h points.
+ * "frame" runs light (top) to deep (bottom); "banner" runs left to right like the screen card.
+ */
+function texture(kind: Kind, pat: ImageBitmap, w: number, h: number, style: "frame" | "banner"): string {
+  const key = `${kind}:${style}:${w.toFixed(1)}x${h.toFixed(1)}`;
+  if (texCache[key]) return texCache[key];
+  const c = document.createElement("canvas");
+  c.width = Math.round(w * PX_PER_PT);
+  c.height = Math.round(h * PX_PER_PT);
+  const ctx = c.getContext("2d")!;
+  const grad =
+    style === "frame"
+      ? ctx.createLinearGradient(c.width * 0.33, 0, c.width * 0.67, c.height)
+      : ctx.createLinearGradient(0, 0, c.width, 0);
+  if (style === "frame") {
+    grad.addColorStop(0, FRAME_LT[kind]);
+    grad.addColorStop(0.48, FRAME[kind]);
+    grad.addColorStop(1, FRAME_DK[kind]);
+  } else {
+    grad.addColorStop(0, FRAME[kind]);
+    grad.addColorStop(1, FRAME_LT[kind]);
+  }
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, c.width, c.height);
+  const fill = ctx.createPattern(pat, "repeat");
+  if (fill) {
+    const tile = PAT_PT[kind] * PX_PER_PT;
+    fill.setTransform(new DOMMatrix().scale(tile / pat.width, tile / pat.height));
+    ctx.fillStyle = fill;
+    ctx.fillRect(0, 0, c.width, c.height);
+  }
+  return (texCache[key] = c.toDataURL("image/jpeg", 0.92));
+}
+
 const badgeCache: Partial<Record<Kind, Promise<Img | null>>> = {};
 const badge = (kind: Kind) => (badgeCache[kind] ??= loadImage(`/tiles/${kind}.webp`));
 
@@ -55,7 +105,7 @@ const badge = (kind: Kind) => (badgeCache[kind] ??= loadImage(`/tiles/${kind}.we
 const clean = (s: string) =>
   s.replace(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{FE0F}]/gu, "").replace(/\s+/g, " ").trim();
 
-type Item = { kind: Kind; card: AnyCard; art: Img | null; mark: Img | null };
+type Item = { kind: Kind; card: AnyCard; art: Img | null; mark: Img | null; pat: ImageBitmap | null };
 
 /**
  * Lays one card out at (x0, y0), W points wide. `f` scales the text and `r` is the
@@ -64,7 +114,7 @@ type Item = { kind: Kind; card: AnyCard; art: Img | null; mark: Img | null };
  */
 function layout(doc: jsPDF, item: Item, x0: number, y0: number, W: number, f: number, r: number, draw: boolean) {
   const g = W / 300;
-  const { kind, card, art, mark } = item;
+  const { kind, card, art, mark, pat } = item;
   const pieces = cardPieces(kind, card);
   const frame = 10 * g;
   const innerW = W - frame * 2;
@@ -86,8 +136,13 @@ function layout(doc: jsPDF, item: Item, x0: number, y0: number, W: number, f: nu
   const lineH = 19 * f;
   const bannerH = Math.max(12 * g + titleLines.length * lineH, markW + 8 * g);
   if (draw) {
-    doc.setFillColor(FRAME[kind]);
-    doc.rect(ix, y, innerW, bannerH, "F");
+    if (pat) {
+      const tex = texture(kind, pat, innerW, bannerH, "banner");
+      doc.addImage(tex, "JPEG", ix, y, innerW, bannerH, `banner-${kind}-${bannerH.toFixed(1)}`);
+    } else {
+      doc.setFillColor(FRAME[kind]);
+      doc.rect(ix, y, innerW, bannerH, "F");
+    }
     doc.setTextColor(kind === "equipment" ? "#ffffff" : INK);
     doc.text(titleLines, ix + 12 * g, y + (bannerH - titleLines.length * lineH) / 2 + lineH * 0.78);
     if (mark) {
@@ -192,11 +247,19 @@ function drawCard(doc: jsPDF, item: Item, x0: number, y0: number) {
   const frame = 10 * g;
   const { f, r } = fit(doc, item, W, H);
   // Square outer edge so it cuts cleanly; the colored frame runs right to the edge.
-  doc.setFillColor(FRAME[item.kind]);
-  doc.rect(x0, y0, W, H, "F");
+  if (item.pat) {
+    doc.addImage(texture(item.kind, item.pat, W, H, "frame"), "JPEG", x0, y0, W, H, `frame-${item.kind}`);
+  } else {
+    doc.setFillColor(FRAME[item.kind]);
+    doc.rect(x0, y0, W, H, "F");
+  }
   doc.setFillColor("#ffffff");
   doc.roundedRect(x0 + frame, y0 + frame, W - frame * 2, H - frame * 2, 12 * g, 12 * g, "F");
   layout(doc, item, x0, y0, W, f, r, true);
+  // Thin gold line where the frame meets the card face (drawn last so it sits over the picture's edge)
+  doc.setDrawColor(GOLD);
+  doc.setLineWidth(1.6 * g);
+  doc.roundedRect(x0 + frame, y0 + frame, W - frame * 2, H - frame * 2, 12 * g, 12 * g, "S");
   // Footer, pinned to the bottom of the card
   doc.setFont("helvetica", "bold");
   doc.setTextColor(SOFT);
@@ -215,8 +278,12 @@ function drawCard(doc: jsPDF, item: Item, x0: number, y0: number) {
 const fileName = (s: string) => `${clean(s).replace(/[^a-z0-9]+/gi, "-") || "cards"}.pdf`;
 
 async function itemFor(kind: Kind, card: AnyCard, imageUrl: string | null): Promise<Item> {
-  const [art, mark] = await Promise.all([imageUrl ? loadImage(imageUrl, true) : null, badge(kind)]);
-  return { kind, card, art, mark };
+  const [art, mark, pat] = await Promise.all([
+    imageUrl ? loadImage(imageUrl, true) : null,
+    badge(kind),
+    pattern(kind),
+  ]);
+  return { kind, card, art, mark, pat };
 }
 
 /** One card on a page exactly the size of a tarot card (2.75 x 4.75 in), ready for a print shop. */

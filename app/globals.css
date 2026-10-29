@@ -378,13 +378,42 @@ button { font: inherit; color: inherit; }
   container-type: inline-size;
   padding: 14px;
   border-radius: 26px;
-  background: var(--c);
+  /* Frame: a light-to-deep gradient in the kind's color, a faint pattern for the kind
+     (scales, sparkles, paws), and a thin gold line inside. lib/card-pdf.ts draws the same frame. */
+  --c-lt: #ffb57e;
+  --c-dk: #e9682b;
+  --pat: url("/frames/creature.png");
+  --pat-size: 104px;
+  background:
+    var(--pat) 0 0 / var(--pat-size) var(--pat-size),
+    linear-gradient(160deg, var(--c-lt) 0%, var(--c) 48%, var(--c-dk) 100%);
   box-shadow: 0 12px 0 #0003;
   color: var(--ink);
 }
-.tcard.equipment { --c: var(--equipment); }
-.tcard.pet { --c: var(--pet); }
-.tcard .inner { background: #fff; border-radius: 16px; overflow: hidden; flex: 1; display: flex; flex-direction: column; }
+.tcard.equipment {
+  --c: var(--equipment);
+  --c-lt: #bea9ff;
+  --c-dk: #7b5af0;
+  --pat: url("/frames/equipment.png");
+  --pat-size: 128px;
+}
+.tcard.pet {
+  --c: var(--pet);
+  --c-lt: #74ebc6;
+  --c-dk: #1bbb88;
+  --pat: url("/frames/pet.png");
+  --pat-size: 140px;
+}
+.tcard .inner {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid #ffd76a;
+  box-shadow: 0 0 0 2px #ffffff55;
+}
 .tcard .art {
   flex: 1 1 0;
   min-height: 62cqw;
@@ -400,7 +429,9 @@ button { font: inherit; color: inherit; }
   justify-content: space-between;
   gap: 10px;
   padding: 10px 14px;
-  background: var(--c);
+  background:
+    var(--pat) 0 0 / var(--pat-size) var(--pat-size),
+    linear-gradient(90deg, var(--c), var(--c-lt));
   color: var(--ink);
 }
 .tcard.equipment .banner { color: #fff; }
