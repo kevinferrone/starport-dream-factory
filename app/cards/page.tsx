@@ -1,4 +1,5 @@
 import Link from "next/link";
+import CardsIcon from "@/components/CardsIcon";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { KINDS, type Kind } from "@/lib/options";
@@ -32,8 +33,8 @@ export default async function MyCards() {
   return (
     <>
       <div className="hero" style={{ paddingTop: 6 }}>
-        <h1 style={{ fontSize: "clamp(36px, 6vw, 56px)" }}>
-          <span aria-hidden>🗂️</span> My cards
+        <h1 style={{ fontSize: "clamp(36px, 6vw, 56px)", display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
+          <CardsIcon size={64} /> My cards
         </h1>
         {cards.length > 0 && (
           <div className="actions" style={{ marginTop: 14 }}>
