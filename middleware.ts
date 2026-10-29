@@ -46,6 +46,7 @@ export async function middleware(request: NextRequest) {
     path === "/login" ||
     path === "/privacy" ||
     path === "/terms" ||
+    path === "/contact" ||
     path.startsWith("/auth") ||
     path.startsWith("/api/stripe/webhook");
 

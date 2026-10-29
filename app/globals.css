@@ -709,3 +709,4 @@ table.admin .nowrap, .nowrap { white-space: nowrap; }
   color: var(--ink-soft);
 }
 .site-foot a { color: var(--ink-soft); font-weight: 700; }
+.contact-email { font-size: 24px; font-weight: 800; color: var(--ink); overflow-wrap: anywhere; }
