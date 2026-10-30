@@ -212,3 +212,10 @@ Google, emailed link, or password (set on the Grown-ups page).
 - Resend verified the domain (auto-configured in Vercel DNS) and a DMARC record was added. Supabase sends mail through Resend SMTP as hello@starportdreamfactory.com; the limit is 100/hour.
 - Site URL updated in Vercel, Supabase, Google OAuth and Branding, and the Stripe test webhook.
 - Polaris Google Workspace: starportdreamfactory.com is on an approved-senders spam bypass rule.
+
+## Done Oct 30, 2026: pictures never get cut off
+- Problem: the square picture was center-cropped to fit the card's shorter picture area, cutting off heads and feet in print.
+- `lib/art-fit.ts` holds one placement rule used by both the card on screen (`components/ArtFrame.tsx`) and the PDF (`framed()` in `lib/card-pdf.ts`), so screen and print match.
+- Default is "Show the whole picture": nothing is cropped; leftover room is filled with the picture's own edge color. Older cards get this automatically.
+- Edit my card has a Picture section: "Fill the frame" plus a zoom slider, and kids drag the picture on the card to pick what shows. Saved as `card.art` {fit, x, y, zoom}.
+- Image prompt now asks for clear empty space around the subject.
