@@ -4,6 +4,7 @@ import { jsPDF } from "jspdf";
 import type { Kind } from "@/lib/options";
 import type { AnyCard } from "@/lib/generate";
 import { cardPieces } from "@/lib/card-text";
+import { artRect, edgeColor, type ArtFit } from "@/lib/art-fit";
 
 // The frame's deep color and pattern, matching .tcard in globals.css.
 const FRAME_DK: Record<Kind, string> = { creature: "#e9682b", equipment: "#7b5af0", pet: "#1bbb88" };
@@ -40,16 +41,24 @@ async function loadImage(url: string, photo = false): Promise<Img | null> {
   }
 }
 
-/** The picture trimmed from the top and bottom to a shorter shape (r = height / width). */
-function cropped(img: Img, r: number): string {
-  if (!img.src || r >= img.h / img.w - 0.001) return img.data;
-  const key = r.toFixed(2);
+/**
+ * The picture placed in a frame of shape r (height / width), exactly as on screen:
+ * the whole picture with its background color around it, or zoomed and moved to fill.
+ */
+function framed(img: Img, r: number, art?: ArtFit): string {
+  if (!img.src) return img.data;
+  const key = `${r.toFixed(3)}|${art ? `${art.fit},${art.x},${art.y},${art.zoom}` : "whole"}`;
   if (img.crops![key]) return img.crops![key];
-  const h = Math.round(img.w * r);
+  const W = img.w;
+  const H = Math.round(img.w * r);
   const c = document.createElement("canvas");
-  c.width = img.w;
-  c.height = h;
-  c.getContext("2d")!.drawImage(img.src, 0, (img.h - h) / 2, img.w, h, 0, 0, img.w, h);
+  c.width = W;
+  c.height = H;
+  const ctx = c.getContext("2d")!;
+  ctx.fillStyle = edgeColor(img.src, img.w, img.h);
+  ctx.fillRect(0, 0, W, H);
+  const b = artRect(W, H, img.w, img.h, art);
+  ctx.drawImage(img.src, b.left, b.top, b.width, b.height);
   return (img.crops![key] = c.toDataURL("image/jpeg", 0.9));
 }
 
@@ -108,7 +117,7 @@ function layout(doc: jsPDF, item: Item, x0: number, y0: number, W: number, f: nu
 
   // Picture
   const artH = innerW * r;
-  if (draw && art) doc.addImage(cropped(art, r), "JPEG", ix, y, innerW, artH);
+  if (draw && art) doc.addImage(framed(art, r, card.art), "JPEG", ix, y, innerW, artH);
   y += artH;
 
   // Name banner with the kind's picture on the right

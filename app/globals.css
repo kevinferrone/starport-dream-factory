@@ -416,8 +416,25 @@ button { font: inherit; color: inherit; }
   background: #f4f2ff;
   display: block;
   width: 100%;
-  object-fit: cover;
+  position: relative;
+  overflow: hidden;
 }
+.tcard .art.movable { cursor: grab; touch-action: none; }
+.tcard .art.movable:active { cursor: grabbing; }
+.tcard .art img { user-select: none; -webkit-user-drag: none; }
+.art-hint {
+  position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%);
+  background: #23205acc; color: #fff; font-size: 13px; font-weight: 800;
+  padding: 3px 10px; border-radius: 99px; pointer-events: none;
+}
+.pic-fit { display: flex; flex-wrap: wrap; gap: 8px; }
+.pic-fit button {
+  font: inherit; font-weight: 800; padding: 8px 14px; border-radius: 12px; cursor: pointer;
+  border: 3px solid var(--line); background: #fff; color: var(--ink);
+}
+.pic-fit button[aria-pressed="true"] { border-color: var(--ink); background: #fff6d6; }
+.zoom { display: grid; gap: 4px; font-weight: 700; font-size: 15px; }
+.zoom input { width: 100%; }
 .tcard .banner {
   display: flex;
   align-items: center;

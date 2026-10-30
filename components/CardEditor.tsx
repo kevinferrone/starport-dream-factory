@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import type { Kind } from "@/lib/options";
 import type { AnyCard, CreatureCard, EquipmentCard, PetCard } from "@/lib/generate";
 import { LIMITS } from "@/lib/card-edit";
+import { DEFAULT_ART, ZOOM_MAX } from "@/lib/art-fit";
 
 type Props = {
   kind: Kind;
@@ -13,16 +13,16 @@ type Props = {
   onSave: () => void;
   onCancel: () => void;
   busy: boolean;
+  /** Only cards with a picture get the picture controls. */
+  hasPicture: boolean;
 };
 
 /** Change any words or numbers on the card. The picture stays the same. */
-export default function CardEditor({ kind, card, onChange, onSave, onCancel, busy }: Props) {
-  const [draft, setDraft] = useState<AnyCard>(card);
-  const set = (patch: Record<string, unknown>) => {
-    const next = { ...draft, ...patch } as AnyCard;
-    setDraft(next);
-    onChange(next);
-  };
+export default function CardEditor({ kind, card, onChange, onSave, onCancel, busy, hasPicture }: Props) {
+  // The card above is the draft, so dragging the picture there and typing here stay in step.
+  const draft = card;
+  const set = (patch: Record<string, unknown>) => onChange({ ...draft, ...patch } as AnyCard);
+  const art = draft.art ?? DEFAULT_ART;
 
   const Text = ({ label, value, max, rows = 1, onText }: { label: string; value: string; max: number; rows?: number; onText: (v: string) => void }) => (
     <label className="edit-field">
@@ -52,7 +52,37 @@ export default function CardEditor({ kind, card, onChange, onSave, onCancel, bus
       <h2>
         <span className="emoji" aria-hidden>✏️</span> Edit my card
       </h2>
-      <p className="hint">Change any words or numbers. The picture stays the same.</p>
+      <p className="hint">Change any words or numbers, and choose how the picture fits.</p>
+
+      {hasPicture && (
+        <fieldset className="edit-group">
+          <legend>Picture</legend>
+          <div className="pic-fit" role="group" aria-label="How the picture fits">
+            <button type="button" aria-pressed={art.fit === "whole"} onClick={() => set({ art: { ...art, fit: "whole" } })}>
+              Show the whole picture
+            </button>
+            <button type="button" aria-pressed={art.fit === "fill"} onClick={() => set({ art: { ...art, fit: "fill" } })}>
+              Fill the frame
+            </button>
+          </div>
+          {art.fit === "fill" && (
+            <>
+              <label className="zoom">
+                <span>Zoom</span>
+                <input
+                  type="range"
+                  min={1}
+                  max={ZOOM_MAX}
+                  step={0.05}
+                  value={art.zoom}
+                  onChange={(e) => set({ art: { ...art, zoom: Number(e.target.value) } })}
+                />
+              </label>
+              <p className="hint">Drag the picture on the card to choose which part shows.</p>
+            </>
+          )}
+        </fieldset>
+      )}
 
       {Text({ label: "Name", value: draft.name, max: LIMITS.name, onText: (v) => set({ name: v }) })}
       {Text({ label: "Description", value: draft.description, max: LIMITS.description, rows: 3, onText: (v) => set({ description: v }) })}

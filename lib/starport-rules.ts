@@ -155,7 +155,7 @@ PET PRICE LADDER (2e prices — match these)
 
 // Note: no "Starport" here. The word makes the picture model reach for space aliens in space suits.
 export const IMAGE_STYLE =
-  "Whimsical children's storybook illustration for a kids' game. Bright saturated colors, soft clean outlines, friendly expressive face, cute and funny, never scary. One character or object centered, full body visible, on a simple soft pastel background with a few sparkles. No text, no letters, no words, no frame.";
+  "Whimsical children's storybook illustration for a kids' game. Bright saturated colors, soft clean outlines, friendly expressive face, cute and funny, never scary. One character or object centered, full body visible, drawn a little small so there is clear empty background on every side and nothing touches or is cut off by the edges, on a simple soft pastel background with a few sparkles. No text, no letters, no words, no frame.";
 
 /** Always added to the picture prompt. */
 export const IMAGE_NEVER =

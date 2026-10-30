@@ -2,6 +2,7 @@
 // Used by the editor (live preview) and by the server (the real check).
 import type { Kind } from "@/lib/options";
 import type { AnyCard, CreatureCard, EquipmentCard, PetCard } from "@/lib/generate";
+import { cleanArt } from "@/lib/art-fit";
 
 export const LIMITS = { name: 60, description: 300, ruleName: 60, rule: 400, bonuses: 200 };
 
@@ -18,12 +19,13 @@ const named = (v: unknown, old: { name: string; effect: string }) => {
   return { name: text(o.name, LIMITS.ruleName, old.name), effect: text(o.effect, LIMITS.rule, old.effect) };
 };
 
-/** Only the words and numbers on the card can change; the picture and its notes stay. */
+/** The words, numbers and how the picture sits in its frame can change; the picture itself and its notes stay. */
 export function applyEdit(kind: Kind, old: AnyCard, input: Partial<AnyCard> & Record<string, unknown>): AnyCard {
   const base = {
     ...old,
     name: text(input.name, LIMITS.name, old.name),
     description: text(input.description, LIMITS.description, old.description),
+    ...(input.art !== undefined || old.art ? { art: cleanArt(input.art ?? old.art) } : {}),
   };
   if (kind === "creature") {
     const o = old as CreatureCard;

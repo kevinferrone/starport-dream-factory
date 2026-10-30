@@ -2,6 +2,7 @@ import type { Kind } from "@/lib/options";
 import { KINDS } from "@/lib/options";
 import type { AnyCard } from "@/lib/generate";
 import { cardPieces, wordOffsets, words, type Piece } from "@/lib/card-text";
+import ArtFrame from "@/components/ArtFrame";
 
 /** Text split into word spans so the read-aloud can highlight each one. */
 function Words({ text, start, highlight }: { text: string; start: number; highlight: number | null }) {
@@ -22,11 +23,14 @@ export default function Card({
   card,
   imageUrl,
   highlight = null,
+  onArtMove,
 }: {
   kind: Kind;
   card: AnyCard;
   imageUrl: string | null;
   highlight?: number | null;
+  /** Lets the picture be dragged while the card is being edited. */
+  onArtMove?: (x: number, y: number) => void;
 }) {
   const pieces = cardPieces(kind, card);
   const offsets = wordOffsets(pieces);
@@ -70,8 +74,7 @@ export default function Card({
     <article className={`tcard ${kind}`} id="the-card">
       <div className="inner">
         {imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img className="art" src={imageUrl} alt={card.name} crossOrigin="anonymous" />
+          <ArtFrame src={imageUrl} alt={card.name} art={card.art} onMove={onArtMove} />
         ) : (
           <div className="art" />
         )}

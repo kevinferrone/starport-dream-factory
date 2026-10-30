@@ -6,6 +6,7 @@ import type { Kind } from "@/lib/options";
 import type { AnyCard } from "@/lib/generate";
 import Card from "@/components/Card";
 import CardEditor from "@/components/CardEditor";
+import { DEFAULT_ART } from "@/lib/art-fit";
 import { speak } from "@/components/ReadAloud";
 import { PHRASES } from "@/lib/voice-phrases";
 import { readingRate } from "@/lib/reading-level";
@@ -219,7 +220,13 @@ export default function CardActions(props: Props) {
           </div>
         </>
       ) : (
-        <Card kind={props.kind} card={card} imageUrl={props.imageUrl} highlight={highlight} />
+        <Card
+          kind={props.kind}
+          card={card}
+          imageUrl={props.imageUrl}
+          highlight={highlight}
+          onArtMove={editing ? (x, y) => setCard((c) => ({ ...c, art: { ...(c.art ?? DEFAULT_ART), x, y } })) : undefined}
+        />
       )}
 
       {editing ? (
@@ -232,6 +239,7 @@ export default function CardActions(props: Props) {
             onSave={saveEdit}
             onCancel={cancelEdit}
             busy={busy === "edit"}
+            hasPicture={!!props.imageUrl}
           />
         </>
       ) : (

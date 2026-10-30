@@ -45,6 +45,8 @@ export type PetCard = {
 export type AnyCard = (CreatureCard | EquipmentCard | PetCard) & {
   /** The main colors chosen for the picture, kept so the next cards can pick different ones. */
   palette?: string;
+  /** How the picture sits in its frame; missing means "show the whole picture". */
+  art?: import("@/lib/art-fit").ArtFit;
 };
 
 const named = {
@@ -620,7 +622,7 @@ export async function drawPicture(userId: string, card: AnyCard, drawing?: Drawi
           prompt:
             `${IMAGE_STYLE}\n\nThis is a child's own drawing. Bring it to life as a finished illustration in the style above, ` +
             `keeping THEIR design: the same body shape, colors, number of eyes and limbs, features, and pose, as close to the drawing as possible. ` +
-            `Clean it up and make it look amazing, but don't add or remove main features. Do not include paper, pencils, hands or the background of the photo.\n\n` +
+            `Clean it up and make it look amazing, but don't add or remove main features. Do not include paper, pencils, hands or the background of the photo. Keep the whole character inside the picture with clear empty space on every side.\n\n` +
             `Subject: ${card.image_prompt}\n\n${IMAGE_NEVER}${fixNote}`,
           size: "1024x1024",
           quality,
