@@ -48,7 +48,8 @@ export async function middleware(request: NextRequest) {
     path === "/terms" ||
     path === "/contact" ||
     path.startsWith("/auth") ||
-    path.startsWith("/api/stripe/webhook");
+    path.startsWith("/api/stripe/webhook") ||
+    path.startsWith("/email/"); // email designs and their images, loaded by Mailchimp and inboxes
 
   if (!user && !isPublic) {
     const url = request.nextUrl.clone();
