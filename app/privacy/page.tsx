@@ -45,7 +45,7 @@ export default function Privacy() {
       <ul>
         <li>Payment card details. Payments are handled entirely by Stripe.</li>
         <li>Anything about a child: no names, ages, photos or locations.</li>
-        <li>Advertising or tracking cookies. We only use the cookies needed to keep you signed in.</li>
+        <li>Advertising, analytics or tracking cookies. We only use the cookies needed to keep you signed in and to remember that a grown-up passed the grown-up check. Your browser also remembers whether read-aloud is on or off.</li>
       </ul>
 
       <h2>Who helps us run the Dream Factory</h2>
