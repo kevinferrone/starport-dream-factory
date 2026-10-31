@@ -65,8 +65,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             <label className="check">
               <input type="checkbox" name="news" value="yes" />
               <span>
-                Email me Starport news, including when Starport 2nd Edition launches on Kickstarter. About once a month;
-                unsubscribe anytime. (Optional)
+                Email me Starport news and updates. About once a month; unsubscribe anytime. (Optional)
               </span>
             </label>
             <button className="big-btn small" type="submit">

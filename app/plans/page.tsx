@@ -145,8 +145,7 @@ export default async function PlansPage({ searchParams }: { searchParams: Promis
             <span className="emoji" aria-hidden>✉️</span> Starport news
           </h2>
           <p className="hint">
-            About once a month: new Dream Factory ideas, Starport adventures, and the Starport 2nd Edition Kickstarter
-            when it launches.
+            About once a month: new Dream Factory ideas, Starport adventures, and news about new Starport games.
           </p>
           {news === "saved" && (
             <p className="error" style={{ background: "#d9fbef", color: "#0d6b4e" }}>Saved.</p>
