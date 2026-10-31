@@ -219,3 +219,9 @@ Google, emailed link, or password (set on the Grown-ups page).
 - Default is "Show the whole picture": nothing is cropped; leftover room is filled with the picture's own edge color. Older cards get this automatically.
 - Edit my card has a Picture section: "Fill the frame" plus a zoom slider, and kids drag the picture on the card to pick what shows. Saved as `card.art` {fit, x, y, zoom}.
 - Image prompt now asks for clear empty space around the subject.
+
+## Done Oct 31, 2026: Kickstarter-first marketing
+- Starport news opt-in: an optional, unticked box on the one-time grown-up step, plus a switch on the Grown-ups page. Saved as `profiles.news_opt_in` / `news_opt_in_at` (run `supabase/2026-10-31-news-opt-in.sql`). Synced to Mailchimp with tag "Dream Factory" when `MAILCHIMP_API_KEY` and `MAILCHIMP_AUDIENCE_ID` are set; Admin → News list (CSV) exports everyone who said yes. An unticked box at signup never unsubscribes anyone.
+- Weekly ads review now has a Kickstarter checkpoint: from Nov 12, once about $90 is spent, it recommends pausing if a signup costs over $8 and nobody has paid (recommend only; Kevin decides).
+- Influencer plan rewritten as gifted-first, 2–3 paid creators with a $300 cap, every creator asked to join the Starport 2e Kickstarter creator list. No partnership-ad boosts for now.
+- FOUNDERS50: 50% off for life, redeem by Nov 30, 2026; in the flyer, partner emails and the Nov 2 launch email.
