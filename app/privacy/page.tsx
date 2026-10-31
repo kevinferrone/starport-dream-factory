@@ -61,6 +61,11 @@ export default function Privacy() {
         </li>
         <li><b>Google</b> handles sign-in if you choose Continue with Google.</li>
         <li>
+          <b>Mailchimp</b> sends Starport news, only if a grown-up ticks &ldquo;Email me Starport news&rdquo; at sign-up
+          or on the Grown-ups page. It gets that email address and nothing else. Untick the box or use the unsubscribe
+          link in any email to stop.
+        </li>
+        <li>
           <b>Meta</b> (Facebook and Instagram): when a grown-up creates an account or starts a paid plan, our
           server tells Meta that it happened, with a scrambled (hashed) copy of the grown-up&apos;s email and their browser type, so we can
           see which of our ads work. We never send Meta anything about kids or what they build, and we don&apos;t use

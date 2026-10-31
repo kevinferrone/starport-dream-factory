@@ -118,3 +118,7 @@ on conflict (id) do nothing;
 -- ---------- Make yourself the admin ----------
 -- After you log in to the site once, run this with your email:
 -- update public.profiles set is_admin = true where email = 'you@example.com';
+
+-- "Email me Starport news" consent (see supabase/2026-10-31-news-opt-in.sql)
+alter table public.profiles add column if not exists news_opt_in boolean not null default false;
+alter table public.profiles add column if not exists news_opt_in_at timestamptz;

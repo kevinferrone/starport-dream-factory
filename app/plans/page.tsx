@@ -8,6 +8,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { READING_LEVELS, DEFAULT_READING_LEVEL } from "@/lib/reading-level";
 import { isGrownup } from "@/lib/grownup";
 import { STARPORT_URL } from "@/lib/site";
+import { setNewsOptIn } from "@/lib/news";
 
 async function saveReadingLevel(formData: FormData) {
   "use server";
@@ -22,9 +23,20 @@ async function saveReadingLevel(formData: FormData) {
   redirect("/plans?level=saved");
 }
 
-export default async function PlansPage({ searchParams }: { searchParams: Promise<{ welcome?: string; limit?: string; level?: string; error?: string }> }) {
+async function saveNews(formData: FormData) {
+  "use server";
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  if (!(await isGrownup(user.id))) redirect("/grownups?next=/plans");
+  await setNewsOptIn(user.id, user.email, formData.get("news") === "yes");
+  revalidatePath("/plans");
+  redirect("/plans?news=saved");
+}
+
+export default async function PlansPage({ searchParams }: { searchParams: Promise<{ welcome?: string; limit?: string; level?: string; error?: string; news?: string }> }) {
   const params = await searchParams;
-  const { welcome, limit, level, error } = params;
+  const { welcome, limit, level, error, news } = params;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -34,6 +46,8 @@ export default async function PlansPage({ searchParams }: { searchParams: Promis
   }
   const access = await getAccess(user.id);
   const { data: profile } = await supabase.from("profiles").select("stripe_customer_id, tier, reading_level").eq("id", user.id).single();
+  // Asked separately so the page still works if the news column hasn't been added yet.
+  const { data: newsRow } = await supabase.from("profiles").select("news_opt_in").eq("id", user.id).single();
 
 
   return (
@@ -123,6 +137,26 @@ export default async function PlansPage({ searchParams }: { searchParams: Promis
         <a className="big-btn small" href={STARPORT_URL} target="_blank" rel="noopener noreferrer">
           Get Starport →
         </a>
+      </section>
+
+      <section className="panel" style={{ maxWidth: 560, margin: "0 auto 18px" }}>
+        <form action={saveNews} className="form">
+          <h2>
+            <span className="emoji" aria-hidden>✉️</span> Starport news
+          </h2>
+          <p className="hint">
+            About once a month: new Dream Factory ideas, Starport adventures, and the Starport 2nd Edition Kickstarter
+            when it launches.
+          </p>
+          {news === "saved" && (
+            <p className="error" style={{ background: "#d9fbef", color: "#0d6b4e" }}>Saved.</p>
+          )}
+          <label className="check">
+            <input type="checkbox" name="news" value="yes" defaultChecked={!!(newsRow as { news_opt_in?: boolean } | null)?.news_opt_in} />
+            <span>Email me Starport news</span>
+          </label>
+          <button className="big-btn small" type="submit">Save</button>
+        </form>
       </section>
 
       <SetPassword />

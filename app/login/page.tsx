@@ -4,6 +4,7 @@ import { sendMetaEvent } from "@/lib/meta";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import EmailLogin from "./EmailLogin";
+import { setNewsOptIn } from "@/lib/news";
 
 async function confirmParent(formData: FormData) {
   "use server";
@@ -13,6 +14,8 @@ async function confirmParent(formData: FormData) {
   if (!user) redirect("/login");
   const { data: before } = await createAdminClient().from("profiles").select("parent_confirmed").eq("id", user.id).single();
   await createAdminClient().from("profiles").update({ parent_confirmed: true }).eq("id", user.id);
+  // Only an explicit yes changes anything; an unticked box never unsubscribes someone already on the list.
+  if (formData.get("news") === "yes") await setNewsOptIn(user.id, user.email, true);
   // A new grown-up account, counted once.
   if (!before?.parent_confirmed) {
     const userAgent = (await headers()).get("user-agent");
@@ -58,6 +61,13 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             <label className="check">
               <input type="checkbox" name="parent" value="yes" />
               <span>I&apos;m a parent or guardian, I&apos;m 18 or older, and I&apos;ll supervise the kids using this account.</span>
+            </label>
+            <label className="check">
+              <input type="checkbox" name="news" value="yes" />
+              <span>
+                Email me Starport news, including when Starport 2nd Edition launches on Kickstarter. About once a month;
+                unsubscribe anytime. (Optional)
+              </span>
             </label>
             <button className="big-btn small" type="submit">
               <span className="emoji" aria-hidden>🚀</span> Let&apos;s build
