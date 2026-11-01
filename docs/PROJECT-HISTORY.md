@@ -235,5 +235,5 @@ Google, emailed link, or password (set on the Grown-ups page).
 - Next: code breaker (message bank for Kevin's approval), then printable PDFs.
 
 ### Nov 1 — Puzzle Lab scoring fix
-- A clean solve is worth 2× the grade; any hint halves it (so hints always cost, even at 1st grade). If hints did more than half the puzzle, it earns no points ("Hints did most of this one").
+- A clean solve is worth 2× the grade; any hint halves it (so hints always cost, even at 1st grade). Every solve earns at least 1 point.
 - Rank thresholds doubled (50/150/300/600/1000/1600/2400) so ranks come at the same pace.
