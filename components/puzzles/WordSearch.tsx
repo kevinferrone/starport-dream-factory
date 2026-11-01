@@ -156,12 +156,12 @@ export default function WordSearch({ cards, startGrade }: { cards: CardWord[]; s
                     ) : (
                       <span className="ws-dot" aria-hidden>★</span>
                     )}
-                    <span className="ws-word">{littles && w.imageUrl && !found.has(w.word) ? "?".repeat(Math.min(w.word.length, 8)) : w.word}</span>
+                    <span className="ws-word">{w.word}</span>
                   </button>
                 </li>
               ))}
             </ul>
-            {littles && <p className="hint">Tap a picture to hear the name, then find it!</p>}
+            {littles && <p className="hint">Tap a word to hear it, then find it!</p>}
             {fillersNote && (
               <p className="hint">
                 <span aria-hidden>✨</span> Make more cards to fill your search with your own creations!
