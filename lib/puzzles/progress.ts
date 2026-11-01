@@ -13,8 +13,13 @@ export const PUZZLES: Record<PuzzleKind, { title: string; spoken: string; icon: 
 
 export const gradeLabel = (g: number) => ["", "1st", "2nd", "3rd", "4th", "5th", "6th", "7th"][g] + " grade";
 
-/** Points for one solve: the grade level, halved (rounded up) if a hint was used. */
-export const pointsFor = (grade: number, hints: number) => (hints > 0 ? Math.ceil(grade / 2) : grade);
+/**
+ * Points for one solve: 2 x the grade level, or half that (the grade) if any hint was used.
+ * If hints did more than half the puzzle, it earns no points (the kid still gets the "you solved it").
+ * `total` = how many squares or words the kid had to find.
+ */
+export const pointsFor = (grade: number, hints: number, total = 0) =>
+  total > 0 && hints * 2 > total ? 0 : hints > 0 ? grade : grade * 2;
 
 /** Kindergarten (0) starts at grade 1; anything else maps straight across. */
 export const gradeFromReadingLevel = (level: number | null | undefined): Grade =>
@@ -22,13 +27,13 @@ export const gradeFromReadingLevel = (level: number | null | undefined): Grade =
 
 export const RANKS = [
   { name: "Cadet", points: 0 },
-  { name: "Explorer", points: 25 },
-  { name: "Pathfinder", points: 75 },
-  { name: "Navigator", points: 150 },
-  { name: "Guide", points: 300 },
-  { name: "Captain", points: 500 },
-  { name: "Star Captain", points: 800 },
-  { name: "Legend of Starport", points: 1200 },
+  { name: "Explorer", points: 50 },
+  { name: "Pathfinder", points: 150 },
+  { name: "Navigator", points: 300 },
+  { name: "Guide", points: 600 },
+  { name: "Captain", points: 1000 },
+  { name: "Star Captain", points: 1600 },
+  { name: "Legend of Starport", points: 2400 },
 ];
 
 /** Index into RANKS for a points total (0 = Cadet). Each rank above Cadet earns one bonus creation. */

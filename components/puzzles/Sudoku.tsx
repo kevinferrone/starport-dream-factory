@@ -29,7 +29,7 @@ export default function Sudoku({ pictures: all, starters, startGrade }: { pictur
       warmNames(pictures.filter((x) => x.cardId).map((x) => ({ cardId: x.cardId! })));
       warmVoices(pictures.filter((x) => !x.cardId).map((x) => x.name));
     }
-    warmVoices([P.done, P.solved(grade), P.solved(Math.ceil(grade / 2)), ...[1, 2, 3, 4, 5, 6, 7].map(gradeLabel)]);
+    warmVoices([P.done, P.solved(grade * 2), P.solved(grade), ...[1, 2, 3, 4, 5, 6, 7].map(gradeLabel)]);
   }, [p, pictures, grade]);
 
   useEffect(() => {
@@ -60,7 +60,7 @@ export default function Sudoku({ pictures: all, starters, startGrade }: { pictur
     setChecked(false);
     const pic = v && p.pictures ? pictures[v - 1] : null;
     if (pic) (pic.cardId ? speakName(pic.cardId, pic.name) : speak(pic.name));
-    if (next.every((x, i) => x === p.solution[i])) submit(grade, hints);
+    if (next.every((x, i) => x === p.solution[i])) submit(grade, hints, p.puzzle.filter((x) => !x).length);
   };
 
   const hint = () => {
@@ -71,7 +71,7 @@ export default function Sudoku({ pictures: all, starters, startGrade }: { pictur
     setCells(next);
     setHints((h) => h + 1);
     setSel(i);
-    if (next.every((x, j) => x === p.solution[j])) submit(grade, hints + 1);
+    if (next.every((x, j) => x === p.solution[j])) submit(grade, hints + 1, p.puzzle.filter((x) => !x).length);
   };
 
   useEffect(() => {

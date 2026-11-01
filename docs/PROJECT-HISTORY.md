@@ -233,3 +233,7 @@ Google, emailed link, or password (set on the Grown-ups page).
 - Unlocks from card rows (deleted cards still count, so nothing re-locks): sudoku at 1 card, word search at 3, code breaker at one of each kind (puzzle not built yet), new puzzle at 10, Master Builder at 20.
 - Puzzle Lab at /puzzles, linked from the top bar, the home page and My cards (badge shelf). Run `supabase/2026-11-01-puzzles.sql`; until then the lab shows "almost ready" and nothing else changes.
 - Next: code breaker (message bank for Kevin's approval), then printable PDFs.
+
+### Nov 1 — Puzzle Lab scoring fix
+- A clean solve is worth 2× the grade; any hint halves it (so hints always cost, even at 1st grade). If hints did more than half the puzzle, it earns no points ("Hints did most of this one").
+- Rank thresholds doubled (50/150/300/600/1000/1600/2400) so ranks come at the same pace.

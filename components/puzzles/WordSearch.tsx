@@ -43,8 +43,8 @@ export default function WordSearch({ cards, startGrade }: { cards: CardWord[]; s
       ...puzzle.words.filter((w) => !w.cardId).map((w) => w.label),
       P.lookFor,
       P.done,
+      P.solved(grade * 2),
       P.solved(grade),
-      P.solved(Math.ceil(grade / 2)),
       ...[1, 2, 3, 4, 5, 6, 7].map(gradeLabel),
     ]);
   }, [puzzle, grade]);
@@ -74,7 +74,7 @@ export default function WordSearch({ cards, startGrade }: { cards: CardWord[]; s
     if (w) {
       const next = new Set(found).add(w.word);
       setFound(next);
-      if (next.size === puzzle.words.length) submit(grade, hints);
+      if (next.size === puzzle.words.length) submit(grade, hints, puzzle.words.length);
       else say(w);
     }
     setStart(null);

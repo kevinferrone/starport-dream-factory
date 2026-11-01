@@ -13,6 +13,7 @@ export type SolveResult = {
   rankUp: { name: string; bonus: boolean } | null;
   newBadges: string[];
   capped?: boolean;
+  helped?: boolean;
 };
 
 /** Grade buttons 1-7. */
@@ -40,18 +41,18 @@ export function LevelPicker({ grade, onPick }: { grade: number; onPick: (g: numb
 export function useSolve(kind: PuzzleKind) {
   const [result, setResult] = useState<SolveResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const submit = async (grade: number, hints: number) => {
+  const submit = async (grade: number, hints: number, total: number) => {
     setError(null);
     try {
       const res = await fetch("/api/puzzles/solve", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind, grade, hints }),
+        body: JSON.stringify({ kind, grade, hints, total }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Couldn't save that one.");
       setResult(data);
-      const said = data.capped
+      const said = data.capped || data.helped
         ? P.done
         : data.rankUp
         ? P.rankUp(data.rankUp.name, data.rankUp.bonus)
@@ -74,6 +75,8 @@ export function Celebration({ result, onAgain }: { result: SolveResult; onAgain:
       <h2>You solved it!</h2>
       {result.capped ? (
         <p>That&apos;s a lot of puzzles today! Points start again tomorrow.</p>
+      ) : result.helped ? (
+        <p>Hints did most of this one. Try it with fewer hints to earn points!</p>
       ) : (
         <p className="celebrate-points">
           +{result.points} point{result.points === 1 ? "" : "s"} · {result.totalPoints} total

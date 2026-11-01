@@ -10,10 +10,11 @@ export async function POST(req: Request) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Please log in." }, { status: 401 });
 
-  const body = (await req.json().catch(() => ({}))) as { kind?: string; grade?: number; hints?: number };
+  const body = (await req.json().catch(() => ({}))) as { kind?: string; grade?: number; hints?: number; total?: number };
   const kind = body.kind as PuzzleKind;
   const grade = Math.round(Number(body.grade));
-  const hints = Math.max(0, Math.min(50, Math.round(Number(body.hints) || 0)));
+  const hints = Math.max(0, Math.min(100, Math.round(Number(body.hints) || 0)));
+  const total = Math.max(0, Math.min(100, Math.round(Number(body.total) || 0)));
   if (!(kind in PUZZLES) || !(grade >= 1 && grade <= 7)) {
     return NextResponse.json({ error: "That puzzle doesn't look right." }, { status: 400 });
   }
@@ -32,7 +33,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ points: 0, totalPoints: before.points, rank: before.rank, rankUp: null, newBadges: [], capped: true });
   }
 
-  const points = pointsFor(grade, hints);
+  const points = pointsFor(grade, hints, total);
+  // Hints did most of the work: celebrate, but no points or badge progress.
+  if (points === 0) {
+    return NextResponse.json({ points: 0, totalPoints: before.points, rank: before.rank, rankUp: null, newBadges: [], helped: true });
+  }
   const { error } = await db.from("puzzle_solves").insert({ user_id: user.id, kind, grade, hints, points });
   if (error) return NextResponse.json({ error: "Couldn't save that solve." }, { status: 500 });
 

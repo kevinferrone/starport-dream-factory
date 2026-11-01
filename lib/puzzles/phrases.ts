@@ -29,7 +29,7 @@ export function puzzlePhrases(): string[] {
   GRADES.forEach((g) => s.add(gradeLabel(g)));
   FILLER_WORDS.forEach((w) => s.add(fillerLabel(w)));
   STARTER_PICTURES.forEach((p) => s.add(p.name));
-  for (let pts = 1; pts <= 7; pts++) s.add(P.solved(pts));
+  for (let pts = 1; pts <= 14; pts++) s.add(P.solved(pts));
   RANKS.slice(1).forEach((r) => {
     s.add(P.rankUp(r.name, true));
     s.add(P.rankUp(r.name, false));
