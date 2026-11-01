@@ -42,7 +42,7 @@ export default async function Home() {
         <span className="emoji" aria-hidden>🧩</span>
         <span>
           <strong>Puzzle Lab</strong>
-          <span className="sub">Word searches made from your cards, sudoku, badges and ranks</span>
+          <span className="sub">Fun puzzles made from the cards you create</span>
         </span>
         <span aria-hidden>→</span>
       </SpeakingLink>
