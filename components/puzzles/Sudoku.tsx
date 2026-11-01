@@ -96,6 +96,12 @@ export default function Sudoku({ pictures, startGrade }: { pictures: Pic[]; star
         <Celebration result={result} onAgain={() => setSeed(Math.random().toString(36).slice(2))} />
       ) : (
         <div className="su-layout">
+          <p className="su-instructions">
+            {p.pictures
+              ? "Put each picture once in every row, column and box."
+              : `Put 1 to ${p.n} once in every row, column and box.`}
+            {hints > 0 && ` Hints used: ${hints} (half points).`}
+          </p>
           <div className={`su-grid n${p.n}${p.pictures ? " pics" : ""}`} style={{ ["--n" as string]: p.n, ["--br" as string]: p.boxR, ["--bc" as string]: p.boxC }}>
             {cells.map((v, i) => {
               const r = Math.floor(i / p.n), c = i % p.n;
@@ -139,19 +145,13 @@ export default function Sudoku({ pictures, startGrade }: { pictures: Pic[]; star
             </button>
             {grade >= 3 && (
               <button className="big-btn small plain" type="button" aria-pressed={pencil} onClick={() => setPencil((x) => !x)}>
-                <span className="emoji" aria-hidden>✏️</span> Pencil {pencil ? "on" : "off"}
+                <span className="emoji" aria-hidden>✏️</span> {pencil ? "Notes on" : "Notes off"}
               </button>
             )}
             <button className="big-btn small plain" type="button" onClick={() => setSeed(Math.random().toString(36).slice(2))}>
               <span className="emoji" aria-hidden>🔁</span> New puzzle
             </button>
           </div>
-          <p className="hint" style={{ textAlign: "center" }}>
-            {p.pictures
-              ? "Put each picture once in every row, column and box."
-              : `Put 1 to ${p.n} once in every row, column and box.`}
-            {hints > 0 && ` Hints used: ${hints} (half points).`}
-          </p>
           {error && <p className="error">{error}</p>}
         </div>
       )}

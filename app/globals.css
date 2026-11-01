@@ -1151,3 +1151,4 @@ table.admin .nowrap, .nowrap { white-space: nowrap; }
 .puzzle-banner .sub { font-size: 16px; font-weight: 600; color: var(--ink-soft); }
 .puzzle-banner:hover { transform: translateY(-2px); }
 .celebrate h2 { justify-content: center; }
+.su-instructions { margin: 0; text-align: center; font-weight: 700; font-size: 18px; color: var(--ink); max-width: 520px; }
