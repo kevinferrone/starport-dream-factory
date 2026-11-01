@@ -39,8 +39,8 @@ export function speak(text: string) {
 }
 
 /** Says one of the family's own card names in the same warm voice. */
-export function speakName(cardId: string, name: string) {
-  play(`/api/name-voice?id=${encodeURIComponent(cardId)}`, name);
+export function speakName(cardId: string, name: string, word?: string) {
+  play(`/api/name-voice?id=${encodeURIComponent(cardId)}${word ? `&w=${encodeURIComponent(word)}` : ""}`, name);
 }
 
 function play(url: string, text: string) {

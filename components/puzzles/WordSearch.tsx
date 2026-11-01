@@ -18,7 +18,9 @@ function line(a: Cell, b: Cell): Cell[] | null {
   return Array.from({ length: steps + 1 }, (_, i) => [a[0] + sr * i, a[1] + sc * i] as Cell);
 }
 
-const say = (w: PlacedWord) => (w.cardId ? speakName(w.cardId, w.label) : speak(w.label));
+/** Says exactly the word shown in the list (e.g. just "Troll" when the grid uses TROLL). */
+const say = (w: PlacedWord) =>
+  w.cardId ? speakName(w.cardId, w.word.charAt(0) + w.word.slice(1).toLowerCase(), w.word) : speak(w.label);
 
 export default function WordSearch({ cards, startGrade }: { cards: CardWord[]; startGrade: number }) {
   const [grade, setGrade] = useState(startGrade);

@@ -19,8 +19,17 @@ export async function GET(req: Request) {
   if (!user) return NextResponse.json({ error: "Please log in." }, { status: 401 });
   // Row-level security only returns the family's own, non-deleted cards.
   const { data: row } = await supabase.from("creations").select("card").eq("id", id).single();
-  const text = ((row?.card as AnyCard | undefined)?.name ?? "").trim().slice(0, 80);
-  if (!text) return NextResponse.json({ error: "Card not found." }, { status: 404 });
+  const name = ((row?.card as AnyCard | undefined)?.name ?? "").trim().slice(0, 80);
+  if (!name) return NextResponse.json({ error: "Card not found." }, { status: 404 });
+  // Optional w = the exact word shown in the puzzle (the whole name, or one word of it, e.g. TROLL).
+  const w = (new URL(req.url).searchParams.get("w") ?? "").toUpperCase();
+  const letters = (x: string) => x.toUpperCase().replace(/[^A-Z]/g, "");
+  let text = name;
+  if (w && letters(name) !== w) {
+    const part = name.split(/[\s-]+/).find((p) => letters(p) === w);
+    if (!part) return NextResponse.json({ error: "Word not on this card." }, { status: 404 });
+    text = part.replace(/[^A-Za-z']/g, "");
+  }
 
   const voice = process.env.OPENAI_TTS_VOICE || "sage";
   const key = createHash("sha1").update(`${voice}|v1|${text}`).digest("hex"); // same key scheme as /api/voice
