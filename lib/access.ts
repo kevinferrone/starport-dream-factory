@@ -68,6 +68,36 @@ const monthStart = () => {
   return start;
 };
 
+/** Same moment, n months later (or earlier), keeping the billing day (Jan 31 -> Feb 28). */
+function addMonths(d: Date, n: number, day: number) {
+  const x = new Date(d);
+  x.setUTCDate(1);
+  x.setUTCMonth(x.getUTCMonth() + n);
+  const last = new Date(Date.UTC(x.getUTCFullYear(), x.getUTCMonth() + 1, 0)).getUTCDate();
+  x.setUTCDate(Math.min(day, last));
+  return x;
+}
+
+/**
+ * The current billing month for a subscription, worked out from Stripe's renewal date:
+ * it starts one month before the next renewal. Stays right even if a renewal update is late.
+ */
+export function billingPeriod(periodEnd: string | Date, now = new Date()) {
+  const anchor = new Date(periodEnd);
+  const day = anchor.getUTCDate();
+  let end = anchor;
+  let start = addMonths(end, -1, day);
+  for (let i = 0; i < 24 && start > now; i++) {
+    end = start;
+    start = addMonths(end, -1, day);
+  }
+  for (let i = 0; i < 24 && end <= now; i++) {
+    start = end;
+    end = addMonths(start, 1, day);
+  }
+  return { start, end };
+}
+
 /** Works out which plan a user is on right now and how many builds they have left. */
 export async function getAccess(userId: string): Promise<Access> {
   const db = createAdminClient();
@@ -94,6 +124,10 @@ export async function getAccess(userId: string): Promise<Access> {
   if (settings?.free_for_all) consider(settings.free_for_all_tier, "site");
 
   const plan = PLANS[tier];
+  // Paid plans reset on the subscription's billing day; free access given by an admin or the site resets on the 1st.
+  const billing =
+    plan.period === "month" && (source as Access["source"]) === "paid" && profile?.current_period_end ? billingPeriod(profile.current_period_end) : null;
+  const periodStart = plan.period === "month" ? billing?.start ?? monthStart() : undefined;
   // Creations restored by an admin (refunded) don't count.
   const count = async (since?: Date) => {
     let q = db.from("creations").select("id", { count: "exact", head: true }).eq("user_id", userId).eq("refunded", false);
@@ -102,7 +136,7 @@ export async function getAccess(userId: string): Promise<Access> {
     return count ?? 0;
   };
   const [used, usedToday] = await Promise.all([
-    count(plan.period === "month" ? monthStart() : undefined),
+    count(periodStart),
     count(new Date(Date.now() - 24 * 60 * 60 * 1000)),
   ]);
 
@@ -115,7 +149,7 @@ export async function getAccess(userId: string): Promise<Access> {
   };
   const [bonusInPeriod, bonusEver] =
     plan.limit !== null && (profile?.bonus_creations ?? 0) > 0
-      ? await Promise.all([bonusCount(plan.period === "month" ? monthStart() : undefined), bonusCount()])
+      ? await Promise.all([bonusCount(periodStart), bonusCount()])
       : [0, 0];
   const bonusLeft = plan.limit !== null ? Math.max(0, (profile?.bonus_creations ?? 0) - bonusEver) : 0;
 
@@ -129,7 +163,13 @@ export async function getAccess(userId: string): Promise<Access> {
   const summary =
     plan.limit === null
       ? "Unlimited creations"
-      : `${planLeft} of ${plan.limit} creations left${plan.period === "month" ? " this month" : ""}${bonusLeft ? ` + ${bonusLeft} bonus` : ""}`;
+      : `${planLeft} of ${plan.limit} creations left${
+          billing
+            ? ` until ${billing.end.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })}`
+            : plan.period === "month"
+              ? " this month"
+              : ""
+        }${bonusLeft ? ` + ${bonusLeft} bonus` : ""}`;
 
   return {
     tier,
