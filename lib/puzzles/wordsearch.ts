@@ -47,7 +47,7 @@ export function wordForName(name: string, maxLen: number): string | null {
   return parts.sort((a, b) => b.length - a.length)[0];
 }
 
-/** Builds a word search. Cards come newest first; the newest are always used. */
+/** Builds a word search from a random mix of the family's cards (a new mix every puzzle). */
 export function makeWordSearch(cards: CardWord[], grade: number, seed: string | number, limit?: number): WordSearch {
   const L = WS_LEVELS[grade] ?? WS_LEVELS[2];
   const want = Math.max(1, limit ?? L.words);
@@ -55,7 +55,7 @@ export function makeWordSearch(cards: CardWord[], grade: number, seed: string | 
 
   const picked: Omit<PlacedWord, "cells">[] = [];
   const seen = new Set<string>();
-  for (const c of cards.slice(0, MAX_CARD_WORDS)) {
+  for (const c of shuffle(cards, rand)) {
     if (picked.length >= want) break;
     const w = wordForName(c.name, Math.min(L.maxLen, L.size));
     if (!w || seen.has(w)) continue;

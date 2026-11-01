@@ -16,7 +16,7 @@ export async function puzzleState(userId: string) {
       .eq("user_id", userId)
       .neq("status", "deleted")
       .order("created_at", { ascending: false })
-      .limit(40),
+      .limit(300),
     db.from("profiles").select("reading_level").eq("id", userId).single(),
   ]);
 

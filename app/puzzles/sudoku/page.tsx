@@ -12,8 +12,8 @@ export default async function SudokuPage() {
   if (!user) redirect("/login");
   const s = await puzzleState(user.id);
   if (!s.ready || !s.unlocks.sudoku.open) redirect("/puzzles");
-  const own = s.cards.filter((c) => c.imageUrl).slice(0, 4).map((c) => ({ src: c.imageUrl as string, name: c.name, cardId: c.cardId }));
-  const pictures = [...own, ...STARTERS.filter((x) => !own.some((o) => o.src === x.src))].slice(0, 4);
+  // All the family's card pictures; the puzzle picks 4 at random each time.
+  const own = s.cards.filter((c) => c.imageUrl).map((c) => ({ src: c.imageUrl as string, name: c.name, cardId: c.cardId }));
   return (
     <>
       <section className="hero" style={{ paddingTop: 6 }}>
@@ -22,7 +22,7 @@ export default async function SudokuPage() {
         </h1>
         <p>Tap a square, then pick what goes there.</p>
       </section>
-      <Sudoku pictures={pictures} startGrade={s.startGrade} />
+      <Sudoku pictures={own} starters={STARTERS} startGrade={s.startGrade} />
     </>
   );
 }

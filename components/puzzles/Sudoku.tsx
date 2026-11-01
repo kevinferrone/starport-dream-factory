@@ -2,15 +2,18 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { makeSudoku, conflicts } from "@/lib/puzzles/sudoku";
+import { rng, shuffle } from "@/lib/puzzles/rng";
 import { LevelPicker, useSolve, Celebration } from "./PuzzleShell";
 import { speak, speakName } from "@/components/ReadAloud";
 
 type Pic = { src: string; name: string; cardId?: string };
 
-export default function Sudoku({ pictures, startGrade }: { pictures: Pic[]; startGrade: number }) {
+export default function Sudoku({ pictures: all, starters, startGrade }: { pictures: Pic[]; starters: Pic[]; startGrade: number }) {
   const [grade, setGrade] = useState(startGrade);
   const [seed, setSeed] = useState(() => Math.random().toString(36).slice(2));
   const p = useMemo(() => makeSudoku(grade, seed), [grade, seed]);
+  // A random 4 of the family's card pictures for each new puzzle; Starport's own art fills any gaps.
+  const pictures = useMemo(() => [...shuffle(all, rng(`pics-${seed}`)), ...starters].slice(0, 4), [all, starters, seed]);
   const [cells, setCells] = useState<number[]>(p.puzzle);
   const [notes, setNotes] = useState<number[][]>(() => p.puzzle.map(() => []));
   const [sel, setSel] = useState<number | null>(null);
