@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { GRADES, gradeLabel, type PuzzleKind } from "@/lib/puzzles/progress";
 import { speak } from "@/components/ReadAloud";
+import { P } from "@/lib/puzzles/phrases";
 
 export type SolveResult = {
   points: number;
@@ -50,11 +51,13 @@ export function useSolve(kind: PuzzleKind) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Couldn't save that one.");
       setResult(data);
-      const said = data.rankUp
-        ? `You solved it! You're a ${data.rankUp.name} now!${data.rankUp.bonus ? " You earned a bonus creation!" : ""}`
+      const said = data.capped
+        ? P.done
+        : data.rankUp
+        ? P.rankUp(data.rankUp.name, data.rankUp.bonus)
         : data.newBadges?.length
-          ? `You solved it! New badge: ${data.newBadges[0]}!`
-          : `You solved it! ${data.points} points!`;
+          ? P.badge(data.newBadges[0])
+          : P.solved(Math.max(1, data.points));
       speak(said);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Couldn't save that one.");

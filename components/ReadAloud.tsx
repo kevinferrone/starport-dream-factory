@@ -35,12 +35,21 @@ function deviceVoice(text: string) {
 
 /** Says a phrase in the warm Dream Factory voice, if read-aloud is on. */
 export function speak(text: string) {
+  play(voiceUrl(text), text);
+}
+
+/** Says one of the family's own card names in the same warm voice. */
+export function speakName(cardId: string, name: string) {
+  play(`/api/name-voice?id=${encodeURIComponent(cardId)}`, name);
+}
+
+function play(url: string, text: string) {
   if (typeof window === "undefined" || !isOn()) return;
   try {
     current?.pause();
     window.speechSynthesis?.cancel();
   } catch {}
-  const audio = new Audio(voiceUrl(text));
+  const audio = new Audio(url);
   current = audio;
   let fellBack = false;
   const fallback = (err?: unknown) => {

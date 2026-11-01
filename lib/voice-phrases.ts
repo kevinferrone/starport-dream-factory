@@ -1,3 +1,4 @@
+import { puzzlePhrases } from "@/lib/puzzles/phrases";
 import { GROUPS, KINDS, DIFFICULTY_MIN, DIFFICULTY_MAX, COINS_MIN, COINS_MAX, difficultyFace, allOptions, type Kind } from "@/lib/options";
 
 /** What the home tiles say out loud. */
@@ -41,5 +42,6 @@ export function allowedPhrases(): Set<string> {
   });
   for (let d = DIFFICULTY_MIN; d <= DIFFICULTY_MAX; d++) s.add(difficultyPhrase(d));
   for (let c = COINS_MIN; c <= COINS_MAX; c++) s.add(coinPhrase(c));
+  puzzlePhrases().forEach((p) => s.add(p));
   return s;
 }

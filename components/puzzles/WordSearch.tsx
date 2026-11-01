@@ -3,7 +3,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { makeWordSearch, matches, type CardWord } from "@/lib/puzzles/wordsearch";
 import { LevelPicker, useSolve, Celebration } from "./PuzzleShell";
-import { speak } from "@/components/ReadAloud";
+import { speak, speakName } from "@/components/ReadAloud";
+import { P } from "@/lib/puzzles/phrases";
+import type { PlacedWord } from "@/lib/puzzles/wordsearch";
 
 type Cell = [number, number];
 
@@ -15,6 +17,8 @@ function line(a: Cell, b: Cell): Cell[] | null {
   const sr = Math.sign(dr), sc = Math.sign(dc);
   return Array.from({ length: steps + 1 }, (_, i) => [a[0] + sr * i, a[1] + sc * i] as Cell);
 }
+
+const say = (w: PlacedWord) => (w.cardId ? speakName(w.cardId, w.label) : speak(w.label));
 
 export default function WordSearch({ cards, startGrade }: { cards: CardWord[]; startGrade: number }) {
   const [grade, setGrade] = useState(startGrade);
@@ -55,7 +59,7 @@ export default function WordSearch({ cards, startGrade }: { cards: CardWord[]; s
       const next = new Set(found).add(w.word);
       setFound(next);
       if (next.size === puzzle.words.length) submit(grade, hints);
-      else speak(w.label);
+      else say(w);
     }
     setStart(null);
     setHover(null);
@@ -98,7 +102,7 @@ export default function WordSearch({ cards, startGrade }: { cards: CardWord[]; s
     const w = left[Math.floor(Math.random() * left.length)];
     setHints((h) => h + 1);
     setFlash(w.cells[0]);
-    speak(`Look for ${w.label}`);
+    speak(P.lookFor);
     setTimeout(() => setFlash(null), 2500);
   };
 
@@ -145,7 +149,7 @@ export default function WordSearch({ cards, startGrade }: { cards: CardWord[]; s
             <ul>
               {puzzle.words.map((w) => (
                 <li key={w.word} className={`${found.has(w.word) ? "done" : ""} ${w.kind ?? "filler"}`}>
-                  <button type="button" onClick={() => speak(w.label)} title="Hear it">
+                  <button type="button" onClick={() => say(w)} title="Hear it">
                     {w.imageUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={w.imageUrl} alt="" />

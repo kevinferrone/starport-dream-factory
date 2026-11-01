@@ -3,9 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { makeSudoku, conflicts } from "@/lib/puzzles/sudoku";
 import { LevelPicker, useSolve, Celebration } from "./PuzzleShell";
-import { speak } from "@/components/ReadAloud";
+import { speak, speakName } from "@/components/ReadAloud";
 
-type Pic = { src: string; name: string };
+type Pic = { src: string; name: string; cardId?: string };
 
 export default function Sudoku({ pictures, startGrade }: { pictures: Pic[]; startGrade: number }) {
   const [grade, setGrade] = useState(startGrade);
@@ -45,7 +45,8 @@ export default function Sudoku({ pictures, startGrade }: { pictures: Pic[]; star
     const next = cells.map((x, i) => (i === sel ? v : x));
     setCells(next);
     setChecked(false);
-    if (v && p.pictures) speak(pictures[v - 1]?.name ?? "");
+    const pic = v && p.pictures ? pictures[v - 1] : null;
+    if (pic) (pic.cardId ? speakName(pic.cardId, pic.name) : speak(pic.name));
     if (next.every((x, i) => x === p.solution[i])) submit(grade, hints);
   };
 

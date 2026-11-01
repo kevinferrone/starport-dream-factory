@@ -2,16 +2,9 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { puzzleState } from "@/lib/puzzles/server";
 import Sudoku from "@/components/puzzles/Sudoku";
+import { STARTER_PICTURES as STARTERS } from "@/lib/puzzles/phrases";
 
 export const dynamic = "force-dynamic";
-
-// Starport's own art fills in when a kid has fewer than 4 cards with pictures.
-const STARTERS = [
-  { src: "/tiles/creature.webp", name: "Troll" },
-  { src: "/tiles/equipment.webp", name: "Backpack" },
-  { src: "/tiles/pet.webp", name: "Monkey" },
-  { src: "/flummox.webp", name: "Flummox" },
-];
 
 export default async function SudokuPage() {
   const supabase = await createClient();
@@ -19,7 +12,7 @@ export default async function SudokuPage() {
   if (!user) redirect("/login");
   const s = await puzzleState(user.id);
   if (!s.ready || !s.unlocks.sudoku.open) redirect("/puzzles");
-  const own = s.cards.filter((c) => c.imageUrl).slice(0, 4).map((c) => ({ src: c.imageUrl as string, name: c.name }));
+  const own = s.cards.filter((c) => c.imageUrl).slice(0, 4).map((c) => ({ src: c.imageUrl as string, name: c.name, cardId: c.cardId }));
   const pictures = [...own, ...STARTERS.filter((x) => !own.some((o) => o.src === x.src))].slice(0, 4);
   return (
     <>
