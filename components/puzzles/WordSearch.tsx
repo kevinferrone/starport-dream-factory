@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { makeWordSearch, matches, type CardWord } from "@/lib/puzzles/wordsearch";
 import { LevelPicker, useSolve, Celebration } from "./PuzzleShell";
-import { speak, speakName } from "@/components/ReadAloud";
+import { speak, speakName, warmNames, warmVoices } from "@/components/ReadAloud";
+import { gradeLabel } from "@/lib/puzzles/progress";
 import { P } from "@/lib/puzzles/phrases";
 import type { PlacedWord } from "@/lib/puzzles/wordsearch";
 
@@ -34,6 +35,19 @@ export default function WordSearch({ cards, startGrade }: { cards: CardWord[]; s
   const dragging = useRef(false);
   const { result, error, submit, reset } = useSolve("wordsearch");
   const littles = grade <= 2;
+
+  // Download every word's voice as soon as the puzzle appears, so taps speak instantly.
+  useEffect(() => {
+    warmNames(puzzle.words.filter((w) => w.cardId).map((w) => ({ cardId: w.cardId!, word: w.word })));
+    warmVoices([
+      ...puzzle.words.filter((w) => !w.cardId).map((w) => w.label),
+      P.lookFor,
+      P.done,
+      P.solved(grade),
+      P.solved(Math.ceil(grade / 2)),
+      ...[1, 2, 3, 4, 5, 6, 7].map(gradeLabel),
+    ]);
+  }, [puzzle, grade]);
 
   useEffect(() => {
     setFound(new Set());

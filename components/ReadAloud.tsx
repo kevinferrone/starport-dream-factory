@@ -38,9 +38,33 @@ export function speak(text: string) {
   play(voiceUrl(text), text);
 }
 
+const nameUrl = (cardId: string, word?: string) =>
+  `/api/name-voice?id=${encodeURIComponent(cardId)}${word ? `&w=${encodeURIComponent(word)}` : ""}`;
+
 /** Says one of the family's own card names in the same warm voice. */
 export function speakName(cardId: string, name: string, word?: string) {
-  play(`/api/name-voice?id=${encodeURIComponent(cardId)}${word ? `&w=${encodeURIComponent(word)}` : ""}`, name);
+  play(nameUrl(cardId, word), name);
+}
+
+// Recordings already downloaded on this page, kept in memory so they play instantly.
+const ready = new Map<string, string>(); // voice url -> in-memory audio url
+const loading = new Map<string, Promise<void>>();
+
+function load(url: string) {
+  if (ready.has(url)) return Promise.resolve();
+  let p = loading.get(url);
+  if (!p) {
+    p = fetch(url)
+      .then((r) => (r.ok ? r.blob() : Promise.reject()))
+      .then((b) => {
+        if (ready.size > 400) return; // plenty for any page
+        ready.set(url, URL.createObjectURL(b));
+      })
+      .catch(() => {})
+      .finally(() => loading.delete(url));
+    loading.set(url, p);
+  }
+  return p;
 }
 
 function play(url: string, text: string) {
@@ -49,7 +73,8 @@ function play(url: string, text: string) {
     current?.pause();
     window.speechSynthesis?.cancel();
   } catch {}
-  const audio = new Audio(url);
+  const audio = new Audio(ready.get(url) ?? url);
+  if (!ready.has(url)) load(url); // next time it's instant
   current = audio;
   let fellBack = false;
   const fallback = (err?: unknown) => {
@@ -63,18 +88,23 @@ function play(url: string, text: string) {
   audio.play().catch(fallback);
 }
 
-/** Records phrases ahead of time (a few at once) so hovering speaks instantly. */
-export function warmVoices(phrases: string[]) {
+function warmUrls(urls: string[]) {
   if (typeof window === "undefined" || !isOn()) return;
-  const queue = [...new Set(phrases)];
+  const queue = [...new Set(urls)].filter((u) => !ready.has(u));
   const worker = async () => {
-    for (let p = queue.shift(); p !== undefined; p = queue.shift()) {
-      try {
-        await fetch(voiceUrl(p));
-      } catch {}
-    }
+    for (let u = queue.shift(); u !== undefined; u = queue.shift()) await load(u);
   };
-  setTimeout(() => [worker(), worker(), worker()], 800);
+  setTimeout(() => [worker(), worker(), worker(), worker()], 300);
+}
+
+/** Downloads phrases ahead of time so hovering or tapping speaks instantly. */
+export function warmVoices(phrases: string[]) {
+  warmUrls(phrases.map(voiceUrl));
+}
+
+/** Same, for the family's own card names (Puzzle Lab word lists and picture sudoku). */
+export function warmNames(items: { cardId: string; word?: string }[]) {
+  warmUrls(items.map((i) => nameUrl(i.cardId, i.word)));
 }
 
 /**

@@ -4,7 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import { makeSudoku, conflicts } from "@/lib/puzzles/sudoku";
 import { rng, shuffle } from "@/lib/puzzles/rng";
 import { LevelPicker, useSolve, Celebration } from "./PuzzleShell";
-import { speak, speakName } from "@/components/ReadAloud";
+import { speak, speakName, warmNames, warmVoices } from "@/components/ReadAloud";
+import { P } from "@/lib/puzzles/phrases";
+import { gradeLabel } from "@/lib/puzzles/progress";
 
 type Pic = { src: string; name: string; cardId?: string };
 
@@ -21,6 +23,14 @@ export default function Sudoku({ pictures: all, starters, startGrade }: { pictur
   const [checked, setChecked] = useState(false);
   const [hints, setHints] = useState(0);
   const { result, error, submit, reset } = useSolve("sudoku");
+
+  useEffect(() => {
+    if (p.pictures) {
+      warmNames(pictures.filter((x) => x.cardId).map((x) => ({ cardId: x.cardId! })));
+      warmVoices(pictures.filter((x) => !x.cardId).map((x) => x.name));
+    }
+    warmVoices([P.done, P.solved(grade), P.solved(Math.ceil(grade / 2)), ...[1, 2, 3, 4, 5, 6, 7].map(gradeLabel)]);
+  }, [p, pictures, grade]);
 
   useEffect(() => {
     setCells(p.puzzle);
