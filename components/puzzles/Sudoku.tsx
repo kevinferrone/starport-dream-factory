@@ -7,6 +7,7 @@ import { LevelPicker, useSolve, Celebration } from "./PuzzleShell";
 import { speak, speakName, warmNames, warmVoices } from "@/components/ReadAloud";
 import { P } from "@/lib/puzzles/phrases";
 import { gradeLabel } from "@/lib/puzzles/progress";
+import { PrintSheet, PrintButton, SheetHeader, SheetFooter } from "./PrintSheet";
 
 type Pic = { src: string; name: string; cardId?: string };
 
@@ -164,10 +165,58 @@ export default function Sudoku({ pictures: all, starters, startGrade }: { pictur
             <button className="big-btn small plain" type="button" onClick={() => setSeed(Math.random().toString(36).slice(2))}>
               <span className="emoji" aria-hidden>🔁</span> New puzzle
             </button>
+            <PrintButton />
           </div>
           {error && <p className="error">{error}</p>}
         </div>
       )}
+
+      <PrintSheet>
+        {[false, true].map((key) => (
+          <section key={String(key)} className={`ps-page${key ? " ps-key" : ""}`}>
+            <SheetHeader
+              title={key ? "Answer key" : "Starport Sudoku"}
+              sub={
+                key
+                  ? "Sudoku"
+                  : `${gradeLabel(grade)} · ${
+                      p.pictures
+                        ? "Put each picture once in every row, column and box. Draw it, or write its number."
+                        : `Put 1 to ${p.n} once in every row, column and box.`
+                    }`
+              }
+            />
+            <div className={`ps-su n${p.n}${key ? " small" : ""}`} style={{ ["--n" as string]: p.n }}>
+              {(key ? p.solution : p.puzzle).map((v, i) => {
+                const r = Math.floor(i / p.n), c = i % p.n;
+                const cls = [
+                  (c + 1) % p.boxC === 0 && c < p.n - 1 ? "edge-r" : "",
+                  (r + 1) % p.boxR === 0 && r < p.n - 1 ? "edge-b" : "",
+                ].join(" ");
+                return (
+                  <span key={i} className={cls}>
+                    {v ? face(v) : ""}
+                  </span>
+                );
+              })}
+            </div>
+            {p.pictures && !key && (
+              <ul className="ps-pics">
+                {pictures.map((pic, k) => (
+                  <li key={k}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={pic.src} alt="" />
+                    <span>
+                      {k + 1} = {pic.name}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <SheetFooter />
+          </section>
+        ))}
+      </PrintSheet>
     </div>
   );
 }

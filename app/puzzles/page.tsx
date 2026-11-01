@@ -58,20 +58,6 @@ export default async function PuzzleLab() {
 
       <BadgeShelf points={s.points} rank={s.rank} earned={s.badges} />
 
-      <section className="panel" style={{ maxWidth: 640, margin: "18px auto 40px" }}>
-        <h2>
-          <span className="emoji" aria-hidden>🏗️</span> Coming up
-        </h2>
-        <ul className="unlock-list">
-          <li className={u.tenCards.open ? "on" : ""}>
-            <strong>10 cards:</strong> a brand-new puzzle {u.tenCards.open ? "(unlocked, coming soon!)" : `(${u.tenCards.progress.toLowerCase()})`}
-          </li>
-          <li className={u.masterBuilder.open ? "on" : ""}>
-            <strong>20 cards:</strong> a gold word-search frame and the Master Builder badge{" "}
-            {u.masterBuilder.open ? "(unlocked!)" : `(${u.masterBuilder.progress.toLowerCase()})`}
-          </li>
-        </ul>
-      </section>
     </>
   );
 }

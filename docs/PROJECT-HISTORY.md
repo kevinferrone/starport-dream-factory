@@ -237,3 +237,7 @@ Google, emailed link, or password (set on the Grown-ups page).
 ### Nov 1 — Puzzle Lab scoring fix
 - A clean solve is worth 2× the grade; any hint halves it (so hints always cost, even at 1st grade). Every solve earns at least 1 point.
 - Rank thresholds doubled (50/150/300/600/1000/1600/2400) so ranks come at the same pace.
+
+### Nov 1 — Printable puzzles; "Coming up" hidden
+- Word search and sudoku have a Print button: a clean letter-size sheet (name line, instructions, word list or picture key, site footer) plus an answer key on page 2. Uses the browser's print / Save as PDF. Printing doesn't award points.
+- Hid the Puzzle Lab "Coming up" list (10-card puzzle and 20-card gold frame/Master Builder weren't built yet). Bring lines back as rewards ship.

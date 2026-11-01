@@ -6,6 +6,7 @@ import { LevelPicker, useSolve, Celebration } from "./PuzzleShell";
 import { speak, speakName, warmNames, warmVoices } from "@/components/ReadAloud";
 import { gradeLabel } from "@/lib/puzzles/progress";
 import { P } from "@/lib/puzzles/phrases";
+import { PrintSheet, PrintButton, SheetHeader, SheetFooter } from "./PrintSheet";
 import type { PlacedWord } from "@/lib/puzzles/wordsearch";
 
 type Cell = [number, number];
@@ -190,12 +191,52 @@ export default function WordSearch({ cards, startGrade }: { cards: CardWord[]; s
               <button className="big-btn small plain" type="button" onClick={() => setSeed(Math.random().toString(36).slice(2))}>
                 <span className="emoji" aria-hidden>🔁</span> New puzzle
               </button>
+              <PrintButton />
             </div>
             {hints > 0 && <p className="hint">Hints used: {hints} (half points)</p>}
             {error && <p className="error">{error}</p>}
           </aside>
         </div>
       )}
+
+      <PrintSheet>
+        <section className="ps-page">
+          <SheetHeader title="Starport Word Search" sub={`${gradeLabel(grade)} · Find all ${puzzle.words.length} words. They go ${grade <= 2 ? "across and down" : "across, down and diagonal"}${grade >= 5 ? ", even backwards" : ""}.`} />
+          <div className="ps-ws" style={{ ["--n" as string]: puzzle.size }}>
+            {puzzle.grid.flat().map((ch, i) => (
+              <span key={i}>{ch}</span>
+            ))}
+          </div>
+          <ul className="ps-words">
+            {puzzle.words.map((w) => (
+              <li key={w.word}>
+                <span className="ps-box" aria-hidden />
+                {w.imageUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={w.imageUrl} alt="" />
+                )}
+                {w.word}
+              </li>
+            ))}
+          </ul>
+          <SheetFooter />
+        </section>
+        <section className="ps-page ps-key">
+          <SheetHeader title="Answer key" sub="Word Search" />
+          <div className="ps-ws small" style={{ ["--n" as string]: puzzle.size }}>
+            {puzzle.grid.flat().map((ch, i) => {
+              const r = Math.floor(i / puzzle.size), c = i % puzzle.size;
+              const hit = puzzle.words.some((w) => w.cells.some(([wr, wc]) => wr === r && wc === c));
+              return (
+                <span key={i} className={hit ? "hit" : ""}>
+                  {ch}
+                </span>
+              );
+            })}
+          </div>
+          <SheetFooter />
+        </section>
+      </PrintSheet>
     </div>
   );
 }
