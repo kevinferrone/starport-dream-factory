@@ -117,6 +117,8 @@ export async function POST(req: Request) {
         card,
         image_url: picture.url,
         image_path: picture.path,
+        // Plan used up but a Puzzle Lab bonus is waiting: this card uses the bonus.
+        ...(access.planLeft <= 0 && access.bonusLeft > 0 ? { bonus: true } : {}),
       })
       .select("id")
       .single();

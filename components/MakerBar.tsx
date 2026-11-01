@@ -22,6 +22,10 @@ export default function MakerBar() {
           </SpeakingLink>
         );
       })}
+      <SpeakingLink href="/puzzles" label="Puzzle Lab" className={`maker puzzles${path.startsWith("/puzzles") ? " here" : ""}`}>
+        <span className="maker-emoji" aria-hidden>🧩</span>
+        <span>Puzzles</span>
+      </SpeakingLink>
     </nav>
   );
 }

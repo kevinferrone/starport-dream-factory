@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import { KINDS, type Kind } from "@/lib/options";
 import type { AnyCard } from "@/lib/generate";
 import SheetButton from "./SheetButton";
+import BadgeShelf from "@/components/puzzles/BadgeShelf";
+import { puzzleState } from "@/lib/puzzles/server";
 
 const ORDER: Kind[] = ["creature", "equipment", "pet"];
 
@@ -19,6 +21,7 @@ export default async function MyCards() {
     .eq("status", "saved")
     .order("saved_at", { ascending: false });
 
+  const puzzles = await puzzleState(user.id);
   const cards = (data ?? []).map((c) => ({
     id: c.id as string,
     kind: c.kind as Kind,
@@ -42,6 +45,8 @@ export default async function MyCards() {
           </div>
         )}
       </div>
+
+      {puzzles.ready && <BadgeShelf compact points={puzzles.points} rank={puzzles.rank} earned={puzzles.badges} />}
 
       {!cards.length ? (
         <p className="empty">

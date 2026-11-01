@@ -225,3 +225,11 @@ Google, emailed link, or password (set on the Grown-ups page).
 - Weekly ads review now has a Kickstarter checkpoint: from Nov 12, once about $90 is spent, it recommends pausing if a signup costs over $8 and nobody has paid (recommend only; Kevin decides).
 - Influencer plan rewritten as gifted-first, 2–3 paid creators with a $300 cap, every creator asked to join the Starport 2e Kickstarter creator list. No partnership-ad boosts for now.
 - FOUNDERS50: 50% off for life, redeem by Nov 30, 2026; in the flyer, partner emails and the Nov 2 launch email.
+
+## Done Nov 1, 2026: Puzzle Lab (first build)
+- Spec doc: "Puzzle Lab Spec" (claude.ai/artifact/1kv24GLhV6qk96NHDneVvS). 7 levels = grades 1–7, starting at the family's reading level (K → 1).
+- Built: Creature word search (card names, newest first, cap 16; Starport filler words when short) and Sudoku (4×4 with the kid's own creature pictures at grades 1–2, up to hard 9×9). Code generators in `lib/puzzles/` (no AI, unique-solution sudoku, seeded).
+- Points = grade (halved with hints). Badges per puzzle (1, 5, 25 solves, a grade-7 solve). Ranks Cadet → Legend of Starport; each new rank = one bonus creation (`profiles.bonus_creations`, max 7). Bonus creations sit on top of the plan, never expire; cards that used one have `creations.bonus = true`.
+- Unlocks from card rows (deleted cards still count, so nothing re-locks): sudoku at 1 card, word search at 3, code breaker at one of each kind (puzzle not built yet), new puzzle at 10, Master Builder at 20.
+- Puzzle Lab at /puzzles, linked from the top bar, the home page and My cards (badge shelf). Run `supabase/2026-11-01-puzzles.sql`; until then the lab shows "almost ready" and nothing else changes.
+- Next: code breaker (message bank for Kevin's approval), then printable PDFs.

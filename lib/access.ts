@@ -49,6 +49,10 @@ export type Access = {
   usedToday: number;
   daily?: number;
   remaining: number;
+  /** Bonus creations from Puzzle Lab ranks that are still unused (they never expire). */
+  bonusLeft: number;
+  /** Creations left on the plan itself, before bonus ones. A build uses a bonus only when this is 0. */
+  planLeft: number;
   /** Hit the hidden daily limit: the factory is resting until tomorrow. */
   resting: boolean;
   /** One line for the meter, e.g. "12 of 20 creations left this month". */
@@ -102,16 +106,30 @@ export async function getAccess(userId: string): Promise<Access> {
     count(new Date(Date.now() - 24 * 60 * 60 * 1000)),
   ]);
 
+  // Bonus creations (from Puzzle Lab ranks) don't count against the plan and never expire.
+  const bonusCount = async (since?: Date) => {
+    let q = db.from("creations").select("id", { count: "exact", head: true }).eq("user_id", userId).eq("refunded", false).eq("bonus", true);
+    if (since) q = q.gte("created_at", since.toISOString());
+    const { count, error } = await q;
+    return error ? 0 : count ?? 0; // 0 until the bonus column exists
+  };
+  const [bonusInPeriod, bonusEver] =
+    plan.limit !== null && (profile?.bonus_creations ?? 0) > 0
+      ? await Promise.all([bonusCount(plan.period === "month" ? monthStart() : undefined), bonusCount()])
+      : [0, 0];
+  const bonusLeft = plan.limit !== null ? Math.max(0, (profile?.bonus_creations ?? 0) - bonusEver) : 0;
+
   const left: number[] = [];
-  if (plan.limit !== null) left.push(plan.limit - used);
+  if (plan.limit !== null) left.push(plan.limit - (used - bonusInPeriod));
   if (plan.daily) left.push(plan.daily - usedToday);
-  const remaining = Math.max(0, Math.min(...left));
+  const planLeft = Math.max(0, Math.min(...left));
+  const remaining = planLeft + bonusLeft;
 
   const resting = !!plan.daily && usedToday >= plan.daily;
   const summary =
     plan.limit === null
       ? "Unlimited creations"
-      : `${remaining} of ${plan.limit} creations left${plan.period === "month" ? " this month" : ""}`;
+      : `${planLeft} of ${plan.limit} creations left${plan.period === "month" ? " this month" : ""}${bonusLeft ? ` + ${bonusLeft} bonus` : ""}`;
 
   return {
     tier,
@@ -122,6 +140,8 @@ export async function getAccess(userId: string): Promise<Access> {
     usedToday,
     daily: plan.daily,
     remaining,
+    bonusLeft,
+    planLeft,
     resting,
     summary,
     isAdmin: !!profile?.is_admin,

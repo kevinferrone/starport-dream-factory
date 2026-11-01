@@ -38,6 +38,15 @@ export default async function Home() {
         ))}
       </nav>
 
+      <SpeakingLink href="/puzzles" label="Puzzle Lab" className="puzzle-banner">
+        <span className="emoji" aria-hidden>🧩</span>
+        <span>
+          <strong>Puzzle Lab</strong>
+          <span className="sub">Word searches made from your cards, sudoku, badges and ranks</span>
+        </span>
+        <span aria-hidden>→</span>
+      </SpeakingLink>
+
       <div className="meter">
         <span aria-hidden>⭐</span>
         <span>{access.resting ? RESTING_MESSAGE : access.summary}</span>
