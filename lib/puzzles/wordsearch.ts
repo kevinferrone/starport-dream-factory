@@ -14,13 +14,13 @@ const BACK = [LEFT, UP];
  * longest word, and how hard to push words to cross on a shared letter (0 = never cross).
  */
 export const WS_LEVELS: Record<number, { size: number; words: number; dirs: Dir[]; maxLen: number; cross: number }> = {
-  1: { size: 8, words: 4, dirs: [RIGHT, DOWN], maxLen: 7, cross: 0 },
-  2: { size: 9, words: 6, dirs: [RIGHT, DOWN], maxLen: 8, cross: 0 },
+  1: { size: 8, words: 4, dirs: [RIGHT, DOWN], maxLen: 8, cross: 0 },
+  2: { size: 9, words: 6, dirs: [RIGHT, DOWN], maxLen: 9, cross: 0 },
   3: { size: 10, words: 8, dirs: [RIGHT, DOWN, DOWN_RIGHT], maxLen: 10, cross: 0 },
-  4: { size: 12, words: 10, dirs: [...STRAIGHT, DOWN_RIGHT, DOWN_RIGHT, UP_RIGHT, UP_RIGHT], maxLen: 11, cross: 1 },
-  5: { size: 13, words: 12, dirs: [...STRAIGHT, ...BACK, ...DIAG, ...DIAG], maxLen: 12, cross: 2 },
-  6: { size: 14, words: 14, dirs: [...STRAIGHT, ...BACK, ...BACK, ...DIAG, ...DIAG], maxLen: 13, cross: 3 },
-  7: { size: 15, words: 16, dirs: [RIGHT, DOWN, ...BACK, ...BACK, ...DIAG, ...DIAG, ...DIAG], maxLen: 14, cross: 3 },
+  4: { size: 12, words: 10, dirs: [...STRAIGHT, DOWN_RIGHT, DOWN_RIGHT, UP_RIGHT, UP_RIGHT], maxLen: 12, cross: 1 },
+  5: { size: 13, words: 12, dirs: [...STRAIGHT, ...BACK, ...DIAG, ...DIAG], maxLen: 14, cross: 2 },
+  6: { size: 14, words: 14, dirs: [...STRAIGHT, ...BACK, ...BACK, ...DIAG, ...DIAG], maxLen: 14, cross: 3 },
+  7: { size: 15, words: 16, dirs: [RIGHT, DOWN, ...BACK, ...BACK, ...DIAG, ...DIAG, ...DIAG], maxLen: 15, cross: 3 },
 };
 
 /** Most card names the search ever uses (the 7th-grade maximum). */
@@ -165,4 +165,10 @@ export function matches(w: PlacedWord, a: [number, number], b: [number, number])
   const first = w.cells[0], last = w.cells[w.cells.length - 1];
   const same = (x: [number, number], y: [number, number]) => x[0] === y[0] && x[1] === y[1];
   return (same(first, a) && same(last, b)) || (same(first, b) && same(last, a));
+}
+
+/** How many of the family's cards have no name (or name word) short enough for this grade's grid. */
+export function tooLongCount(cards: CardWord[], grade: number) {
+  const L = WS_LEVELS[grade] ?? WS_LEVELS[2];
+  return cards.filter((c) => !wordForName(c.name, Math.min(L.maxLen, L.size))).length;
 }

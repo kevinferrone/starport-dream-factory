@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { makeWordSearch, matches, type CardWord } from "@/lib/puzzles/wordsearch";
+import { makeWordSearch, matches, tooLongCount, type CardWord } from "@/lib/puzzles/wordsearch";
 import { LevelPicker, useSolve, Celebration } from "./PuzzleShell";
 import { speak, speakName, warmNames, warmVoices } from "@/components/ReadAloud";
 import { gradeLabel } from "@/lib/puzzles/progress";
@@ -124,6 +124,7 @@ export default function WordSearch({ cards, startGrade }: { cards: CardWord[]; s
   };
 
   const fillersNote = puzzle.fillers > 0;
+  const tooLong = useMemo(() => tooLongCount(cards, grade), [cards, grade]);
 
   return (
     <div className="puzzle-wrap">
@@ -179,6 +180,11 @@ export default function WordSearch({ cards, startGrade }: { cards: CardWord[]; s
               ))}
             </ul>
             {littles && <p className="hint">Tap a word to hear it, then find it!</p>}
+            {tooLong > 0 && (
+              <p className="hint">
+                {tooLong === 1 ? "1 of your cards has a name" : `${tooLong} of your cards have names`} too long for this grid. Try a higher grade to find {tooLong === 1 ? "it" : "them"}!
+              </p>
+            )}
             {fillersNote && (
               <p className="hint">
                 <span aria-hidden>✨</span> Make more cards to fill your search with your own creations!

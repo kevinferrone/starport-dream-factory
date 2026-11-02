@@ -253,3 +253,6 @@ Google, emailed link, or password (set on the Grown-ups page).
 
 ### Nov 2 — PDF picture frame matches the screen
 - The PDF used to pick its own picture-frame shape, so pictures looked smaller ("whole") or cut differently ("fill"). Download/Print now measure the on-screen frame (#the-card .art) and the PDF uses that exact shape, shrinking only the words if needed. Saving an edit also stores the shape in card.art.r so print sheets match too.
+
+### Nov 2 — Word search card variety
+- Checked: card picks are evenly random. Cards drop out only when no word in the name fits the grid (e.g. one-word 9+ letter names at 1st grade). Grades 1–2 now allow words as long as the grid (8/9). A note tells kids when some card names are too long for the grade.
