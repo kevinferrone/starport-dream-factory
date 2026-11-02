@@ -244,3 +244,6 @@ Google, emailed link, or password (set on the Grown-ups page).
 
 ### Nov 2 — Harder word searches for older grades
 - Grades 4–7: direction is picked first (weighted toward diagonals and, from grade 5, backwards), then every spot is tried. Words now cross on shared letters (4th: some, 6th–7th: lots). Words only cross at an angle, never along another word, so each stays findable. Grades 1–3 unchanged.
+
+### Nov 2 — Rank ladder
+- Puzzle Lab shows all 8 ranks in a row (earned in green, current marked "You are here", future greyed) with the points each needs.

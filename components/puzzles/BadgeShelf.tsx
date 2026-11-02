@@ -37,6 +37,17 @@ export default function BadgeShelf({ points, rank, earned, compact }: Props) {
           </Link>
         )}
       </div>
+      {!compact && (
+        <ol className="rank-ladder" aria-label="All ranks">
+          {RANKS.map((r, i) => (
+            <li key={r.name} className={i < rank.index ? "past" : i === rank.index ? "now" : "next"} aria-current={i === rank.index ? "step" : undefined}>
+              <span className="rl-medal" aria-hidden>{MEDAL[i] ?? "⭐"}</span>
+              <span className="rl-name">{r.name}</span>
+              <span className="rl-pts">{i === rank.index ? "You are here" : `${r.points} pts`}</span>
+            </li>
+          ))}
+        </ol>
+      )}
       {list.length > 0 && (
         <ul className="badges">
           {list.map((b) => (
