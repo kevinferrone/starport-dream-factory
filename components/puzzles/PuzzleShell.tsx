@@ -76,7 +76,7 @@ export function Celebration({ result, onAgain }: { result: SolveResult; onAgain:
       {result.capped ? (
         <p>That&apos;s a lot of puzzles today! Points start again tomorrow.</p>
       ) : result.helped ? (
-        <p>Hints did most of this one. Try it with fewer hints to earn points!</p>
+        <p>Hints solved this whole one. Find some yourself next time to earn points!</p>
       ) : (
         <p className="celebrate-points">
           +{result.points} point{result.points === 1 ? "" : "s"} · {result.totalPoints} total

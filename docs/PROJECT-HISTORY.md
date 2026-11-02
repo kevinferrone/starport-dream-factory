@@ -256,3 +256,6 @@ Google, emailed link, or password (set on the Grown-ups page).
 
 ### Nov 2 — Word search card variety
 - Checked: card picks are evenly random. Cards drop out only when no word in the name fits the grid (e.g. one-word 9+ letter names at 1st grade). Grades 1–2 now allow words as long as the grid (8/9). A note tells kids when some card names are too long for the grade.
+
+### Nov 2 — Hint scoring
+- Points = 2x grade minus 1 per hint, minimum 1. A puzzle finished entirely by hints earns 0 ("Hints solved this whole one").

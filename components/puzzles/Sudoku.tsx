@@ -114,7 +114,7 @@ export default function Sudoku({ pictures: all, starters, startGrade }: { pictur
             {p.pictures
               ? "Put each picture once in every row, column and box."
               : `Put 1 to ${p.n} once in every row, column and box.`}
-            {hints > 0 && ` Hints used: ${hints} (half points).`}
+            {hints > 0 && ` Hints used: ${hints} (each hint is 1 point less).`}
           </p>
           <div className={`su-grid n${p.n}${p.pictures ? " pics" : ""}`} style={{ ["--n" as string]: p.n, ["--br" as string]: p.boxR, ["--bc" as string]: p.boxC }}>
             {cells.map((v, i) => {

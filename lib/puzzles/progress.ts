@@ -14,11 +14,12 @@ export const PUZZLES: Record<PuzzleKind, { title: string; spoken: string; icon: 
 export const gradeLabel = (g: number) => ["", "1st", "2nd", "3rd", "4th", "5th", "6th", "7th"][g] + " grade";
 
 /**
- * Points for one solve: 2 x the grade level, or half that (the grade) if any hint was used.
- * Every solve earns at least 1 point. `total` is kept for future tuning.
+ * Points for one solve: 2 x the grade level, minus 1 for each hint, never below 1.
+ * A puzzle finished entirely by hints (every square or word) earns 0.
+ * `total` = how many squares or words the kid had to find.
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const pointsFor = (grade: number, hints: number, _total = 0) => Math.max(1, hints > 0 ? grade : grade * 2);
+export const pointsFor = (grade: number, hints: number, total = 0) =>
+  total > 0 && hints >= total ? 0 : Math.max(1, grade * 2 - hints);
 
 /** Kindergarten (0) starts at grade 1; anything else maps straight across. */
 export const gradeFromReadingLevel = (level: number | null | undefined): Grade =>

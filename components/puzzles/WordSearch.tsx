@@ -199,7 +199,7 @@ export default function WordSearch({ cards, startGrade }: { cards: CardWord[]; s
               </button>
               <PrintButton />
             </div>
-            {hints > 0 && <p className="hint">Hints used: {hints} (half points)</p>}
+            {hints > 0 && <p className="hint">Hints used: {hints} (each hint is 1 point less)</p>}
             {error && <p className="error">{error}</p>}
           </aside>
         </div>
