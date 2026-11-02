@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { artRect, edgeColor, type ArtFit } from "@/lib/art-fit";
+import { artRect, edgeColor, featherAxis, FEATHER, paintBackdrop, type ArtFit } from "@/lib/art-fit";
 
 type Props = {
   src: string;
@@ -17,6 +17,8 @@ export default function ArtFrame({ src, alt, art, onMove }: Props) {
   const [size, setSize] = useState<{ w: number; h: number } | null>(null);
   const [nat, setNat] = useState<{ w: number; h: number } | null>(null);
   const [bg, setBg] = useState("#f4f2ff");
+  const backdrop = useRef<HTMLCanvasElement>(null);
+  const imgEl = useRef<HTMLImageElement>(null);
   const drag = useRef<{ px: number; py: number; x: number; y: number } | null>(null);
 
   useEffect(() => {
@@ -29,6 +31,22 @@ export default function ArtFrame({ src, alt, art, onMove }: Props) {
 
   const rect = size && nat ? artRect(size.w, size.h, nat.w, nat.h, art) : null;
   const canMove = !!onMove && art?.fit === "fill";
+  const whole = art?.fit !== "fill";
+
+  // "Whole" mode: a soft blurred copy of the picture fills the frame behind it (same as the PDF).
+  useEffect(() => {
+    const c = backdrop.current, im = imgEl.current;
+    if (!whole || !c || !im || !size || !nat) return;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    c.width = Math.round(size.w * dpr);
+    c.height = Math.round(size.h * dpr);
+    paintBackdrop(c.getContext("2d")!, im, nat.w, nat.h, c.width, c.height);
+  }, [whole, size, nat]);
+  const axis = whole && size && nat ? featherAxis(size.w, size.h, nat.w, nat.h) : null;
+  const pct = `${FEATHER * 100}%`;
+  const mask = axis
+    ? `linear-gradient(${axis === "x" ? "to right" : "to bottom"}, transparent, #000 ${pct}, #000 calc(100% - ${pct}), transparent)`
+    : undefined;
 
   const down = (e: React.PointerEvent) => {
     if (!canMove || !art) return;
@@ -59,8 +77,10 @@ export default function ArtFrame({ src, alt, art, onMove }: Props) {
       onPointerUp={up}
       onPointerCancel={up}
     >
+      {whole && <canvas ref={backdrop} aria-hidden style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
+        ref={imgEl}
         src={src}
         alt={alt}
         crossOrigin="anonymous"
@@ -72,7 +92,7 @@ export default function ArtFrame({ src, alt, art, onMove }: Props) {
         }}
         style={
           rect
-            ? { position: "absolute", left: rect.left, top: rect.top, width: rect.width, height: rect.height, maxWidth: "none" }
+            ? { position: "absolute", left: rect.left, top: rect.top, width: rect.width, height: rect.height, maxWidth: "none", maskImage: mask, WebkitMaskImage: mask }
             : { position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }
         }
       />

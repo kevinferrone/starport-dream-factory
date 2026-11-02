@@ -247,3 +247,6 @@ Google, emailed link, or password (set on the Grown-ups page).
 
 ### Nov 2 — Rank ladder
 - Puzzle Lab shows all 8 ranks in a row (earned in green, current marked "You are here", future greyed) with the points each needs.
+
+### Nov 2 — No more box edge around card pictures
+- "Whole picture" mode now fills leftover room by stretching the picture's own outer edges to the frame and blurring them, with the picture's edges faded in. Same drawing on screen (ArtFrame canvas + CSS mask) and in the PDF (paintWhole). Works for every existing card; no regeneration or extra image cost.

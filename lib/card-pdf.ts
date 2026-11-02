@@ -4,7 +4,7 @@ import { jsPDF } from "jspdf";
 import type { Kind } from "@/lib/options";
 import type { AnyCard } from "@/lib/generate";
 import { cardPieces } from "@/lib/card-text";
-import { artRect, edgeColor, type ArtFit } from "@/lib/art-fit";
+import { artRect, edgeColor, paintWhole, type ArtFit } from "@/lib/art-fit";
 
 // The frame's deep color and pattern, matching .tcard in globals.css.
 const FRAME_DK: Record<Kind, string> = { creature: "#e9682b", equipment: "#7b5af0", pet: "#1bbb88" };
@@ -43,7 +43,7 @@ async function loadImage(url: string, photo = false): Promise<Img | null> {
 
 /**
  * The picture placed in a frame of shape r (height / width), exactly as on screen:
- * the whole picture with its background color around it, or zoomed and moved to fill.
+ * the whole picture on a soft blurred copy of its own background, or zoomed and moved to fill.
  */
 function framed(img: Img, r: number, art?: ArtFit): string {
   if (!img.src) return img.data;
@@ -55,10 +55,14 @@ function framed(img: Img, r: number, art?: ArtFit): string {
   c.width = W;
   c.height = H;
   const ctx = c.getContext("2d")!;
-  ctx.fillStyle = edgeColor(img.src, img.w, img.h);
-  ctx.fillRect(0, 0, W, H);
-  const b = artRect(W, H, img.w, img.h, art);
-  ctx.drawImage(img.src, b.left, b.top, b.width, b.height);
+  if (art?.fit === "fill") {
+    ctx.fillStyle = edgeColor(img.src, img.w, img.h);
+    ctx.fillRect(0, 0, W, H);
+    const b = artRect(W, H, img.w, img.h, art);
+    ctx.drawImage(img.src, b.left, b.top, b.width, b.height);
+  } else {
+    paintWhole(ctx, img.src, img.w, img.h, W, H);
+  }
   return (img.crops![key] = c.toDataURL("image/jpeg", 0.9));
 }
 
