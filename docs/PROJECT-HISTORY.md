@@ -241,3 +241,6 @@ Google, emailed link, or password (set on the Grown-ups page).
 ### Nov 1 — Printable puzzles; "Coming up" hidden
 - Word search and sudoku have a Print button: a clean letter-size sheet (name line, instructions, word list or picture key, site footer) plus an answer key on page 2. Uses the browser's print / Save as PDF. Printing doesn't award points.
 - Hid the Puzzle Lab "Coming up" list (10-card puzzle and 20-card gold frame/Master Builder weren't built yet). Bring lines back as rewards ship.
+
+### Nov 2 — Harder word searches for older grades
+- Grades 4–7: direction is picked first (weighted toward diagonals and, from grade 5, backwards), then every spot is tried. Words now cross on shared letters (4th: some, 6th–7th: lots). Words only cross at an angle, never along another word, so each stays findable. Grades 1–3 unchanged.

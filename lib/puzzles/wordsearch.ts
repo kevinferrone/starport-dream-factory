@@ -5,15 +5,22 @@ type Dir = [number, number];
 const RIGHT: Dir = [0, 1], DOWN: Dir = [1, 0], DOWN_RIGHT: Dir = [1, 1], UP_RIGHT: Dir = [-1, 1];
 const LEFT: Dir = [0, -1], UP: Dir = [-1, 0], DOWN_LEFT: Dir = [1, -1], UP_LEFT: Dir = [-1, -1];
 
-/** Grid size, how many words, which directions, longest word, and whether words may share letters. */
-export const WS_LEVELS: Record<number, { size: number; words: number; dirs: Dir[]; maxLen: number; cross: boolean }> = {
-  1: { size: 8, words: 4, dirs: [RIGHT, DOWN], maxLen: 7, cross: false },
-  2: { size: 9, words: 6, dirs: [RIGHT, DOWN], maxLen: 8, cross: false },
-  3: { size: 10, words: 8, dirs: [RIGHT, DOWN, DOWN_RIGHT], maxLen: 10, cross: false },
-  4: { size: 12, words: 10, dirs: [RIGHT, DOWN, DOWN_RIGHT, UP_RIGHT], maxLen: 11, cross: false },
-  5: { size: 13, words: 12, dirs: [RIGHT, DOWN, DOWN_RIGHT, UP_RIGHT, LEFT, UP], maxLen: 12, cross: true },
-  6: { size: 14, words: 14, dirs: [RIGHT, DOWN, DOWN_RIGHT, UP_RIGHT, LEFT, UP, DOWN_LEFT, UP_LEFT], maxLen: 13, cross: true },
-  7: { size: 15, words: 16, dirs: [RIGHT, DOWN, DOWN_RIGHT, UP_RIGHT, LEFT, UP, DOWN_LEFT, UP_LEFT], maxLen: 14, cross: true },
+const STRAIGHT = [RIGHT, DOWN];
+const DIAG = [DOWN_RIGHT, UP_RIGHT, DOWN_LEFT, UP_LEFT];
+const BACK = [LEFT, UP];
+
+/**
+ * Grid size, how many words, which directions (repeat a direction to make it more common),
+ * longest word, and how hard to push words to cross on a shared letter (0 = never cross).
+ */
+export const WS_LEVELS: Record<number, { size: number; words: number; dirs: Dir[]; maxLen: number; cross: number }> = {
+  1: { size: 8, words: 4, dirs: [RIGHT, DOWN], maxLen: 7, cross: 0 },
+  2: { size: 9, words: 6, dirs: [RIGHT, DOWN], maxLen: 8, cross: 0 },
+  3: { size: 10, words: 8, dirs: [RIGHT, DOWN, DOWN_RIGHT], maxLen: 10, cross: 0 },
+  4: { size: 12, words: 10, dirs: [...STRAIGHT, DOWN_RIGHT, DOWN_RIGHT, UP_RIGHT, UP_RIGHT], maxLen: 11, cross: 1 },
+  5: { size: 13, words: 12, dirs: [...STRAIGHT, ...BACK, ...DIAG, ...DIAG], maxLen: 12, cross: 2 },
+  6: { size: 14, words: 14, dirs: [...STRAIGHT, ...BACK, ...BACK, ...DIAG, ...DIAG], maxLen: 13, cross: 3 },
+  7: { size: 15, words: 16, dirs: [RIGHT, DOWN, ...BACK, ...BACK, ...DIAG, ...DIAG, ...DIAG], maxLen: 14, cross: 3 },
 };
 
 /** Most card names the search ever uses (the 7th-grade maximum). */
@@ -74,10 +81,11 @@ export function makeWordSearch(cards: CardWord[], grade: number, seed: string | 
   // Longest first places most reliably. A few full retries in the rare case a grid jams.
   for (let attempt = 0; attempt < 30; attempt++) {
     const grid: string[][] = Array.from({ length: L.size }, () => Array(L.size).fill(""));
+    const dirsAt: Dir[][][] = Array.from({ length: L.size }, () => Array.from({ length: L.size }, () => []));
     const placed: PlacedWord[] = [];
     let ok = true;
     for (const p of [...picked].sort((a, b) => b.word.length - a.word.length)) {
-      const cells = place(grid, p.word, L, rand);
+      const cells = place(grid, dirsAt, p.word, L, rand);
       if (!cells) {
         ok = false;
         break;
@@ -96,31 +104,60 @@ export function makeWordSearch(cards: CardWord[], grade: number, seed: string | 
   return makeWordSearch(cards, grade, `${seed}-x`, want - 1);
 }
 
-function place(grid: string[][], word: string, L: (typeof WS_LEVELS)[number], rand: () => number) {
+/**
+ * Tries lots of spots for a word and keeps the best one. On older grades the best spot is the one
+ * that crosses other words on a shared letter, so kids can't just scan the open spaces.
+ * Words only cross at an angle (never lying along another word), so every word stays findable.
+ */
+function place(grid: string[][], dirsAt: Dir[][][], word: string, L: (typeof WS_LEVELS)[number], rand: () => number) {
   const n = grid.length;
-  for (let tries = 0; tries < 400; tries++) {
-    const [dr, dc] = L.dirs[Math.floor(rand() * L.dirs.length)];
-    const r0 = Math.floor(rand() * n);
-    const c0 = Math.floor(rand() * n);
-    const r1 = r0 + dr * (word.length - 1);
-    const c1 = c0 + dc * (word.length - 1);
-    if (r1 < 0 || r1 >= n || c1 < 0 || c1 >= n) continue;
-    const cells: [number, number][] = [];
-    let fits = true;
-    for (let i = 0; i < word.length; i++) {
-      const r = r0 + dr * i, c = c0 + dc * i;
-      const there = grid[r][c];
-      if (there && (!L.cross || there !== word[i])) {
-        fits = false;
-        break;
+  // Pick the direction first (so diagonals and backwards really show up), then fall back to others.
+  const order: Dir[] = [];
+  for (const d of shuffle(L.dirs, rand)) if (!order.includes(d)) order.push(d);
+  for (const dir of order) {
+    const [dr, dc] = dir;
+    let best: { cells: [number, number][]; score: number } | null = null;
+    // Every start square where the word fits on the board, in random order.
+    const starts: [number, number][] = [];
+    for (let r0 = 0; r0 < n; r0++)
+      for (let c0 = 0; c0 < n; c0++) {
+        const r1 = r0 + dr * (word.length - 1), c1 = c0 + dc * (word.length - 1);
+        if (r1 >= 0 && r1 < n && c1 >= 0 && c1 < n) starts.push([r0, c0]);
       }
-      cells.push([r, c]);
+    for (const [r0, c0] of shuffle(starts, rand)) {
+      const cells: [number, number][] = [];
+      let fits = true;
+      let shared = 0;
+      for (let i = 0; i < word.length; i++) {
+        const r = r0 + dr * i, c = c0 + dc * i;
+        const there = grid[r][c];
+        if (there) {
+          // Share a letter only if crossing is on, the letter matches, and the other word runs a different way.
+          const parallel = dirsAt[r][c].some(([a, b]) => (a === dr && b === dc) || (a === -dr && b === -dc));
+          if (!L.cross || there !== word[i] || parallel) {
+            fits = false;
+            break;
+          }
+          shared++;
+        }
+        cells.push([r, c]);
+      }
+      if (!fits || shared >= word.length) continue;
+      if (!L.cross) return commit(grid, dirsAt, word, cells, dir);
+      const score = shared * L.cross + rand();
+      if (!best || score > best.score) best = { cells, score };
     }
-    if (!fits) continue;
-    cells.forEach(([r, c], i) => (grid[r][c] = word[i]));
-    return cells;
+    if (best) return commit(grid, dirsAt, word, best.cells, dir);
   }
   return null;
+}
+
+function commit(grid: string[][], dirsAt: Dir[][][], word: string, cells: [number, number][], dir: Dir) {
+  cells.forEach(([r, c], i) => {
+    grid[r][c] = word[i];
+    dirsAt[r][c].push(dir);
+  });
+  return cells;
 }
 
 /** True if the dragged line from a to b covers exactly this word (either direction). */
