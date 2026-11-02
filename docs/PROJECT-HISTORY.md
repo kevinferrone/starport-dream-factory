@@ -250,3 +250,6 @@ Google, emailed link, or password (set on the Grown-ups page).
 
 ### Nov 2 — No more box edge around card pictures
 - "Whole picture" mode now fills leftover room by stretching the picture's own outer edges to the frame and blurring them, with the picture's edges faded in. Same drawing on screen (ArtFrame canvas + CSS mask) and in the PDF (paintWhole). Works for every existing card; no regeneration or extra image cost.
+
+### Nov 2 — PDF picture frame matches the screen
+- The PDF used to pick its own picture-frame shape, so pictures looked smaller ("whole") or cut differently ("fill"). Download/Print now measure the on-screen frame (#the-card .art) and the PDF uses that exact shape, shrinking only the words if needed. Saving an edit also stores the shape in card.art.r so print sheets match too.

@@ -7,7 +7,8 @@
 // "fill":  the picture fills the frame edge to edge; the kid picks the zoom and
 //          drags to choose which part shows.
 
-export type ArtFit = { fit: "whole" | "fill"; x: number; y: number; zoom: number };
+/** r = the picture frame's shape (height / width) as the kid last saw it, so the PDF uses the same frame. */
+export type ArtFit = { fit: "whole" | "fill"; x: number; y: number; zoom: number; r?: number };
 
 export const DEFAULT_ART: ArtFit = { fit: "whole", x: 50, y: 50, zoom: 1 };
 export const ZOOM_MAX = 3;
@@ -26,6 +27,7 @@ export function cleanArt(v: unknown): ArtFit {
     x: Math.round(n(o.x, 0, 100, 50)),
     y: Math.round(n(o.y, 0, 100, 50)),
     zoom: Math.round(n(o.zoom, 1, ZOOM_MAX, 1) * 100) / 100,
+    ...(Number.isFinite(Number(o.r)) && o.r !== null && o.r !== undefined ? { r: Math.round(n(o.r, 0.4, 1.2, 0.8) * 1000) / 1000 } : {}),
   };
 }
 
@@ -158,4 +160,12 @@ export function paintWhole(ctx: CanvasRenderingContext2D, src: CanvasImageSource
   tc.fillStyle = g;
   tc.fillRect(0, 0, t.width, t.height);
   ctx.drawImage(t, b.left, b.top, b.width, b.height);
+}
+
+/** The on-screen card's picture frame shape (height / width), or undefined if there's no card showing. */
+export function measureArtRatio(): number | undefined {
+  if (typeof document === "undefined") return undefined;
+  const el = document.querySelector("#the-card .art") as HTMLElement | null;
+  if (!el || !el.clientWidth || !el.clientHeight) return undefined;
+  return Math.round((el.clientHeight / el.clientWidth) * 1000) / 1000;
 }

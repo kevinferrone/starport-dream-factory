@@ -218,8 +218,14 @@ const FITS: [number, number][] = [
   [1, 1], [0.9, 1], [0.8, 1], [0.7, 1], [0.62, 1], [0.62, 0.94], [0.62, 0.88],
   [0.55, 0.88], [0.55, 0.82], [0.55, 0.77], [0.55, 0.72], [0.55, 0.67], [0.5, 0.62],
 ];
-function fit(doc: jsPDF, item: Item, W: number, H: number) {
+function fit(doc: jsPDF, item: Item, W: number, H: number, fixedR?: number) {
   const base = 0.82; // text size for a tarot card
+  // Same picture frame as the card on screen: keep its shape and only shrink the words if needed.
+  if (fixedR && fixedR >= 0.4 && fixedR <= 1.2) {
+    for (let f = base; f >= 0.4; f -= 0.02) {
+      if (layout(doc, item, 0, 0, W, f, fixedR, false) + footRoom(W, f) <= H) return { f, r: fixedR };
+    }
+  }
   for (const [r, s] of FITS) {
     const f = base * s;
     if (layout(doc, item, 0, 0, W, f, r, false) + footRoom(W, f) <= H) return { f, r };
@@ -236,12 +242,12 @@ function fit(doc: jsPDF, item: Item, W: number, H: number) {
 }
 
 /** Draws one tarot card with its top-left corner at (x0, y0). */
-function drawCard(doc: jsPDF, item: Item, x0: number, y0: number) {
+function drawCard(doc: jsPDF, item: Item, x0: number, y0: number, artR?: number) {
   const W = CARD_W;
   const H = CARD_H;
   const g = W / 300;
   const frame = 10 * g;
-  const { f, r } = fit(doc, item, W, H);
+  const { f, r } = fit(doc, item, W, H, artR ?? item.card.art?.r);
   // Square outer edge so it cuts cleanly; the colored frame runs right to the edge.
   if (item.pat) {
     doc.addImage(texture(item.kind, item.pat, W, H), "JPEG", x0, y0, W, H, `frame-${item.kind}`);
@@ -283,22 +289,23 @@ async function itemFor(kind: Kind, card: AnyCard, imageUrl: string | null): Prom
 }
 
 /** One card on a page exactly the size of a tarot card (2.75 x 4.75 in), ready for a print shop. */
-async function cardDoc(kind: Kind, card: AnyCard, imageUrl: string | null) {
+async function cardDoc(kind: Kind, card: AnyCard, imageUrl: string | null, artR?: number) {
   const doc = new jsPDF({ unit: "pt", format: [CARD_W, CARD_H] });
-  drawCard(doc, await itemFor(kind, card, imageUrl), 0, 0);
+  drawCard(doc, await itemFor(kind, card, imageUrl), 0, 0, artR);
   return doc;
 }
 
-export async function downloadCardPdf(kind: Kind, card: AnyCard, imageUrl: string | null) {
-  (await cardDoc(kind, card, imageUrl)).save(fileName(card.name));
+/** artR = the on-screen picture frame's shape, so the PDF picture matches what the kid sees. */
+export async function downloadCardPdf(kind: Kind, card: AnyCard, imageUrl: string | null, artR?: number) {
+  (await cardDoc(kind, card, imageUrl, artR)).save(fileName(card.name));
 }
 
 /**
  * Print: opens the tarot-size card in a new tab with the print window ready.
  * `win` must be opened during the click, or browsers block it.
  */
-export async function printCard(win: Window | null, kind: Kind, card: AnyCard, imageUrl: string | null) {
-  const doc = await cardDoc(kind, card, imageUrl);
+export async function printCard(win: Window | null, kind: Kind, card: AnyCard, imageUrl: string | null, artR?: number) {
+  const doc = await cardDoc(kind, card, imageUrl, artR);
   doc.autoPrint();
   const url = doc.output("bloburl").toString();
   if (win) win.location.href = url;

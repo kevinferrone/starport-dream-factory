@@ -6,7 +6,7 @@ import type { Kind } from "@/lib/options";
 import type { AnyCard } from "@/lib/generate";
 import Card from "@/components/Card";
 import CardEditor from "@/components/CardEditor";
-import { DEFAULT_ART } from "@/lib/art-fit";
+import { DEFAULT_ART, measureArtRatio } from "@/lib/art-fit";
 import { speak } from "@/components/ReadAloud";
 import { PHRASES } from "@/lib/voice-phrases";
 import { readingRate } from "@/lib/reading-level";
@@ -109,7 +109,11 @@ export default function CardActions(props: Props) {
       const res = await fetch("/api/edit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: props.id, card }),
+        // Remember the picture frame's shape so PDFs and print sheets use the same frame.
+        body: JSON.stringify({
+          id: props.id,
+          card: props.imageUrl ? { ...card, art: { ...(card.art ?? DEFAULT_ART), r: measureArtRatio() ?? card.art?.r } } : card,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Couldn't save your changes.");
@@ -166,7 +170,7 @@ export default function CardActions(props: Props) {
     setBusy("pdf");
     try {
       const { downloadCardPdf } = await import("@/lib/card-pdf");
-      await downloadCardPdf(props.kind, card, props.imageUrl);
+      await downloadCardPdf(props.kind, card, props.imageUrl, measureArtRatio());
     } catch {
       setError("Couldn't make the PDF. Try Print and choose Save as PDF.");
     } finally {
@@ -180,7 +184,7 @@ export default function CardActions(props: Props) {
     setBusy("print");
     try {
       const { printCard } = await import("@/lib/card-pdf");
-      await printCard(win, props.kind, card, props.imageUrl);
+      await printCard(win, props.kind, card, props.imageUrl, measureArtRatio());
     } catch {
       win?.close();
       setError("Couldn't get the card ready to print. Try Download PDF.");
