@@ -5,7 +5,7 @@ import { getAccess, RESTING_MESSAGE } from "@/lib/access";
 import { KINDS, type Kind } from "@/lib/options";
 import { SpeakingLink } from "@/components/ReadAloud";
 import { KIND_SPOKEN } from "@/lib/voice-phrases";
-import { STARPORT_URL } from "@/lib/site";
+import { STARPORT_URL, STARPORT_2E_URL } from "@/lib/site";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -52,6 +52,28 @@ export default async function Home() {
         <span>{access.resting ? RESTING_MESSAGE : access.summary}</span>
         {access.tier !== "unlimited" && <Link href="/plans">Get more</Link>}
       </div>
+
+      <a className="sp2e-poster" href={STARPORT_2E_URL} target="_blank" rel="noopener noreferrer">
+        <span className="sp2e-tag">For grown-ups</span>
+        <span className="sp2e-text">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="sp2e-logo" src="/starport-logo.png" alt="Starport" width={1200} height={267} />
+          <span className="sp2e-ribbon">2nd Edition</span>
+          <strong className="sp2e-head">Coming soon to Kickstarter</strong>
+          <span className="sp2e-sub">
+            New creatures, new adventures and brand-new art. No fighting, all wonder, for <span className="nowrap">ages 4–12</span>.
+          </span>
+          <span className="sp2e-btn">Join the launch list →</span>
+        </span>
+        <span className="sp2e-art" aria-hidden>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="sp2e-troll" src="/tiles/creature.webp" alt="" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="sp2e-flummox" src="/flummox.webp" alt="" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="sp2e-chatter" src="/tiles/pet.webp" alt="" />
+        </span>
+      </a>
 
       <p className="made-for">
         These cards are made for <strong>Starport</strong>, the tabletop roleplaying game.{" "}

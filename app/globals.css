@@ -1205,3 +1205,99 @@ table.admin .nowrap, .nowrap { white-space: nowrap; }
 .rank-ladder li.next .rl-medal { filter: grayscale(1); opacity: 0.45; }
 .rank-ladder li.next .rl-name { color: var(--ink-soft); }
 @media (max-width: 700px) { .rank-ladder { grid-template-columns: repeat(4, 1fr); } }
+
+/* ---------- Starport 2nd Edition poster (homepage, links to the Shopify launch-list page) ---------- */
+.sp2e-poster {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  align-items: center;
+  gap: 8px;
+  max-width: 720px;
+  margin: 0 auto 44px;
+  padding: 30px 28px 30px 34px;
+  border-radius: var(--r-big);
+  overflow: hidden;
+  color: #fff;
+  text-decoration: none;
+  /* Night sky: a few painted stars over a navy-to-violet gradient, gold trim like the 2e ribbon */
+  background:
+    radial-gradient(1.5px 1.5px at 12% 18%, #fff 99%, #0000),
+    radial-gradient(2px 2px at 28% 72%, #fff9 99%, #0000),
+    radial-gradient(1.5px 1.5px at 46% 12%, #fffc 99%, #0000),
+    radial-gradient(2.5px 2.5px at 63% 30%, #ffe9a8 99%, #0000),
+    radial-gradient(1.5px 1.5px at 78% 9%, #fff 99%, #0000),
+    radial-gradient(2px 2px at 91% 46%, #fffa 99%, #0000),
+    radial-gradient(1.5px 1.5px at 7% 88%, #fff8 99%, #0000),
+    radial-gradient(2px 2px at 38% 92%, #ffe9a8cc 99%, #0000),
+    radial-gradient(ellipse 380px 260px at 78% 60%, #7b5cff55, #0000 70%),
+    radial-gradient(ellipse 420px 300px at 10% 0%, #2f7fc455, #0000 70%),
+    linear-gradient(160deg, #141a4a 0%, #1d2466 55%, #34247a 100%);
+  border: 3px solid #e6b94a;
+  box-shadow: 0 10px 0 #0e1238, 0 18px 30px #1d246633;
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.sp2e-poster:hover { transform: translateY(-3px); }
+.sp2e-poster:active { transform: translateY(6px); box-shadow: 0 4px 0 #0e1238; }
+
+.sp2e-tag {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  z-index: 2;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #ffffff1f;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #ffffffd0;
+}
+
+.sp2e-text { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; }
+.sp2e-logo { width: 100%; max-width: 330px; height: auto; filter: drop-shadow(0 0 14px #ffc93c55); }
+.sp2e-ribbon {
+  margin: 6px 0 14px;
+  padding: 4px 18px 3px;
+  background: linear-gradient(180deg, #f3cf6a, #d9a536);
+  color: #141a4a;
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 50%, 100% 100%, 0 100%, 10px 50%);
+}
+.sp2e-head { font-size: 25px; line-height: 1.15; font-weight: 800; }
+.sp2e-sub .nowrap { white-space: nowrap; }
+.sp2e-sub { margin: 6px 0 16px; font-size: 16px; line-height: 1.4; color: #ffffffcc; max-width: 34ch; }
+.sp2e-btn {
+  padding: 9px 20px;
+  border-radius: 999px;
+  background: var(--sun);
+  color: #141a4a;
+  font-weight: 800;
+  font-size: 18px;
+  box-shadow: 0 5px 0 #b8861d;
+}
+.sp2e-poster:hover .sp2e-btn { background: #ffd65e; }
+
+.sp2e-art { position: relative; align-self: stretch; min-height: 230px; }
+.sp2e-art img { position: absolute; height: auto; filter: drop-shadow(0 8px 10px #0006); pointer-events: none; }
+.sp2e-troll { width: 62%; left: 2%; bottom: -6px; transform: rotate(-6deg); }
+.sp2e-chatter { width: 46%; right: -4%; bottom: 2px; transform: rotate(5deg); }
+.sp2e-flummox { width: 50%; right: 8%; top: 0; animation: sp2e-float 4s ease-in-out infinite; }
+@keyframes sp2e-float { 50% { translate: 0 -8px; } }
+
+@media (max-width: 640px) {
+  .sp2e-poster { grid-template-columns: 1fr; padding: 40px 22px 0; text-align: center; }
+  .sp2e-text { align-items: center; }
+  .sp2e-sub { max-width: none; }
+  .sp2e-art { min-height: 160px; margin: 8px -10px 0; }
+  .sp2e-troll { width: 38%; left: 8%; }
+  .sp2e-chatter { width: 30%; right: 8%; }
+  .sp2e-flummox { width: 30%; right: auto; left: 36%; top: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sp2e-poster { transition: none; }
+  .sp2e-flummox { animation: none; }
+}
