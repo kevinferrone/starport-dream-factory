@@ -261,6 +261,6 @@ Google, emailed link, or password (set on the Grown-ups page).
 - Points = 2x grade minus 1 per hint, minimum 1. A puzzle finished entirely by hints earns 0 ("Hints solved this whole one").
 
 ## Done Nov 10, 2026: Starport 2e poster on the homepage
-- Navy-and-gold "Starport 2nd Edition · Coming soon to Kickstarter" poster under the plan meter, with the Joke Troll, Flummox and Chatter. Labeled "For grown-ups" and opens in a new tab.
+- Poster under the plan meter styled like the Shopify landing hero: 2e sky art under a navy wash, tilted 2e book cover, gold "2nd Edition" badge, "Coming soon to Kickstarter", floating Flummox. Images: `public/promo/starport-2e-cover.jpg`, `public/promo/starport-2e-sky.jpg`. Labeled "For grown-ups" and opens in a new tab.
 - Links to the Shopify launch-list page (`STARPORT_2E_URL` in `lib/site.ts`, utm_source=dreamfactory, utm_medium=homepage_poster). No tracking on the kid page itself.
 - Code: the `sp2e-` block at the end of `app/globals.css`, markup in `app/page.tsx`. Remove both at launch, or change the wording to "Live on Kickstarter now".

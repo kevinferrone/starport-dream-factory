@@ -55,24 +55,27 @@ export default async function Home() {
 
       <a className="sp2e-poster" href={STARPORT_2E_URL} target="_blank" rel="noopener noreferrer">
         <span className="sp2e-tag">For grown-ups</span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          className="sp2e-book"
+          src="/promo/starport-2e-cover.jpg"
+          alt="Starport 2nd Edition book cover"
+          width={560}
+          height={724}
+        />
         <span className="sp2e-text">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="sp2e-logo" src="/starport-logo.png" alt="Starport" width={1200} height={267} />
-          <span className="sp2e-ribbon">2nd Edition</span>
-          <strong className="sp2e-head">Coming soon to Kickstarter</strong>
+          <span className="sp2e-edition"><span>2nd Edition</span></span>
+          <strong className="sp2e-head">
+            Coming soon to <em>Kickstarter</em>
+          </strong>
           <span className="sp2e-sub">
-            New creatures, new adventures and brand-new art. No fighting, all wonder, for <span className="nowrap">ages 4–12</span>.
+            New creatures, new adventures and brand-new art. No fighting, all wonder, for{" "}
+            <span className="nowrap">ages 4–12</span>.
           </span>
           <span className="sp2e-btn">Join the launch list →</span>
         </span>
-        <span className="sp2e-art" aria-hidden>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="sp2e-troll" src="/tiles/creature.webp" alt="" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="sp2e-flummox" src="/flummox.webp" alt="" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="sp2e-chatter" src="/tiles/pet.webp" alt="" />
-        </span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="sp2e-flummox" src="/flummox.webp" alt="" aria-hidden />
       </a>
 
       <p className="made-for">
