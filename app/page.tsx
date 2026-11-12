@@ -6,6 +6,7 @@ import { KINDS, type Kind } from "@/lib/options";
 import { SpeakingLink } from "@/components/ReadAloud";
 import { KIND_SPOKEN } from "@/lib/voice-phrases";
 import { STARPORT_URL, STARPORT_2E_URL } from "@/lib/site";
+import { tileSrc } from "@/lib/hero-icons";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -32,7 +33,7 @@ export default async function Home() {
         {kinds.map(([kind, k]) => (
           <SpeakingLink key={kind} href={`/build/${kind}`} label={KIND_SPOKEN[kind]} className={`tile ${kind}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="tile-art" src={`/tiles/${kind}.webp`} alt="" aria-hidden />
+            <img className="tile-art" src={tileSrc(kind)} alt="" aria-hidden />
             {k.title}
           </SpeakingLink>
         ))}

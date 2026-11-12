@@ -3,6 +3,7 @@ import { KINDS } from "@/lib/options";
 import type { AnyCard } from "@/lib/generate";
 import { cardPieces, wordOffsets, words, type Piece } from "@/lib/card-text";
 import ArtFrame from "@/components/ArtFrame";
+import { tileSrc } from "@/lib/hero-icons";
 
 /** Text split into word spans so the read-aloud can highlight each one. */
 function Words({ text, start, highlight }: { text: string; start: number; highlight: number | null }) {
@@ -81,7 +82,7 @@ export default function Card({
         <div className="banner">
           <h3>{at(0)}</h3>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="kindmark" src={`/tiles/${kind}.webp`} alt={KINDS[kind].title} />
+          <img className="kindmark" src={tileSrc(kind)} alt={KINDS[kind].title} />
         </div>
         <div className="body">{body}</div>
         <div className="foot">Starport Dream Factory</div>

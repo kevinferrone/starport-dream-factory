@@ -39,12 +39,34 @@ export default function HeroIcons({ icons }: { icons: Icon[] }) {
     }
   };
 
+  const [tile, setTile] = useState<"idle" | "painting" | "failed">("idle");
+  const [tileV, setTileV] = useState(0);
+  const paintTile = async () => {
+    setTile("painting");
+    const res = await fetch("/api/admin/hero-tile", { method: "POST" });
+    setTile(res.ok ? "idle" : "failed");
+    if (res.ok) setTileV(Date.now());
+  };
+
   const missing = icons.filter((i) => !made.has(i.id)).map((i) => i.id);
   const busy = working.size > 0;
 
   return (
     <section className="panel">
-      <h2>Character icons</h2>
+      <h2>Characters tile</h2>
+      <p className="hint">
+        The full-body Pockets on the Characters tile, card badge and menu, painted from her portrait. Until it&apos;s made,
+        the round portrait shows. About 25 cents, takes about a minute.
+      </p>
+      <div className="hero-tile-row">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={`/hero-tile.webp${tileV ? `?v=${tileV}` : ""}`} alt="Characters tile" />
+        <button className="big-btn small" disabled={tile === "painting"} onClick={paintTile}>
+          {tile === "painting" ? "Painting…" : tile === "failed" ? "Failed, try again" : "Paint full-body Pockets"}
+        </button>
+      </div>
+
+      <h2 style={{ marginTop: 24 }}>Character icons</h2>
       <p className="hint">
         Painted &quot;Who are you?&quot; buttons for the Characters builder, each a kid version. Kids see the emoji until
         an icon is made. About 4 cents each.

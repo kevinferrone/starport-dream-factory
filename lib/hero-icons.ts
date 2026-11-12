@@ -14,3 +14,9 @@ export const iconPath = (id: string) => `${ICON_FOLDER}/${iconFile(id)}`;
 
 export const iconUrl = (id: string) =>
   `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/card-images/${iconPath(id)}`;
+
+/** The Characters tile: a full-body Pockets painted in Admin, stored in Supabase (see app/hero-tile.webp). */
+export const TILE_PATH = "ui/character-tile.webp";
+
+/** The picture for a kind's tile and card badge. */
+export const tileSrc = (kind: string) => (kind === "character" ? "/hero-tile.webp" : `/tiles/${kind}.webp`);

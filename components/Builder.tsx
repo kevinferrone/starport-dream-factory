@@ -19,7 +19,7 @@ import {
   allOptions,
   MAX_BRING,
 } from "@/lib/options";
-import { iconUrl } from "@/lib/hero-icons";
+import { iconUrl, tileSrc } from "@/lib/hero-icons";
 import { speak, useSpeakOnHover, warmVoices } from "@/components/ReadAloud";
 import { PHRASES, difficultyPhrase, coinPhrase } from "@/lib/voice-phrases";
 import FactoryScene from "@/components/FactoryScene";
@@ -202,7 +202,7 @@ export default function Builder({ kind, remaining, resting = false, initial, bri
       <div className="hero" style={{ paddingTop: 6 }}>
         <h1 className="build-title">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={`/tiles/${kind}.webp`} alt="" aria-hidden />
+          <img src={tileSrc(kind)} alt="" aria-hidden />
           {k.title}
         </h1>
       </div>

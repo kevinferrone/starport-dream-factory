@@ -142,7 +142,8 @@ button { font: inherit; color: inherit; }
   margin: 0 auto 2px;
   filter: drop-shadow(0 6px 0 #ffffff99);
 }
-.hero h1 .line2 { display: block; color: var(--ink); transform: rotate(-2deg); }
+/* Tilted text gets hairline seams where the font's strokes overlap (r, m); one layer keeps it smooth. */
+.hero h1 .line2 { display: block; color: var(--ink); transform: rotate(-2deg); will-change: transform; backface-visibility: hidden; }
 .hero p { font-size: 20px; margin: 18px auto 0; max-width: 34ch; color: var(--ink-soft); }
 
 .tiles {
@@ -1379,3 +1380,5 @@ table.admin .nowrap, .nowrap { white-space: nowrap; }
 .hero-icon-cell img { width: 64px; height: 64px; object-fit: contain; }
 .hero-icon-cell .emoji { font-size: 44px; line-height: 64px; }
 .hero-icon-cell .icon-link { font-size: 12px; }
+.hero-tile-row { display: flex; align-items: center; gap: 18px; margin-bottom: 8px; }
+.hero-tile-row img { width: 140px; height: 140px; object-fit: contain; padding: 8px; border-radius: 18px; background: #ffb3d9; }
