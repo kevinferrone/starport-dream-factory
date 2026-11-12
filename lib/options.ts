@@ -263,7 +263,11 @@ export const CHARACTER_GROUPS: OptionGroup[] = [
       who("Elf", "🧝", "a young elf kid with pointy ears"), who("Dwarf", "🧔", "a young dwarf kid, short and sturdy, no beard yet"),
       who("Fairy", "🧚", "a fairy kid with little wings"), who("Mermaid", "🧜", "a merkid with a fish tail"),
       who("Gekkoid", "🦎", "a young Gekkoid: a friendly gecko kid who walks on two legs"),
-      who("Dactyloid", "🦕", "a young Dactyloid: a friendly little pterodactyl kid who walks on two legs, with wing-arms"),
+      who(
+        "Dactyloid",
+        "🦕",
+        "a young Dactyloid: a baby pterodactyl kid with a long pointed beak, a bony crest on the back of its head and big leathery wings (no feathers)"
+      ),
       who("Fox", "🦊"), who("Bunny", "🐰"), who("Bear", "🐻"), who("Cat", "🐱"), who("Dog", "🐶"), who("Frog", "🐸"),
       who("Owl", "🦉"), who("Penguin", "🐧"), who("Panda", "🐼"), who("Raccoon", "🦝"), who("Mouse", "🐭"),
       who("Tiger", "🐯"), who("Lion", "🦁"), who("Monkey", "🐵"), who("Otter", "🦦"), who("Koala", "🐨"),
@@ -454,19 +458,44 @@ export const CHARACTER_GROUPS: OptionGroup[] = [
     icon: "🗺️",
     min: 0,
     max: 1,
-    options: [
-      o("Plain background", "✂️", "a plain soft pastel background (good for cutting out)"),
-      o("Port of Stars", "🗼", "the Port of Stars: a busy sky port with airships and a flying mechanical tower"),
-      o("Bardo's shop", "🏪", "inside Bardo's Equipment Shop: a cozy shop that is taller inside, with spiraling shelves of magical gear"),
-      o("Starville", "🏘️", "Starville: a cheerful little town with a fortune-teller tent, a kitchen and a wizard's spell tower"),
-      o("Laboratory", "🧪", "a bubbly, colorful laboratory full of strange experiments"),
-      o("Forest", "🌳", "a magical forest with rainbow slides"), o("Mushroom village", "🍄", "a riverside mushroom village by an old rope bridge"),
-      o("Mountains", "⛰️"), o("Swamp", "🐸", "a friendly glowing swamp"),
-      o("Robotopia", "🤖", "Robotopia: a bright robot city of gears, crystals and glowing signs"),
-      o("Undercity", "💎", "the Undercity: glowing crystal caves and mushroom groves underground"),
-      o("Multiversal Mailer", "✉️", "aboard the Multiversal Mailer: a giant flying mail ship full of letters"),
-      o("Floating island", "🏝️"), o("Beach", "🏖️"), o("Snowy hill", "🏔️"), o("Underwater", "🐠"),
-      o("Outer space", "🌌", "outer space with stars and planets"), o("Castle", "🏰"), o("Candy hills", "🍭"),
+    // Starport places use the 1e and 2e manuscript descriptions, so the background looks like the real place.
+    sections: [
+      {
+        title: "Starport",
+        options: [
+          o("Town Hall", "🏛️", "Starport's Town Hall: a grand, cheerful hall with tall windows and banners, a big Quest Board covered in pinned notes, and a plate of cookies"),
+          o("Bardo's shop", "🏪", "inside Bardo's Equipment Shop: much taller inside than outside, with spiraling shelves of magical gear (hats, wands, potions, backpacks) climbing up and up in warm lantern light"),
+          o("Game Room", "🎲", "the Game Room: a bright, noisy room full of game tables, puzzles, riddle posters and a hoverboard race track"),
+          o("Kids Club", "📚", "the Kids Club: a cozy library and craft room with tall bookshelves, bean bags, craft tables and puzzle tables"),
+          o("Laboratory", "🧪", "the Laboratory: a bubbly lab with glowing potion bottles, bubbling green goo, twisty ribbons of smoke, rumbly pebbles and floaty bottles"),
+          o("Newsroom", "📰", "the Newsroom: a busy mail-and-news room with letters flying through the air, tall sorting cubbies and stacks of envelopes"),
+          o("Pet Shelter", "🐾", "the Pet Shelter: a cheerful home for pets with cozy pens, treat jars, flying cats and all kinds of odd, friendly critters"),
+          o("Port of Stars", "🗼", "the Port of Stars: a busy sky port where airships and flying machines dock, with Tinkerton, a flying mechanical tower, floating above"),
+          o("Starville", "🏘️", "Starville: an open-air market town with striped market stalls, apple pies and cozy little homes"),
+          o("Fortuna's Flames", "🔮", "Fortuna's Flames: a fortune-teller's tent in Starville, glowing with candles, crystal balls and a silver mirror"),
+          o("Simmering Kitchen", "🍲", "the Simmering Kitchen: a bustling gnome kitchen in Starville with bubbling pots, hanging pans and towers of ingredients"),
+          o("Spell Tower", "🪄", "the Spell Tower: a wizard's tall, twisty tower in Starville with glowing floating letters and shelves of spell books"),
+          o("Forest", "🌳", "the Forest: a magical forest of giant trees with secret hiding hollows and rainbow slides winding between the trunks"),
+          o("River", "🏞️", "the River: a sparkling river with an old rope bridge, smooth stones and a friendly manta ray gliding in the water"),
+          o("Mushrooga Village", "🍄", "Mushrooga Village: round mushroom houses on the riverbank past the old rope bridge, one with a living green door"),
+          o("Mountains", "⛰️", "the Mountains: tall rocky peaks with climbing ropes, caves, a dwarf's little metal hut and a sleepy volcano far away"),
+          o("Swamp", "🐸", "the Swamp: a misty, friendly swamp with glowing flowers, lily pads and mossy logs"),
+        ],
+      },
+      {
+        title: "Beyond Starport",
+        options: [
+          o("Robotopia", "🤖", "Robotopia: a bright robot city of gears, crystals and glowing signs"),
+          o("Undercity", "💎", "the Undercity: glowing crystal caves, mushroom groves and stone bridges underground"),
+          o("Multiversal Mailer", "✉️", "aboard the Multiversal Mailer: a giant flying mail ship full of letters"),
+          o("Floating island", "🏝️"), o("Beach", "🏖️"), o("Snowy hill", "🏔️"), o("Underwater", "🐠"),
+          o("Outer space", "🌌", "outer space with stars and planets"), o("Castle", "🏰"), o("Candy hills", "🍭"),
+        ],
+      },
+      {
+        title: "Plain",
+        options: [o("Plain background", "✂️", "a plain soft pastel background (good for cutting out)")],
+      },
     ],
   },
 ];
@@ -516,10 +545,13 @@ export function allOptions(group: OptionGroup): Option[] {
   return group.options ?? group.sections?.flatMap((s) => s.options) ?? [];
 }
 
-/** Trims saved choices to today's button limits (e.g. older cards made before a limit changed). */
+/** Trims saved choices to today's buttons and limits (e.g. older cards made before a button changed). */
 export function fitChoices(kind: Kind, choices: Record<string, string[]>): Record<string, string[]> {
   const out: Record<string, string[]> = {};
-  for (const g of GROUPS[kind]) out[g.id] = (choices[g.id] ?? []).slice(0, g.max);
+  for (const g of GROUPS[kind]) {
+    const ids = new Set(allOptions(g).map((x) => x.id));
+    out[g.id] = (choices[g.id] ?? []).filter((id) => ids.has(id)).slice(0, g.max); // buttons that were renamed or removed drop out
+  }
   return out;
 }
 
