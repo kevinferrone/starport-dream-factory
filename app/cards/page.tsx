@@ -7,7 +7,6 @@ import type { AnyCard } from "@/lib/generate";
 import SheetButton from "./SheetButton";
 import BadgeShelf from "@/components/puzzles/BadgeShelf";
 import { puzzleState } from "@/lib/puzzles/server";
-import { tileSrc } from "@/lib/hero-icons";
 
 const ORDER: Kind[] = ["character", "creature", "equipment", "pet"];
 
@@ -61,7 +60,7 @@ export default async function MyCards() {
               <div className="shelf-head">
                 <h2>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={tileSrc(k)} alt="" aria-hidden />
+                  <img src={`/tiles/${k}.webp`} alt="" aria-hidden />
                   {KINDS[k].title}
                   <span className="count">({list.length})</span>
                 </h2>

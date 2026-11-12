@@ -1380,5 +1380,3 @@ table.admin .nowrap, .nowrap { white-space: nowrap; }
 .hero-icon-cell img { width: 64px; height: 64px; object-fit: contain; }
 .hero-icon-cell .emoji { font-size: 44px; line-height: 64px; }
 .hero-icon-cell .icon-link { font-size: 12px; }
-.hero-tile-row { display: flex; align-items: center; gap: 18px; margin-bottom: 8px; }
-.hero-tile-row img { width: 140px; height: 140px; object-fit: contain; padding: 8px; border-radius: 18px; background: #ffb3d9; }

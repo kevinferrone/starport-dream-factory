@@ -4,7 +4,6 @@ import { usePathname } from "next/navigation";
 import { KINDS, type Kind } from "@/lib/options";
 import { KIND_SPOKEN } from "@/lib/voice-phrases";
 import { SpeakingLink } from "@/components/ReadAloud";
-import { tileSrc } from "@/lib/hero-icons";
 
 /** Jump straight to any builder from any page (the home page already has the big tiles). */
 export default function MakerBar() {
@@ -18,7 +17,7 @@ export default function MakerBar() {
         return (
           <SpeakingLink key={k} href={`/build/${k}`} label={KIND_SPOKEN[k]} className={`maker ${k}${here ? " here" : ""}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={tileSrc(k)} alt="" aria-hidden />
+            <img src={`/tiles/${k}.webp`} alt="" aria-hidden />
             <span>{KINDS[k].title}</span>
           </SpeakingLink>
         );

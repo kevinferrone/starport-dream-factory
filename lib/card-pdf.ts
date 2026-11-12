@@ -5,7 +5,6 @@ import type { Kind } from "@/lib/options";
 import type { AnyCard } from "@/lib/generate";
 import { cardPieces } from "@/lib/card-text";
 import { artRect, edgeColor, paintWhole, type ArtFit } from "@/lib/art-fit";
-import { tileSrc } from "@/lib/hero-icons";
 
 // The frame's deep color and pattern, matching .tcard in globals.css.
 const FRAME_DK: Record<Kind, string> = { character: "#e0478f", creature: "#e9682b", equipment: "#7b5af0", pet: "#1bbb88" };
@@ -96,7 +95,7 @@ function texture(kind: Kind, pat: ImageBitmap, w: number, h: number): string {
 }
 
 const badgeCache: Partial<Record<Kind, Promise<Img | null>>> = {};
-const badge = (kind: Kind) => (badgeCache[kind] ??= loadImage(tileSrc(kind)));
+const badge = (kind: Kind) => (badgeCache[kind] ??= loadImage(`/tiles/${kind}.webp`));
 
 /** Emoji aren't in the PDF's built-in font, so leave them out. */
 const clean = (s: string) =>
