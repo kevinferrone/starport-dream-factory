@@ -1380,3 +1380,4 @@ table.admin .nowrap, .nowrap { white-space: nowrap; }
 .hero-icon-cell img { width: 64px; height: 64px; object-fit: contain; }
 .hero-icon-cell .emoji { font-size: 44px; line-height: 64px; }
 .hero-icon-cell .icon-link { font-size: 12px; }
+.pick .opt-img { width: 52px; height: 52px; margin-bottom: 2px; }

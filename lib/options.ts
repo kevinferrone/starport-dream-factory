@@ -13,6 +13,8 @@ export type Option = {
   swatch?: string;
   /** Characters: where it goes on the body. Two things in one slot: the first is worn, the rest are carried. */
   slot?: Slot;
+  /** A picture file in /public used as the icon instead of the emoji (when no emoji fits). */
+  img?: string;
   /** Characters: has a painted picture icon (made in Admin), with the emoji as a fallback. */
   pic?: boolean;
 };
@@ -366,10 +368,10 @@ export const CHARACTER_GROUPS: OptionGroup[] = [
         title: "Clothes",
         options: [
           outfit("Explorer vest", "🦺", "an explorer vest with lots of pockets"), outfit("Space jumpsuit", "🧑‍🚀"),
-          outfit("Cozy sweater", "🧶"), outfit("Overalls", "👖"), outfit("Hoodie", "🧥"), outfit("Robe of stars", "🌌"),
+          outfit("Cozy sweater", "🧶"), outfit("Jeans", "👖"), outfit("Coat", "🧥", "a cozy coat"), outfit("Robe of stars", "🌌"),
           outfit("Pajamas", "🛌"), outfit("Chef apron", "🧑‍🍳"), outfit("Lab coat", "🥼"), outfit("Raincoat", "🌧️"),
           outfit("Superhero suit", "🦸"), outfit("Sports jersey", "🎽"), outfit("Fancy suit", "🤵"), outfit("Fancy dress", "👗"),
-          outfit("Tutu", "🩰"), outfit("Mail carrier uniform", "📮"), outfit("Pirate coat", "🏴‍☠️", "a big swishy pirate coat (no weapons)"),
+          outfit("Tutu", "🩰"), outfit("Mail carrier uniform", "📮"), { ...outfit("Pirate coat", "🏴‍☠️", "a big swishy pirate coat (no weapons)"), img: "/icons/pirate-hat.svg" },
           outfit("Knight armor", "🛡️", "shiny storybook knight armor (no weapons)"),
         ],
       },

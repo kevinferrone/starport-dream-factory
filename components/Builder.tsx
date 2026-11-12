@@ -55,6 +55,8 @@ function OptIcon({ opt }: { opt: Option }) {
     img.src = iconUrl(opt.id);
   }, [opt.pic, opt.id]);
   if (opt.swatch) return <span className="swatch" style={{ background: opt.swatch }} aria-hidden />;
+  // eslint-disable-next-line @next/next/no-img-element
+  if (opt.img) return <img className="opt-img" src={opt.img} alt="" aria-hidden />;
   if (opt.pic)
     return (
       <span className="pic-icon" aria-hidden>
