@@ -152,6 +152,11 @@ button { font: inherit; color: inherit; }
   margin: 36px 0 22px;
 }
 @media (max-width: 760px) { .tiles { grid-template-columns: 1fr; } }
+/* Homepage: four builders */
+.tiles.four { grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.tiles.four .tile { font-size: 27px; }
+@media (max-width: 900px) { .tiles.four { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .tiles.four { grid-template-columns: 1fr; } }
 
 .tile {
   --c: var(--creature);
@@ -180,6 +185,7 @@ button { font: inherit; color: inherit; }
   filter: drop-shadow(0 6px 0 #0000001f);
   pointer-events: none;
 }
+.tile.character { --c: #ffb3d9; }   /* bubblegum: Pockets' patchwork coat pops on it */
 .tile.creature { --c: #ffd25e; }   /* sunshine yellow: the Joke Troll's magenta and teal pop */
 .tile.equipment { --c: var(--equipment); color: #fff; }  /* lilac: matches the backpack's bedroll */
 .tile.pet { --c: #7fe3dc; }        /* aqua: matches Chatter's "Hi!" bubble */
@@ -296,6 +302,7 @@ button { font: inherit; color: inherit; }
 .pick:disabled { opacity: 0.4; cursor: not-allowed; }
 .pick.wide { min-height: 120px; }
 
+.kind-character .pick { --c: #ffc6e3; }
 .kind-creature .pick { --c: #ffc29e; }
 .kind-equipment .pick { --c: #d6caff; }
 .kind-pet .pick { --c: #a6f0d6; }
@@ -386,6 +393,12 @@ button { font: inherit; color: inherit; }
   background: var(--pat) 0 0 / var(--pat-size) var(--pat-size), var(--c-dk);
   box-shadow: 0 12px 0 #0003;
   color: var(--ink);
+}
+.tcard.character {
+  --c: var(--gum);
+  --c-dk: #e0478f;
+  --pat: url("/frames/character.png");
+  --pat-size: 120px;
 }
 .tcard.equipment {
   --c: var(--equipment);
@@ -486,6 +499,7 @@ button { font: inherit; color: inherit; }
   color: var(--ink);
   font-weight: 800;
 }
+.mini.character { --c: var(--gum); }
 .mini.equipment { --c: var(--equipment); }
 .mini.pet { --c: var(--pet); }
 .mini img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; display: block; background: #fff; }
@@ -741,6 +755,7 @@ table.admin .nowrap, .nowrap { white-space: nowrap; }
   box-shadow: 0 4px 0 #0002;
   border: 3px solid transparent;
 }
+.maker.character { --c: #ffb3d9; }
 .maker.equipment { --c: var(--equipment); color: #fff; }
 .maker.pet { --c: #7fe3dc; }
 .maker img { height: 40px; width: 40px; object-fit: contain; }
@@ -834,6 +849,7 @@ table.admin .nowrap, .nowrap { white-space: nowrap; }
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
 }
+.factory.kind-character { --m: var(--gum); }
 .factory.kind-equipment { --m: var(--equipment); }
 .factory.kind-pet { --m: var(--pet); }
 .factory-panel {
@@ -1090,6 +1106,7 @@ table.admin .nowrap, .nowrap { white-space: nowrap; }
 }
 .ws-cell.picking { background: #fff1a8; }
 .ws-cell.found { background: color-mix(in srgb, var(--creature) 45%, #fff); }
+.ws-cell.found.character { background: color-mix(in srgb, var(--gum) 35%, #fff); }
 .ws-cell.found.equipment { background: color-mix(in srgb, var(--equipment) 40%, #fff); }
 .ws-cell.found.pet { background: color-mix(in srgb, var(--pet) 45%, #fff); }
 .ws-cell.found.filler { background: #dff1ff; }
@@ -1101,6 +1118,7 @@ table.admin .nowrap, .nowrap { white-space: nowrap; }
 .ws-words ul { list-style: none; padding: 0; margin: 0 0 10px; display: grid; gap: 6px; }
 .ws-words li button { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: none; font: inherit; color: inherit; cursor: pointer; padding: 2px; text-align: left; }
 .ws-words li img { width: 40px; height: 40px; object-fit: cover; border-radius: 10px; border: 3px solid var(--creature); flex: none; }
+.ws-words li.character img { border-color: var(--gum); }
 .ws-words li.equipment img { border-color: var(--equipment); }
 .ws-words li.pet img { border-color: var(--pet); }
 .ws-dot { width: 40px; text-align: center; color: var(--sky-deep); flex: none; }
@@ -1328,3 +1346,36 @@ table.admin .nowrap, .nowrap { white-space: nowrap; }
   .sp2e-poster, .sp2e-book { transition: none; }
   .sp2e-flummox { animation: none; }
 }
+
+/* ---------- Characters builder ---------- */
+/* Color circles (skin and hair colors) */
+.pick .swatch {
+  width: 46px; height: 46px; margin: 4px 0 6px; border-radius: 50%;
+  border: 3px solid #fff; box-shadow: 0 0 0 2px var(--line), 0 3px 0 #0001;
+}
+/* Painted "Who are you?" icons; the emoji shows until the picture is made in Admin */
+.pick.has-pic { min-height: 132px; }
+.pick .pic-icon { display: grid; place-items: center; width: 84px; height: 84px; }
+.pick .pic-icon img { width: 84px; height: 84px; object-fit: contain; grid-area: 1 / 1; filter: drop-shadow(0 3px 0 #0001); }
+/* Bring your saved cards */
+.bring-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 12px; }
+.bring-card {
+  position: relative; display: flex; flex-direction: column; align-items: stretch; gap: 4px; padding: 6px;
+  border-radius: var(--r-mid); border: 3px solid var(--line); background: #fff; box-shadow: 0 6px 0 var(--line);
+  font: inherit; font-weight: 700; font-size: 14px; line-height: 1.15; color: var(--ink); cursor: pointer;
+}
+.bring-card img, .bring-card .bring-blank { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; background: var(--sky-low); }
+.bring-card .bring-name { padding: 2px 2px 4px; text-align: center; overflow-wrap: anywhere; }
+.bring-card[aria-pressed="true"] { border-color: var(--gum); background: #ffe3f1; box-shadow: 0 3px 0 #e0478f66; transform: translateY(3px); }
+.bring-card:disabled { opacity: 0.4; cursor: not-allowed; }
+.bring-num {
+  position: absolute; top: -10px; right: -8px; width: 32px; height: 32px; display: grid; place-items: center;
+  border-radius: 50%; background: var(--gum); color: #fff; font-size: 17px; font-weight: 800; box-shadow: 0 2px 0 #0002;
+}
+.idea.hero-name { min-height: 0; font-size: 20px; font-weight: 700; }
+/* Admin: character icon painter */
+.hero-icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; }
+.hero-icon-cell { display: grid; justify-items: center; gap: 2px; padding: 8px 4px; border-radius: 12px; background: #f6f5ff; font-size: 13px; font-weight: 700; text-align: center; }
+.hero-icon-cell img { width: 64px; height: 64px; object-fit: contain; }
+.hero-icon-cell .emoji { font-size: 44px; line-height: 64px; }
+.hero-icon-cell .icon-link { font-size: 12px; }

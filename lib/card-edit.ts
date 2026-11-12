@@ -27,6 +27,7 @@ export function applyEdit(kind: Kind, old: AnyCard, input: Partial<AnyCard> & Re
     description: text(input.description, LIMITS.description, old.description),
     ...(input.art !== undefined || old.art ? { art: cleanArt(input.art ?? old.art) } : {}),
   };
+  if (kind === "character") return base as AnyCard; // name, description and picture fit only
   if (kind === "creature") {
     const o = old as CreatureCard;
     const abilities = Array.isArray(input.abilities) ? input.abilities : o.abilities;

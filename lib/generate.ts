@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import type { Kind } from "@/lib/options";
 import { readingGuide } from "@/lib/reading-level";
 import { WEAPONS } from "@/lib/safety";
+import { CHARACTER_GUIDE } from "@/lib/hero";
 import {
   CORE_RULES,
   CREATURE_RULES,
@@ -42,7 +43,17 @@ export type PetCard = {
   roleplay?: string; // older cards only; no longer shown or generated
   image_prompt: string;
 };
-export type AnyCard = (CreatureCard | EquipmentCard | PetCard) & {
+/** A hero card: picture only, no stats. */
+export type CharacterCard = {
+  name: string;
+  description: string;
+  image_prompt: string;
+  /** The job button, shown as a chip. */
+  job?: string;
+  /** Names of the saved cards drawn in the picture with them. */
+  with?: string[];
+};
+export type AnyCard = (CreatureCard | EquipmentCard | PetCard | CharacterCard) & {
   /** The main colors chosen for the picture, kept so the next cards can pick different ones. */
   palette?: string;
   /** How the picture sits in its frame; missing means "show the whole picture". */
@@ -56,6 +67,19 @@ const named = {
 };
 
 const TOOLS: Record<Kind, Anthropic.Tool> = {
+  character: {
+    name: "make_character",
+    description: "Return the finished Starport hero card (picture only, no stats).",
+    input_schema: {
+      type: "object",
+      properties: {
+        name: { type: "string" },
+        description: { type: "string", description: "1-2 short sentences, 25 words or fewer" },
+        image_prompt: { type: "string", description: "For the illustrator, 120 words or fewer, as the instructions describe." },
+      },
+      required: ["name", "description", "image_prompt"],
+    },
+  },
   creature: {
     name: "make_creature",
     description: "Return the finished Starport creature card.",
@@ -127,6 +151,7 @@ export type Drawing = { data: Buffer; mediaType: "image/jpeg" | "image/png" | "i
 const pick = <T,>(list: T[]) => list[Math.floor(Math.random() * list.length)];
 
 const BASES: Record<Kind, string[]> = {
+  character: [],
   creature: [
     "an axolotl", "a teapot", "a cactus", "a jellyfish", "a moth", "an armadillo", "a storm cloud", "a mushroom",
     "a snail", "an owl", "a toaster", "a hedgehog", "a pumpkin", "a hermit crab", "a paper lantern", "a platypus",
@@ -218,6 +243,7 @@ async function recentLooks(): Promise<string[]> {
 }
 
 const RULES: Record<Kind, string> = {
+  character: "",
   creature: CREATURE_RULES,
   equipment: EQUIPMENT_RULES,
   pet: PET_RULES,
@@ -251,6 +277,7 @@ function checkCard(kind: Kind, card: AnyCard, difficulty?: number): string | nul
   if (!card.name || !card.description) return "Missing name or description.";
   if (WEAPONS.test(JSON.stringify(card)))
     return "No weapons or sharp things anywhere on the card (guns, lasers, blasters, swords, knives, spears, arrows, axes). Replace them with something harmless and silly.";
+  if (kind === "character") return null;
   if (kind === "creature") {
     const c = card as CreatureCard;
     if (c.difficulty !== difficulty) return `Difficulty must be exactly ${difficulty}.`;
@@ -272,10 +299,17 @@ const imageBlock = (d: Drawing): Anthropic.ImageBlockParam => ({
   source: { type: "base64", media_type: d.mediaType, data: d.data.toString("base64") },
 });
 
-async function askClaude(kind: Kind, userText: string, readingLevel?: number | null, drawing?: Drawing): Promise<AnyCard> {
+async function askClaude(
+  kind: Kind,
+  userText: string,
+  readingLevel?: number | null,
+  drawing?: Drawing,
+  more: Drawing[] = []
+): Promise<AnyCard> {
   const tool = TOOLS[kind];
+  const pics = [...(drawing ? [drawing] : []), ...more];
   const messages: Anthropic.MessageParam[] = [
-    { role: "user", content: drawing ? [imageBlock(drawing), { type: "text", text: userText }] : userText },
+    { role: "user", content: pics.length ? [...pics.map(imageBlock), { type: "text", text: userText }] : userText },
   ];
   for (let attempt = 0; attempt < 3; attempt++) {
     const res = await anthropic().messages.create({
@@ -283,7 +317,11 @@ async function askClaude(kind: Kind, userText: string, readingLevel?: number | n
       max_tokens: 1500,
       // The rulebook part never changes, so it's cached: repeat sends cost a fraction.
       system: [
-        { type: "text", text: CORE_RULES + "\n" + RULES[kind], cache_control: { type: "ephemeral" } },
+        {
+          type: "text",
+          text: kind === "character" ? CHARACTER_GUIDE : CORE_RULES + "\n" + RULES[kind],
+          cache_control: { type: "ephemeral" },
+        },
         {
           type: "text",
           text:
@@ -323,6 +361,7 @@ async function askClaude(kind: Kind, userText: string, readingLevel?: number | n
 }
 
 const RULE_FIELDS: Record<Kind, string> = {
+  character: "",
   creature: "abilities[].effect and special.effect",
   equipment: "effect",
   pet: "bonuses and power.effect",
@@ -355,6 +394,19 @@ async function reviewRules(kind: Kind, card: AnyCard, readingLevel?: number | nu
   } catch {
     return card; // if the review fails, the original card is still fine to show
   }
+}
+
+/** Writes a hero card (name, description and picture notes; no stats). */
+export async function writeCharacter(
+  request: string,
+  readingLevel?: number | null,
+  drawing?: Drawing,
+  refs: Drawing[] = [],
+  heroName?: string
+): Promise<AnyCard> {
+  const card = await askClaude("character", request, readingLevel, drawing, refs);
+  if (heroName?.trim()) card.name = heroName.trim();
+  return card;
 }
 
 /** Writes new stats from the buttons. */
@@ -608,14 +660,48 @@ async function checkPicture(
  * Draws the picture (from the kid's drawing when there is one), checks it shows
  * what the kid picked with no weapons, redraws up to twice if not, and stores it.
  */
-export async function drawPicture(userId: string, card: AnyCard, drawing?: Drawing, musts = "") {
+export async function drawPicture(
+  userId: string,
+  card: AnyCard,
+  drawing?: Drawing,
+  musts = "",
+  /** Characters: their own style, plus pictures of the saved cards they brought. */
+  hero?: { style: string; refs: Drawing[]; refNames: string[] }
+) {
   const model = process.env.OPENAI_IMAGE_MODEL || "gpt-image-1.5";
   const quality = (process.env.OPENAI_IMAGE_QUALITY as "low" | "medium" | "high") || "medium";
   const backdrop = pick(BACKDROPS);
+  const asFile = (d: Drawing, name: string) => toFile(d.data, `${name}.${d.mediaType.split("/")[1]}`, { type: d.mediaType });
+
+  const drawHero = async (fixNote: string) => {
+    const h = hero!;
+    const refs = [...(drawing ? [drawing] : []), ...h.refs];
+    const refNote = [
+      ...(drawing ? ["Picture 1 is the child's own drawing of their hero: keep THEIR design (shape, colors, features)."] : []),
+      ...h.refNames.map((n, i) => `Picture ${i + 1 + (drawing ? 1 : 0)} is the child's card "${n}": draw it so it looks just like that card, only smaller, with the hero.`),
+    ].join(" ");
+    const prompt =
+      (musts ? `MUST SHOW: ${musts}.\n\n` : "") +
+      `Subject: ${card.image_prompt}\n\nStyle: ${h.style}\n\n` +
+      (refs.length ? `${refNote} Make ONE new illustration in the style above; don't copy the pictures' backgrounds or card frames.\n\n` : "") +
+      `${IMAGE_NEVER}${fixNote}`;
+    return refs.length
+      ? openai().images.edit({
+          model,
+          image: await Promise.all(refs.map((d, i) => asFile(d, `ref${i + 1}`))),
+          prompt,
+          size: "1024x1024",
+          quality,
+          n: 1,
+        })
+      : openai().images.generate({ model, prompt, size: "1024x1024", quality, n: 1 });
+  };
 
   const draw = async (fix: string) => {
     const fixNote = fix ? `\n\nIMPORTANT, the last try was wrong. Fix this: ${fix}` : "";
-    const res = drawing
+    const res = hero
+      ? await drawHero(fixNote)
+      : drawing
       ? await openai().images.edit({
           model,
           image: await toFile(drawing.data, `drawing.${drawing.mediaType.split("/")[1]}`, { type: drawing.mediaType }),
@@ -648,7 +734,7 @@ export async function drawPicture(userId: string, card: AnyCard, drawing?: Drawi
   let b64 = await draw("");
   let pictures = 1;
   for (let tries = 0; tries < 2; tries++) {
-    const problem = await checkPicture(b64, card, drawing ? "" : musts);
+    const problem = await checkPicture(b64, card, drawing && !hero ? "" : musts);
     if (!problem) break;
     console.log("picture redraw:", problem);
     b64 = await draw(problem);

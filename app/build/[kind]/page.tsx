@@ -2,7 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAccess } from "@/lib/access";
 import { KINDS, fitChoices, type Kind } from "@/lib/options";
-import Builder from "@/components/Builder";
+import Builder, { type BringCard } from "@/components/Builder";
 
 export default async function BuildPage({
   params,
@@ -23,14 +23,24 @@ export default async function BuildPage({
 
   // "Change my buttons" — start from an earlier card's choices.
   let initial:
-    | { choices: Record<string, string[]>; difficulty?: number; text?: string; drawingPath?: string; drawingUrl?: string }
+    | {
+        choices: Record<string, string[]>;
+        difficulty?: number;
+        text?: string;
+        drawingPath?: string;
+        drawingUrl?: string;
+        bring?: string[];
+        heroName?: string;
+      }
     | undefined;
   if (from) {
     const { data } = await supabase.from("creations").select("kind, choices, prompt_text").eq("id", from).single();
     if (data && data.kind === kind) {
-      const { difficulty, drawing_path, ...rest } = data.choices as {
+      const { difficulty, drawing_path, bring, hero_name, ...rest } = data.choices as {
         difficulty?: number | null;
         drawing_path?: string | null;
+        bring?: string[] | null;
+        hero_name?: string | null;
         [k: string]: unknown;
       };
       initial = {
@@ -41,9 +51,38 @@ export default async function BuildPage({
         drawingUrl: drawing_path
           ? supabase.storage.from("card-images").getPublicUrl(drawing_path).data.publicUrl
           : undefined,
+        bring: bring ?? undefined,
+        heroName: hero_name ?? undefined,
       };
     }
   }
 
-  return <Builder kind={kind as Kind} initial={initial} remaining={access.remaining} resting={access.resting} />;
+  // Characters: the kid's saved pets and equipment, to bring into the picture.
+  let bringable: BringCard[] = [];
+  if (kind === "character") {
+    const { data } = await supabase
+      .from("creations")
+      .select("id, kind, card, image_url")
+      .eq("user_id", user.id)
+      .eq("status", "saved")
+      .in("kind", ["pet", "equipment"])
+      .order("saved_at", { ascending: false })
+      .limit(60);
+    bringable = (data ?? []).map((c) => ({
+      id: c.id as string,
+      kind: c.kind as "pet" | "equipment",
+      name: String((c.card as { name?: string })?.name ?? ""),
+      imageUrl: (c.image_url as string | null) ?? null,
+    }));
+  }
+
+  return (
+    <Builder
+      kind={kind as Kind}
+      initial={initial}
+      remaining={access.remaining}
+      resting={access.resting}
+      bringable={bringable}
+    />
+  );
 }

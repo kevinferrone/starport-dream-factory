@@ -27,6 +27,7 @@ type Props = {
 };
 
 const REVEAL_TITLE: Record<Kind, string> = {
+  character: "Ta-da! Meet your hero!",
   creature: "Ta-da! Meet your creature!",
   equipment: "Ta-da! Here's your new gear!",
   pet: "Ta-da! Meet your new pet!",

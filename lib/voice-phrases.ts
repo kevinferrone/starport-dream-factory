@@ -2,7 +2,7 @@ import { puzzlePhrases } from "@/lib/puzzles/phrases";
 import { GROUPS, KINDS, DIFFICULTY_MIN, DIFFICULTY_MAX, COINS_MIN, COINS_MAX, difficultyFace, allOptions, type Kind } from "@/lib/options";
 
 /** What the home tiles say out loud. */
-export const KIND_SPOKEN: Record<Kind, string> = { creature: "Creatures", equipment: "Equipment", pet: "Pets" };
+export const KIND_SPOKEN: Record<Kind, string> = { character: "Characters", creature: "Creatures", equipment: "Equipment", pet: "Pets" };
 
 /** Fixed things the app says. */
 export const PHRASES = {
@@ -23,6 +23,8 @@ export const PHRASES = {
   removeDrawing: "Remove drawing",
   surprise: "Surprise me!",
   factoryPicks: "The factory picks",
+  bringCards: "Bring your cards",
+  heroName: "Your hero's name",
 };
 
 export const pickFirst = (title: string) => `Pick ${title.toLowerCase()} first`;
@@ -42,6 +44,7 @@ export function allowedPhrases(): Set<string> {
   });
   for (let d = DIFFICULTY_MIN; d <= DIFFICULTY_MAX; d++) s.add(difficultyPhrase(d));
   for (let c = COINS_MIN; c <= COINS_MAX; c++) s.add(coinPhrase(c));
+  ["Pets", "Equipment"].forEach((t) => s.add(t));
   puzzlePhrases().forEach((p) => s.add(p));
   return s;
 }

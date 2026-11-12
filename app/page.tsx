@@ -28,7 +28,7 @@ export default async function Home() {
         <p>Pick what you want to make. Press the buttons. Watch it come to life!</p>
       </section>
 
-      <nav className="tiles" aria-label="What do you want to make?">
+      <nav className="tiles four" aria-label="What do you want to make?">
         {kinds.map(([kind, k]) => (
           <SpeakingLink key={kind} href={`/build/${kind}`} label={KIND_SPOKEN[kind]} className={`tile ${kind}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}

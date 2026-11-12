@@ -7,9 +7,9 @@ import { cardPieces } from "@/lib/card-text";
 import { artRect, edgeColor, paintWhole, type ArtFit } from "@/lib/art-fit";
 
 // The frame's deep color and pattern, matching .tcard in globals.css.
-const FRAME_DK: Record<Kind, string> = { creature: "#e9682b", equipment: "#7b5af0", pet: "#1bbb88" };
+const FRAME_DK: Record<Kind, string> = { character: "#e0478f", creature: "#e9682b", equipment: "#7b5af0", pet: "#1bbb88" };
 /** Pattern tile size in points (the screen card is 400px wide with 104/128/140px tiles; the PDF card is 198pt). */
-const PAT_PT: Record<Kind, number> = { creature: 51.5, equipment: 63.4, pet: 69.3 };
+const PAT_PT: Record<Kind, number> = { character: 59.4, creature: 51.5, equipment: 63.4, pet: 69.3 };
 const GOLD = "#ffd76a";
 const PX_PER_PT = 4; // frame textures render at about 288 dpi
 const INK = "#23205a";

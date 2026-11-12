@@ -24,6 +24,7 @@ export async function POST(req: Request) {
     .eq("user_id", user.id)
     .single();
   if (!row) return NextResponse.json({ error: "Card not found." }, { status: 404 });
+  if (row.kind === "character") return NextResponse.json({ error: "Hero cards don't have stats." }, { status: 400 });
   if (row.reroll_count >= MAX_REROLLS_PER_CARD) {
     return NextResponse.json({ error: "You've changed the stats a lot on this card! Try building a new one." }, { status: 429 });
   }

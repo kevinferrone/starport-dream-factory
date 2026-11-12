@@ -28,9 +28,13 @@ export default function FactoryScene({ kind, picks, drawing }: { kind: Kind; pic
   STEPS.forEach((s, i) => {
     if (elapsed >= s.at) current = i;
   });
-  const steps = drawing
-    ? STEPS.map((s, i) => (i === 0 ? { ...s, label: "Looking at your drawing" } : s))
-    : STEPS;
+  const steps = STEPS.map((s, i) =>
+    i === 0 && drawing
+      ? { ...s, label: "Looking at your drawing" }
+      : i === 1 && kind === "character"
+        ? { ...s, label: "Dreaming up your hero" }
+        : s
+  );
   const chips = (picks.length ? picks : ["Surprise!"]).slice(0, 3);
 
   return (

@@ -7,7 +7,17 @@ export type Option = {
   icon: string;
   once?: boolean; // equipment items: true = use once, false = keep forever
   boosts?: string[]; // equipment items: pattern ids this item type makes more likely
+  /** Characters: what the illustrator is told (when it needs more than the label). */
+  prompt?: string;
+  /** Characters: a color circle instead of an emoji (skin and hair colors). */
+  swatch?: string;
+  /** Characters: where it goes on the body. Two things in one slot: the first is worn, the rest are carried. */
+  slot?: Slot;
+  /** Characters: has a painted picture icon (made in Admin), with the emoji as a fallback. */
+  pic?: boolean;
 };
+/** Body slots for characters. "held" fits 2 (one per hand); "ring" fits any number; the rest fit 1. */
+export type Slot = "head" | "eyes" | "mask" | "neck" | "back" | "outer" | "outfit" | "feet" | "hands" | "waist" | "held" | "ring";
 export type OptionGroup = {
   id: string;
   title: string;
@@ -16,13 +26,18 @@ export type OptionGroup = {
   min: number;
   sections?: { title: string; options: Option[] }[];
   options?: Option[];
+  /** Only one pick per section (e.g. one hair style and one hair color). */
+  onePerSection?: boolean;
+  /** Shown under the title instead of the usual "Pick 1" hint. */
+  hint?: string;
 };
-export type Kind = "creature" | "equipment" | "pet";
+export type Kind = "character" | "creature" | "equipment" | "pet";
 
-const o = (label: string, icon: string): Option => ({
+const o = (label: string, icon: string, prompt?: string): Option => ({
   id: label.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
   label,
   icon,
+  ...(prompt ? { prompt } : {}),
 });
 
 /**
@@ -37,6 +52,7 @@ const item = (label: string, icon: string, kind: "keep" | "once", boosts: string
 });
 
 export const KINDS: Record<Kind, { title: string; icon: string; button: string; color: string }> = {
+  character: { title: "Characters", icon: "🧒", button: "Build my character", color: "#ff6fb5" },
   creature: { title: "Creatures", icon: "🐲", button: "Build my creature", color: "#ff7a59" },
   equipment: { title: "Equipment", icon: "🪄", button: "Build my equipment item", color: "#7b61ff" },
   pet: { title: "Pets", icon: "🐾", button: "Build my pet", color: "#20b486" },
@@ -224,7 +240,252 @@ export const PET_GROUPS: OptionGroup[] = [
   },
 ];
 
+// ---------- Characters: picture only, no stats ----------
+/** A "Who are you?" button: always drawn as a KID version, with a painted icon. */
+const who = (label: string, icon: string, prompt?: string): Option => ({
+  ...o(label, icon),
+  pic: true,
+  prompt: prompt ?? `a little ${label.toLowerCase()} kid`,
+});
+const sw = (label: string, swatch: string, prompt?: string): Option => ({ ...o(label, "●"), swatch, prompt });
+const at = (slot: Slot) => (label: string, icon: string, prompt?: string): Option => ({ ...o(label, icon), slot, prompt });
+const head = at("head"), feet = at("feet"), outfit = at("outfit"), held = at("held"), eyes = at("eyes");
+
+export const CHARACTER_GROUPS: OptionGroup[] = [
+  {
+    id: "who",
+    title: "Who are you?",
+    icon: "🧒",
+    min: 0,
+    max: 1,
+    options: [
+      who("Kid", "🧒", "a human kid"), who("Robot", "🤖", "a little robot kid"), who("Alien", "👽", "a friendly little alien kid"),
+      who("Elf", "🧝", "a young elf kid with pointy ears"), who("Dwarf", "🧔", "a young dwarf kid, short and sturdy, no beard yet"),
+      who("Fairy", "🧚", "a fairy kid with little wings"), who("Mermaid", "🧜", "a merkid with a fish tail"),
+      who("Gekkoid", "🦎", "a young Gekkoid: a friendly gecko kid who walks on two legs"),
+      who("Dactyloid", "🦕", "a young Dactyloid: a friendly little pterodactyl kid who walks on two legs, with wing-arms"),
+      who("Fox", "🦊"), who("Bunny", "🐰"), who("Bear", "🐻"), who("Cat", "🐱"), who("Dog", "🐶"), who("Frog", "🐸"),
+      who("Owl", "🦉"), who("Penguin", "🐧"), who("Panda", "🐼"), who("Raccoon", "🦝"), who("Mouse", "🐭"),
+      who("Tiger", "🐯"), who("Lion", "🦁"), who("Monkey", "🐵"), who("Otter", "🦦"), who("Koala", "🐨"),
+      who("Hedgehog", "🦔"), who("Turtle", "🐢"), who("Octopus", "🐙"), who("Bee", "🐝"), who("Dragon", "🐲"),
+      who("Dinosaur", "🦖"), who("Unicorn", "🦄"), who("Yeti", "❄️", "a fluffy little yeti kid"),
+      who("Plant", "🌱", "a sprout kid made of leaves and vines"), who("Mushroom", "🍄", "a mushroom kid with a mushroom-cap head"),
+      who("Cloud", "☁️", "a fluffy cloud kid"), who("Star", "⭐", "a glowing little star kid"),
+      who("Slime", "🫧", "a squishy, see-through slime kid"), who("Ghost", "👻", "a cute, friendly little ghost kid"),
+      who("Snowman", "⛄", "a little snow kid"), who("Candy", "🍭", "a kid made of candy"),
+    ],
+  },
+  {
+    id: "job",
+    title: "What is your job?",
+    icon: "🧰",
+    min: 0,
+    max: 1,
+    options: [
+      o("Explorer", "🧭"), o("Inventor", "⚙️"), o("Chef", "🧑‍🍳"), o("Mail carrier", "📮"), o("Musician", "🎸"),
+      o("Pet tamer", "🐾"), o("Wizard", "🧙"), o("Gardener", "🌻"), o("Detective", "🔍"), o("Joke-teller", "🤡"),
+      o("Pilot", "✈️"), o("Artist", "🎨"), o("Scientist", "🧪"), o("Builder", "🏗️"), o("Doctor", "🩺"),
+      o("Astronaut", "🚀"), o("Dancer", "💃"), o("Storyteller", "📖"), o("Treasure hunter", "💎"), o("Baker", "🧁"),
+      o("Sailor", "⛵"), o("Firefighter", "🚒"), o("Librarian", "📚"), o("Magician", "🎩"), o("Park ranger", "🌲"),
+      o("Map maker", "🗺️"), o("Toy maker", "🧸"), o("Sports star", "🏆"), o("Dragon trainer", "🐉"), o("Star gazer", "🔭"),
+    ],
+  },
+  {
+    id: "skin",
+    title: "Skin color",
+    icon: "🎨",
+    min: 0,
+    max: 1,
+    hint: "Pick 1 (for animals and robots it's their fur, scales or metal), or skip it for a surprise",
+    sections: [
+      {
+        title: "Skin",
+        options: [
+          sw("Fair", "#fde3cf", "fair skin"), sw("Light", "#f6cfae", "light skin"), sw("Medium", "#e0a879", "medium skin"),
+          sw("Tan", "#c68a5a", "tan skin"), sw("Brown", "#8d5a3b", "brown skin"), sw("Deep brown", "#5a3522", "deep brown skin"),
+        ],
+      },
+      {
+        title: "Fantasy colors",
+        options: [
+          sw("Blue", "#5aa9ff"), sw("Green", "#4fcf7a"), sw("Purple", "#a77bff"), sw("Pink", "#ff8cc6"),
+          sw("Orange", "#ff9a3d"), sw("Gold", "#f2c230"), sw("Silver", "#c9cfd8"), sw("Rainbow", "conic-gradient(red, orange, yellow, lime, deepskyblue, violet, red)", "rainbow"),
+        ],
+      },
+    ],
+  },
+  {
+    id: "hair",
+    title: "Hair",
+    icon: "💇",
+    min: 0,
+    max: 2,
+    onePerSection: true,
+    hint: "Pick a style and a color, or skip it for a surprise",
+    sections: [
+      {
+        title: "Style",
+        options: [
+          o("Short", "💇"), o("Long", "👱"), o("Curly", "🌀"), o("Spiky", "⚡"), o("Braids", "🪢"), o("Ponytail", "🎀"),
+          o("Pigtails", "👧"), o("Space buns", "🪐"), o("Afro puffs", "☁️"), o("Mohawk", "🦔"), o("Messy", "🌪️"),
+          o("Bald", "🥚"), o("Flower hair", "🌸"), o("Leaf hair", "🍃"), o("Glowing hair", "✨"), o("Cloud hair", "🌥️"),
+        ],
+      },
+      {
+        title: "Color",
+        options: [
+          sw("Black", "#1f1b24", "black hair"), sw("Brown", "#6b4226", "brown hair"), sw("Red", "#c4471f", "red hair"),
+          sw("Blonde", "#f1cf6b", "blonde hair"), sw("White", "#f4f4f4", "white hair"), sw("Blue", "#3f8cff", "blue hair"),
+          sw("Pink", "#ff7fbf", "pink hair"), sw("Green", "#3cc46a", "green hair"), sw("Purple", "#9b63ff", "purple hair"),
+          sw("Rainbow", "conic-gradient(red, orange, yellow, lime, deepskyblue, violet, red)", "rainbow hair"),
+        ],
+      },
+    ],
+  },
+  {
+    id: "face",
+    title: "Face",
+    icon: "😊",
+    min: 0,
+    max: 3,
+    options: [
+      o("Freckles", "🟤"), eyes("Glasses", "👓"), eyes("Sunglasses", "🕶️"), eyes("Monocle", "🧐"), o("Big smile", "😁"),
+      o("Gap tooth", "😬"), o("Braces", "🦷"), o("Rosy cheeks", "☺️"), o("Dimples", "😊"), o("Face paint", "🎨"),
+      o("Star stickers", "⭐"), o("Silly mustache", "🥸"), o("Whiskers", "🐱"), o("Big eyes", "👀"),
+      o("Three eyes", "🔮", "three eyes"), o("Glowing eyes", "🌟"), o("Sleepy eyes", "😴"), o("Bandana", "🧣", "a bandana tied on the forehead"),
+    ],
+  },
+  {
+    id: "outfit",
+    title: "Outfit",
+    icon: "👕",
+    min: 0,
+    max: 3,
+    onePerSection: true,
+    hint: "Pick clothes, something on your head and something on your feet, or skip it for a surprise",
+    sections: [
+      {
+        title: "Clothes",
+        options: [
+          outfit("Explorer vest", "🦺", "an explorer vest with lots of pockets"), outfit("Space jumpsuit", "🧑‍🚀"),
+          outfit("Cozy sweater", "🧶"), outfit("Overalls", "👖"), outfit("Hoodie", "🧥"), outfit("Robe of stars", "🌌"),
+          outfit("Pajamas", "🛌"), outfit("Chef apron", "🧑‍🍳"), outfit("Lab coat", "🥼"), outfit("Raincoat", "🌧️"),
+          outfit("Superhero suit", "🦸"), outfit("Sports jersey", "🎽"), outfit("Fancy suit", "🤵"), outfit("Fancy dress", "👗"),
+          outfit("Tutu", "🩰"), outfit("Mail carrier uniform", "📮"), outfit("Pirate coat", "🏴‍☠️", "a big swishy pirate coat (no weapons)"),
+          outfit("Knight armor", "🛡️", "shiny storybook knight armor (no weapons)"),
+        ],
+      },
+      {
+        title: "On your head",
+        options: [
+          head("Wizard hat", "🧙"), head("Crown", "👑"), head("Beanie", "🧢", "a beanie with a pom-pom"), head("Baseball cap", "🧢"),
+          head("Flower crown", "🌼"), head("Pilot goggles", "🥽", "pilot cap and goggles"), head("Top hat", "🎩"),
+          head("Chef hat", "👨‍🍳"), head("Helmet", "⛑️", "an adventure helmet"), head("Bow", "🎀", "a big hair bow"),
+          head("Headphones", "🎧"), head("Party hat", "🥳"),
+        ],
+      },
+      {
+        title: "On your feet",
+        options: [
+          feet("Sneakers", "👟"), feet("Rain boots", "🥾"), feet("Light-up shoes", "✨"), feet("Roller skates", "🛼"),
+          feet("Slippers", "🩴", "fuzzy slippers"), feet("Sandals", "🩴"), feet("Cowboy boots", "🤠"), feet("Barefoot", "🦶"),
+          feet("Jet boots", "🚀", "jet boots with little puffs of cloud"),
+        ],
+      },
+    ],
+  },
+  {
+    id: "extra",
+    title: "Something extra",
+    icon: "✨",
+    min: 0,
+    max: 2,
+    options: [
+      o("Wings", "🪽"), o("Tail", "🐒"), o("Robot arm", "🦾"), at("back")("Cape", "🦸"), at("back")("Jetpack", "🚀"),
+      at("back")("Backpack", "🎒"), o("Sparkle trail", "✨"), o("Bubble shield", "🫧", "a shimmering bubble around them"),
+      o("Little horns", "🦄"), o("Antennae", "🐜"), o("Pointy ears", "🧝"), o("Halo of stars", "💫"),
+      at("neck")("Medal", "🏅"), at("neck")("Scarf", "🧣"), at("waist")("Tool belt", "🧰"), o("Glowing aura", "🌟"),
+      o("Floating books", "📚"), o("Musical notes", "🎶", "musical notes floating around them"),
+    ],
+  },
+  {
+    id: "holding",
+    title: "Holding",
+    icon: "🤲",
+    min: 0,
+    max: 2,
+    options: [
+      held("Lantern", "🏮"), held("Treasure map", "🗺️"), held("Magic wand", "🪄"), held("Book", "📖"),
+      held("Giant wrench", "🔧"), held("Big spoon", "🥄"), held("Kite", "🪁"), held("Balloon", "🎈"), held("Guitar", "🎸"),
+      held("Paintbrush", "🖌️"), held("Telescope", "🔭"), held("Magnifying glass", "🔍"), held("Butterfly net", "🦋"),
+      held("Teddy bear", "🧸"), held("Sandwich", "🥪"), held("Ice cream", "🍦"), held("Flower", "🌷"), held("Compass", "🧭"),
+      held("Crystal", "💎"), held("Umbrella", "☂️"), held("Trophy", "🏆"), held("Skateboard", "🛹"), held("Letter", "✉️"),
+      held("Potion", "🧪"),
+    ],
+  },
+  {
+    id: "pose",
+    title: "Pose",
+    icon: "🤸",
+    min: 0,
+    max: 1,
+    options: [
+      o("Waving", "👋"), o("Jumping", "🦘"), o("Running", "🏃"), o("Sneaking", "🐾", "tiptoeing and sneaking"),
+      o("Flying", "🕊️"), o("Dancing", "💃"), o("Sitting", "🪑"), o("Superhero landing", "🦸"), o("Cartwheel", "🤸"),
+      o("Pointing ahead", "👉"), o("Climbing", "🧗"), o("Reading", "📖"), o("Thumbs up", "👍"), o("Hands on hips", "🦸"),
+      o("Peeking", "🫣", "peeking out from behind something"), o("Floating", "🎈"),
+    ],
+  },
+  {
+    id: "mood",
+    title: "Mood",
+    icon: "😄",
+    min: 0,
+    max: 1,
+    options: [
+      o("Happy", "😊"), o("Excited", "🤩"), o("Brave", "😤"), o("Silly", "🤪"), o("Curious", "🤔"), o("Calm", "😌"),
+      o("Proud", "😎"), o("Sleepy", "😴"), o("Shy", "😳"), o("Grumpy", "😠"), o("Surprised", "😮"), o("Determined", "💪"),
+      o("Mischievous", "😏"), o("Dreamy", "😇"),
+    ],
+  },
+  {
+    id: "location",
+    title: "Location",
+    icon: "🗺️",
+    min: 0,
+    max: 1,
+    options: [
+      o("Plain background", "✂️", "a plain soft pastel background (good for cutting out)"),
+      o("Port of Stars", "🗼", "the Port of Stars: a busy sky port with airships and a flying mechanical tower"),
+      o("Bardo's shop", "🏪", "inside Bardo's Equipment Shop: a cozy shop that is taller inside, with spiraling shelves of magical gear"),
+      o("Starville", "🏘️", "Starville: a cheerful little town with a fortune-teller tent, a kitchen and a wizard's spell tower"),
+      o("Laboratory", "🧪", "a bubbly, colorful laboratory full of strange experiments"),
+      o("Forest", "🌳", "a magical forest with rainbow slides"), o("Mushroom village", "🍄", "a riverside mushroom village by an old rope bridge"),
+      o("Mountains", "⛰️"), o("Swamp", "🐸", "a friendly glowing swamp"),
+      o("Robotopia", "🤖", "Robotopia: a bright robot city of gears, crystals and glowing signs"),
+      o("Undercity", "💎", "the Undercity: glowing crystal caves and mushroom groves underground"),
+      o("Multiversal Mailer", "✉️", "aboard the Multiversal Mailer: a giant flying mail ship full of letters"),
+      o("Floating island", "🏝️"), o("Beach", "🏖️"), o("Snowy hill", "🏔️"), o("Underwater", "🐠"),
+      o("Outer space", "🌌", "outer space with stars and planets"), o("Castle", "🏰"), o("Candy hills", "🍭"),
+    ],
+  },
+];
+
+/**
+ * Where each equipment item type goes on a character. Items from a kid's saved cards
+ * use this; anything not listed (or a card with no item type) is held.
+ */
+export const ITEM_SLOT: Record<string, Slot> = {
+  hat: "head", crown: "head", headband: "head", goggles: "eyes", mask: "mask", jacket: "outer", cape: "back",
+  bag: "back", armor: "outer", boots: "feet", socks: "feet", gloves: "hands", ring: "ring", necklace: "neck",
+  scarf: "neck", belt: "waist",
+};
+
+/** The most saved cards a kid can bring into a character picture. */
+export const MAX_BRING = 3;
+
 export const GROUPS: Record<Kind, OptionGroup[]> = {
+  character: CHARACTER_GROUPS,
   creature: CREATURE_GROUPS,
   equipment: EQUIPMENT_GROUPS,
   pet: PET_GROUPS,
@@ -271,6 +532,8 @@ export type BuildInput = {
   text?: string;
   drawing?: string; // a new drawing, as a JPEG data URL
   drawingPath?: string; // a drawing already uploaded (when changing buttons on an earlier card)
+  bring?: string[]; // characters: saved equipment and pet card ids, in the order picked
+  heroName?: string; // characters: a name the kid typed
 };
 
 /** Fills any group the kid skipped with random picks, so pressing Build alone still makes something. */
@@ -280,6 +543,11 @@ export function fillRandom(kind: Kind, choices: Record<string, string[]>): Recor
     const picked = choices[g.id] ?? [];
     if (picked.length) {
       out[g.id] = picked;
+      continue;
+    }
+    if (g.onePerSection && g.sections) {
+      // One random pick from each section (a style and a color, etc.).
+      out[g.id] = g.sections.map((sec) => sec.options[Math.floor(Math.random() * sec.options.length)].id);
       continue;
     }
     const pool = [...allOptions(g)];
@@ -309,6 +577,13 @@ export function validateChoices(input: BuildInput): { ok: true; labels: Record<s
       if (!opt) return { ok: false, error: `Unknown choice ${id}` };
       names.push(opt.label);
     }
+    if (g.onePerSection && g.sections) {
+      for (const sec of g.sections) {
+        if (picked.filter((id) => sec.options.some((x) => x.id === id)).length > 1) {
+          return { ok: false, error: `Pick just 1 ${sec.title.toLowerCase()} in ${g.title}` };
+        }
+      }
+    }
     labels[g.title] = names;
   }
   if (input.kind === "creature") {
@@ -324,6 +599,12 @@ export function validateChoices(input: BuildInput): { ok: true; labels: Record<s
     }
   }
   if (input.text && input.text.length > 300) return { ok: false, error: "Description is too long" };
+  if (input.kind === "character") {
+    if ((input.bring ?? []).length > MAX_BRING) return { ok: false, error: `Bring up to ${MAX_BRING} cards` };
+    if (input.heroName && input.heroName.length > 40) return { ok: false, error: "That name is too long" };
+  } else if (input.bring?.length || input.heroName) {
+    return { ok: false, error: "Only characters can bring cards" };
+  }
   return { ok: true, labels };
 }
 

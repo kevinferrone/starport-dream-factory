@@ -1,7 +1,12 @@
 // The words on a card, in reading order. The card display, the PDF and the
 // read-aloud all use this, so the highlighted word always matches the spoken word.
 import type { Kind } from "@/lib/options";
-import type { CreatureCard, EquipmentCard, PetCard, AnyCard } from "@/lib/generate";
+import type { CreatureCard, EquipmentCard, PetCard, CharacterCard, AnyCard } from "@/lib/generate";
+import { CHARACTER_GROUPS, allOptions } from "@/lib/options";
+
+/** The emoji for a character's job chip. */
+const jobIcon = (job: string) =>
+  allOptions(CHARACTER_GROUPS.find((g) => g.id === "job")!).find((o) => o.label === job)?.icon ?? "🧭";
 
 export type Piece = {
   role: "title" | "desc" | "chip" | "ruleName" | "ruleText" | "note";
@@ -14,7 +19,14 @@ export function cardPieces(kind: Kind, card: AnyCard): Piece[] {
     { role: "title", text: card.name },
     { role: "desc", text: card.description },
   ];
-  if (kind === "creature") {
+  if (kind === "character") {
+    const h = card as CharacterCard;
+    if (h.job) p.push({ role: "chip", icon: jobIcon(h.job), text: h.job });
+    if (h.with?.length) {
+      p.push({ role: "ruleName", text: "Adventuring with" });
+      p.push({ role: "ruleText", text: listWords(h.with) });
+    }
+  } else if (kind === "creature") {
     const c = card as CreatureCard;
     p.push({ role: "chip", icon: "🎯", text: `Difficulty ${c.difficulty}` });
     p.push({ role: "chip", icon: "⭐", text: `Successes to defeat ${c.successes}` });
@@ -43,6 +55,9 @@ export function cardPieces(kind: Kind, card: AnyCard): Piece[] {
   }
   return p;
 }
+
+/** "A", "A and B", "A, B and C". */
+export const listWords = (xs: string[]) => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`);
 
 export const words = (text: string) => text.split(/\s+/).filter(Boolean);
 

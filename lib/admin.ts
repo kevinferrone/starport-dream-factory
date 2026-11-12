@@ -64,3 +64,14 @@ export const monthStartIso = () => {
   d.setUTCHours(0, 0, 0, 0);
   return d.toISOString();
 };
+
+/** For API routes: the admin's user id, or null (no redirects). */
+export async function adminIdOrNull(): Promise<string | null> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+  const { data } = await createAdminClient().from("profiles").select("is_admin").eq("id", user.id).single();
+  if (!data?.is_admin) return null;
+  if (!(await isGrownup(user.id))) return null;
+  return user.id;
+}

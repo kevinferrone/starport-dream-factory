@@ -41,7 +41,7 @@ insert into public.site_settings (id) values (1) on conflict do nothing;
 create table if not exists public.creations (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users (id) on delete cascade,
-  kind text not null check (kind in ('creature', 'equipment', 'pet')),
+  kind text not null check (kind in ('character', 'creature', 'equipment', 'pet')),
   choices jsonb not null,
   prompt_text text,
   card jsonb not null,

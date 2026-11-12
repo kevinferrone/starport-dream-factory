@@ -17,23 +17,57 @@ import {
   type Option,
   type OptionGroup,
   allOptions,
+  MAX_BRING,
 } from "@/lib/options";
+import { iconUrl } from "@/lib/hero-icons";
 import { speak, useSpeakOnHover, warmVoices } from "@/components/ReadAloud";
 import { PHRASES, difficultyPhrase, coinPhrase } from "@/lib/voice-phrases";
 import FactoryScene from "@/components/FactoryScene";
+
+/** A saved pet or equipment card a kid can bring into a character picture. */
+export type BringCard = { id: string; kind: "pet" | "equipment"; name: string; imageUrl: string | null };
 
 type Props = {
   kind: Kind;
   remaining: number;
   resting?: boolean;
+  /** Characters: the kid's saved pets and equipment. */
+  bringable?: BringCard[];
   initial?: {
     choices: Record<string, string[]>;
     difficulty?: number;
     text?: string;
     drawingPath?: string;
     drawingUrl?: string;
+    bring?: string[];
+    heroName?: string;
   };
 };
+
+/** A button's picture: a color circle, a painted icon (emoji until it's made), or an emoji. */
+function OptIcon({ opt }: { opt: Option }) {
+  // Painted icons load in the browser only, so a missing one never shows as a broken picture.
+  const [painted, setPainted] = useState(false);
+  useEffect(() => {
+    if (!opt.pic) return;
+    const img = new Image();
+    img.onload = () => setPainted(true);
+    img.src = iconUrl(opt.id);
+  }, [opt.pic, opt.id]);
+  if (opt.swatch) return <span className="swatch" style={{ background: opt.swatch }} aria-hidden />;
+  if (opt.pic)
+    return (
+      <span className="pic-icon" aria-hidden>
+        {painted ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={iconUrl(opt.id)} alt="" />
+        ) : (
+          <span className="emoji">{opt.icon}</span>
+        )}
+      </span>
+    );
+  return <span className="emoji" aria-hidden>{opt.icon}</span>;
+}
 
 /** Shrinks a photo of a drawing to a small JPEG (fast to upload, plenty for the illustrator). */
 async function shrinkPhoto(file: File): Promise<string> {
@@ -50,7 +84,7 @@ async function shrinkPhoto(file: File): Promise<string> {
   return canvas.toDataURL("image/jpeg", 0.85);
 }
 
-export default function Builder({ kind, remaining, resting = false, initial }: Props) {
+export default function Builder({ kind, remaining, resting = false, initial, bringable = [] }: Props) {
   const router = useRouter();
   const groups = GROUPS[kind];
   const k = KINDS[kind];
@@ -60,6 +94,10 @@ export default function Builder({ kind, remaining, resting = false, initial }: P
   // null = the factory picks the Coin value.
   const [coins, setCoins] = useState<number | null>(null);
   const [text, setText] = useState(initial?.text ?? "");
+  // Characters: saved cards to bring along (in the order picked) and an optional name.
+  const [bring, setBring] = useState<string[]>((initial?.bring ?? []).filter((id) => bringable.some((b) => b.id === id)));
+  const [heroName, setHeroName] = useState(initial?.heroName ?? "");
+  const isHero = kind === "character";
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // A new drawing (data URL), or one carried over from an earlier card.
@@ -101,13 +139,22 @@ export default function Builder({ kind, remaining, resting = false, initial }: P
       const cur = prev[g.id] ?? [];
       if (cur.includes(opt.id)) return { ...prev, [g.id]: cur.filter((x) => x !== opt.id) };
       if (g.max === 1) return { ...prev, [g.id]: [opt.id] }; // single choice: swap
+      if (g.onePerSection && g.sections) {
+        // One per section: a new style replaces the old style, a new color the old color.
+        const sec = g.sections.find((x) => x.options.some((y) => y.id === opt.id));
+        const others = cur.filter((id) => !sec?.options.some((y) => y.id === id));
+        return { ...prev, [g.id]: [...others, opt.id] };
+      }
       if (cur.length >= g.max) return prev;
       return { ...prev, [g.id]: [...cur, opt.id] };
     });
   };
 
   const outOfBuilds = remaining <= 0;
-  const nothingPicked = !preview && !text.trim() && groups.every((g) => !(choices[g.id]?.length));
+  const nothingPicked =
+    !preview && !text.trim() && !bring.length && !heroName.trim() && groups.every((g) => !(choices[g.id]?.length));
+  const toggleBring = (id: string) =>
+    setBring((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : cur.length >= MAX_BRING ? cur : [...cur, id]));
 
   const build = async () => {
     setError(null);
@@ -121,7 +168,9 @@ export default function Builder({ kind, remaining, resting = false, initial }: P
           kind,
           choices,
           difficulty: kind === "creature" ? difficulty : undefined,
-          coins: kind !== "creature" && coins ? coins : undefined,
+          coins: (kind === "equipment" || kind === "pet") && coins ? coins : undefined,
+          bring: isHero && bring.length ? bring : undefined,
+          heroName: isHero && heroName.trim() ? heroName.trim() : undefined,
           text,
           drawing: drawing ?? undefined,
           drawingPath: !drawing && keptDrawing ? keptDrawing.path : undefined,
@@ -141,9 +190,12 @@ export default function Builder({ kind, remaining, resting = false, initial }: P
 
   const face = difficultyFace(difficulty);
   // The kid's picks, by name, for the factory scene.
-  const pickLabels = groups.flatMap((g) =>
-    (choices[g.id] ?? []).map((id) => allOptions(g).find((o) => o.id === id)?.label).filter((l): l is string => !!l)
-  );
+  const pickLabels = [
+    ...bring.map((id) => bringable.find((b) => b.id === id)?.name).filter((l): l is string => !!l),
+    ...groups.flatMap((g) =>
+      (choices[g.id] ?? []).map((id) => allOptions(g).find((o) => o.id === id)?.label).filter((l): l is string => !!l)
+    ),
+  ];
 
   return (
     <div className={`kind-${kind}`}>
@@ -191,7 +243,7 @@ export default function Builder({ kind, remaining, resting = false, initial }: P
 
       {groups.map((g) => {
         const picked = choices[g.id] ?? [];
-        const full = g.max > 1 && picked.length >= g.max;
+        const full = g.max > 1 && !g.onePerSection && picked.length >= g.max;
         const renderOpt = (opt: Option) => {
           const on = picked.includes(opt.id);
           const { spokeOnClick, ...hover } = say(opt.label);
@@ -200,7 +252,7 @@ export default function Builder({ kind, remaining, resting = false, initial }: P
               {...hover}
               key={opt.id}
               type="button"
-              className={`pick${g.id === "size" ? " wide" : ""}`}
+              className={`pick${g.id === "size" ? " wide" : ""}${opt.pic ? " has-pic" : ""}`}
               aria-pressed={on}
               disabled={!on && full}
               onClick={() => {
@@ -208,7 +260,7 @@ export default function Builder({ kind, remaining, resting = false, initial }: P
                 toggle(g, opt);
               }}
             >
-              <span className="emoji" aria-hidden>{opt.icon}</span>
+              <OptIcon opt={opt} />
               {opt.label}
             </button>
           );
@@ -220,7 +272,7 @@ export default function Builder({ kind, remaining, resting = false, initial }: P
               {g.title}
             </h2>
             <p className="hint">
-              {g.max === 1 ? "Pick 1" : `Pick up to ${g.max} (${picked.length} picked)`}, or skip it for a surprise
+              {g.hint ?? `${g.max === 1 ? "Pick 1" : `Pick up to ${g.max} (${picked.length} picked)`}, or skip it for a surprise`}
             </p>
             {g.sections ? (
               g.sections.map((s) => (
@@ -259,7 +311,76 @@ export default function Builder({ kind, remaining, resting = false, initial }: P
         </section>
       )}
 
-      {kind !== "creature" && (
+      {isHero && (
+        <section className="panel">
+          <h2>
+            <span className="emoji" aria-hidden>🎒</span>
+            Bring your cards (optional)
+          </h2>
+          <p className="hint">
+            Pick up to {MAX_BRING} of your saved pets and equipment to be in the picture with your hero ({bring.length} picked).
+            Your cards come first: if two things go in the same spot, the first one is worn and the rest go in a bag.
+          </p>
+          {!bringable.length ? (
+            <p className="hint">
+              You don&apos;t have any saved pets or equipment yet. Make one with the <Link href="/build/pet">Pets</Link> or{" "}
+              <Link href="/build/equipment">Equipment</Link> builder and save it.
+            </p>
+          ) : (
+            (["pet", "equipment"] as const).map((k) => {
+              const list = bringable.filter((b) => b.kind === k);
+              if (!list.length) return null;
+              return (
+                <div key={k}>
+                  <div className="section-title">{k === "pet" ? "Pets" : "Equipment"}</div>
+                  <div className="bring-grid">
+                    {list.map((b) => {
+                      const n = bring.indexOf(b.id);
+                      const on = n >= 0;
+                      return (
+                        <button
+                          key={b.id}
+                          type="button"
+                          className={`bring-card ${b.kind}`}
+                          aria-pressed={on}
+                          disabled={!on && bring.length >= MAX_BRING}
+                          onClick={() => toggleBring(b.id)}
+                        >
+                          {on && <span className="bring-num" aria-label={`Pick ${n + 1}`}>{n + 1}</span>}
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          {b.imageUrl ? <img src={b.imageUrl} alt="" /> : <span className="bring-blank" />}
+                          <span className="bring-name">{b.name}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </section>
+      )}
+
+      {isHero && (
+        <section className="panel">
+          <h2>
+            <span className="emoji" aria-hidden>🏷️</span>
+            Your hero&apos;s name (optional)
+          </h2>
+          <p className="hint">Skip it and the factory will think of a name.</p>
+          <input
+            className="idea hero-name"
+            type="text"
+            maxLength={40}
+            value={heroName}
+            onChange={(e) => setHeroName(e.target.value)}
+            onFocus={() => speak(PHRASES.heroName)}
+            placeholder="Captain Pockets"
+          />
+        </section>
+      )}
+
+      {(kind === "equipment" || kind === "pet") && (
         <section className="panel">
           <h2>
             <span className="emoji" aria-hidden>🪙</span>
@@ -305,7 +426,7 @@ export default function Builder({ kind, remaining, resting = false, initial }: P
           maxLength={300}
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="It loves pancakes and is scared of puddles…"
+          placeholder={isHero ? "My hero hums all the time and loves jumping in puddles…" : "It loves pancakes and is scared of puddles…"}
         />
       </section>
 

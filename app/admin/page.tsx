@@ -5,6 +5,9 @@ import { PLANS, PAID_TIERS, isPaidTier, type PaidTier } from "@/lib/access";
 import { requireAdmin, ACTIVE } from "@/lib/admin";
 import { logActivity } from "@/lib/activity";
 import ActivityTable from "@/components/admin/ActivityTable";
+import HeroIcons from "@/components/admin/HeroIcons";
+import { CHARACTER_GROUPS, allOptions } from "@/lib/options";
+import { ICON_FOLDER } from "@/lib/hero-icons";
 
 async function setSiteFree(formData: FormData) {
   "use server";
@@ -69,6 +72,14 @@ export default async function AdminPage() {
     db.from("creations").select("created_at, pictures:choices->pictures").gte("created_at", ago(30)).limit(20000),
     db.from("activity").select("user_id, kind, detail, created_at").order("created_at", { ascending: false }).limit(8),
   ]);
+  const { data: iconFiles } = await db.storage.from("card-images").list(ICON_FOLDER, { limit: 200 });
+  const madeIcons = new Set((iconFiles ?? []).map((f) => f.name.replace(/\.webp$/, "")));
+  const heroIcons = allOptions(CHARACTER_GROUPS.find((g) => g.id === "who")!).map((o) => ({
+    id: o.id,
+    label: o.label,
+    emoji: o.icon,
+    made: madeIcons.has(o.id),
+  }));
 
   const active = (subs ?? []).filter((s) => ACTIVE.includes(s.subscription_status ?? "") && isPaidTier(s.tier));
   const byTier = Object.fromEntries(PAID_TIERS.map((t) => [t, active.filter((s) => s.tier === t).length])) as Record<PaidTier, number>;
@@ -118,6 +129,8 @@ export default async function AdminPage() {
         <ActivityTable rows={activity ?? []} emailOf={emailOf} />
         <p className="hint" style={{ marginTop: 10 }}><Link href="/admin/activity">See all activity →</Link></p>
       </section>
+
+      <HeroIcons icons={heroIcons} />
 
       <section className="panel">
         <h2>Free for everyone</h2>

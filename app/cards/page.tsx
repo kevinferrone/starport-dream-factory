@@ -8,7 +8,7 @@ import SheetButton from "./SheetButton";
 import BadgeShelf from "@/components/puzzles/BadgeShelf";
 import { puzzleState } from "@/lib/puzzles/server";
 
-const ORDER: Kind[] = ["creature", "equipment", "pet"];
+const ORDER: Kind[] = ["character", "creature", "equipment", "pet"];
 
 export default async function MyCards() {
   const supabase = await createClient();
@@ -30,7 +30,7 @@ export default async function MyCards() {
   }));
   const byKind = (k: Kind) => cards.filter((c) => c.kind === k);
   const sheet = (list: typeof cards) => list.map(({ kind, card, imageUrl }) => ({ kind, card, imageUrl }));
-  // The "all cards" sheet keeps each kind together: creatures, then equipment, then pets.
+  // The "all cards" sheet keeps each kind together: heroes, creatures, equipment, then pets.
   const everything = ORDER.flatMap(byKind);
 
   return (
