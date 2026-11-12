@@ -7,7 +7,7 @@ import { logActivity } from "@/lib/activity";
 import ActivityTable from "@/components/admin/ActivityTable";
 import HeroIcons from "@/components/admin/HeroIcons";
 import { CHARACTER_GROUPS, allOptions } from "@/lib/options";
-import { ICON_FOLDER } from "@/lib/hero-icons";
+import { ICON_FOLDER, iconFile } from "@/lib/hero-icons";
 
 async function setSiteFree(formData: FormData) {
   "use server";
@@ -73,12 +73,12 @@ export default async function AdminPage() {
     db.from("activity").select("user_id, kind, detail, created_at").order("created_at", { ascending: false }).limit(8),
   ]);
   const { data: iconFiles } = await db.storage.from("card-images").list(ICON_FOLDER, { limit: 200 });
-  const madeIcons = new Set((iconFiles ?? []).map((f) => f.name.replace(/\.webp$/, "")));
+  const madeIcons = new Set((iconFiles ?? []).map((f) => f.name));
   const heroIcons = allOptions(CHARACTER_GROUPS.find((g) => g.id === "who")!).map((o) => ({
     id: o.id,
     label: o.label,
     emoji: o.icon,
-    made: madeIcons.has(o.id),
+    made: madeIcons.has(iconFile(o.id)),
   }));
 
   const active = (subs ?? []).filter((s) => ACTIVE.includes(s.subscription_status ?? "") && isPaidTier(s.tier));

@@ -265,7 +265,7 @@ export const CHARACTER_GROUPS: OptionGroup[] = [
       who("Gekkoid", "🦎", "a young Gekkoid: a friendly gecko kid who walks on two legs"),
       who(
         "Dactyloid",
-        "🦕",
+        "🪽",
         "a young Dactyloid: a baby pterodactyl kid with a long pointed beak, a bony crest on the back of its head and big leathery wings (no feathers)"
       ),
       who("Fox", "🦊"), who("Bunny", "🐰"), who("Bear", "🐻"), who("Cat", "🐱"), who("Dog", "🐶"), who("Frog", "🐸"),
@@ -382,7 +382,7 @@ export const CHARACTER_GROUPS: OptionGroup[] = [
       {
         title: "On your head",
         options: [
-          head("Wizard hat", "🧙"), head("Crown", "👑"), head("Beanie", "🧢", "a beanie with a pom-pom"), head("Baseball cap", "🧢"),
+          head("Wizard hat", "🧙"), head("Crown", "👑"), head("Baseball cap", "🧢"),
           head("Flower crown", "🌼"), head("Pilot goggles", "🥽", "pilot cap and goggles"), head("Top hat", "🎩"),
           head("Chef hat", "👨‍🍳"), head("Helmet", "⛑️", "an adventure helmet"), head("Bow", "🎀", "a big hair bow"),
           head("Headphones", "🎧"), head("Party hat", "🥳"),
@@ -392,7 +392,7 @@ export const CHARACTER_GROUPS: OptionGroup[] = [
         title: "On your feet",
         options: [
           feet("Sneakers", "👟"), feet("Rain boots", "🥾"), feet("Light-up shoes", "✨"), feet("Roller skates", "🛼"),
-          feet("Slippers", "🩴", "fuzzy slippers"), feet("Sandals", "🩴"), feet("Cowboy boots", "🤠"), feet("Barefoot", "🦶"),
+feet("Sandals", "🩴"), feet("Cowboy boots", "🤠"), feet("Barefoot", "🦶"),
           feet("Jet boots", "🚀", "jet boots with little puffs of cloud"),
         ],
       },
