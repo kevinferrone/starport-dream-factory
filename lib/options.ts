@@ -262,12 +262,6 @@ export const CHARACTER_GROUPS: OptionGroup[] = [
       who("Kid", "🧒", "a human kid"), who("Robot", "🤖", "a little robot kid"), who("Alien", "👽", "a friendly little alien kid"),
       who("Elf", "🧝", "a young elf kid with pointy ears"), who("Dwarf", "🧔", "a young dwarf kid, short and sturdy, no beard yet"),
       who("Fairy", "🧚", "a fairy kid with little wings"), who("Mermaid", "🧜", "a merkid with a fish tail"),
-      who("Gekkoid", "🦎", "a young Gekkoid: a friendly gecko kid who walks on two legs"),
-      who(
-        "Dactyloid",
-        "🪽",
-        "a young Dactyloid: a baby pterodactyl kid with a long pointed beak, a bony crest on the back of its head and big leathery wings (no feathers)"
-      ),
       who("Fox", "🦊"), who("Bunny", "🐰"), who("Bear", "🐻"), who("Cat", "🐱"), who("Dog", "🐶"), who("Frog", "🐸"),
       who("Owl", "🦉"), who("Penguin", "🐧"), who("Panda", "🐼"), who("Raccoon", "🦝"), who("Mouse", "🐭"),
       who("Tiger", "🐯"), who("Lion", "🦁"), who("Monkey", "🐵"), who("Otter", "🦦"), who("Koala", "🐨"),
@@ -275,7 +269,7 @@ export const CHARACTER_GROUPS: OptionGroup[] = [
       who("Dinosaur", "🦖"), who("Unicorn", "🦄"), who("Yeti", "❄️", "a fluffy little yeti kid"),
       who("Plant", "🌱", "a sprout kid made of leaves and vines"), who("Mushroom", "🍄", "a mushroom kid with a mushroom-cap head"),
       who("Cloud", "☁️", "a fluffy cloud kid"), who("Star", "⭐", "a glowing little star kid"),
-      who("Slime", "🫧", "a squishy, see-through slime kid"), who("Ghost", "👻", "a cute, friendly little ghost kid"),
+      who("Slime", "🫠", "a gooey green slime kid: a wobbly, drippy blob of shiny see-through green goo shaped like a little kid, with a happy face (not a bubble)"), who("Ghost", "👻", "a cute, friendly little ghost kid"),
       who("Snowman", "⛄", "a little snow kid"), who("Candy", "🍭", "a kid made of candy"),
     ],
   },
