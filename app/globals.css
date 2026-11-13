@@ -142,8 +142,8 @@ button { font: inherit; color: inherit; }
   margin: 0 auto 2px;
   filter: drop-shadow(0 6px 0 #ffffff99);
 }
-/* Tilted text gets hairline seams where the font's strokes overlap (r, m); one layer keeps it smooth. */
-.hero h1 .line2 { display: block; color: var(--ink); transform: rotate(-2deg); will-change: transform; backface-visibility: hidden; }
+/* Kept level on purpose: tilting this big text made browsers draw it in two slightly offset halves (a "bump" through the middle). */
+.hero h1 .line2 { display: block; color: var(--ink); }
 .hero p { font-size: 20px; margin: 18px auto 0; max-width: 34ch; color: var(--ink-soft); }
 
 .tiles {

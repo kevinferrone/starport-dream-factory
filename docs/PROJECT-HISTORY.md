@@ -275,6 +275,6 @@ Google, emailed link, or password (set on the Grown-ups page).
 - "Change the stats" refuses character cards. Edit my card on a hero changes name, description and picture fit only.
 
 - Nov 12 update: Location now has a "Starport" section with every place on the city map (Town Hall, Bardo's shop, Game Room, Kids Club, Laboratory, Newsroom, Pet Shelter, Port of Stars, Starville, Fortuna's Flames, Simmering Kitchen, Spell Tower, Forest, River, Mushrooga Village, Mountains, Swamp). Each button's background description comes from the 1e and 2e manuscripts. "Beyond Starport" and "Plain" sections hold the rest. Dactyloid is now described as a baby pterodactyl (beak, head crest, leathery wings); its icon needs a Redo in Admin. Saved choices for renamed or removed buttons now drop out quietly instead of erroring.
-- Nov 12 update: Characters tile is now Kevin's full-body Pockets art (waving, transparent background) at `public/tiles/character.webp`. Fixed hairline seams in the tilted "Dream Factory" homepage title (`will-change: transform` on `.line2`).
+- Nov 12 update: Characters tile is now Kevin's full-body Pockets art (waving, transparent background) at `public/tiles/character.webp`. The "Dream Factory" homepage title is no longer tilted (the tilt drew it in two offset halves on some screens).
 - Nov 12: removed Gekkoid and Dactyloid from Who are you?; Slime is now a gooey green slime kid (icon version 2, repaint in Admin).
 - Nov 13: no skulls, skeletons or bones in any picture (IMAGE_NEVER + picture check). Pirate hat icon uses a gold star and a feather.
