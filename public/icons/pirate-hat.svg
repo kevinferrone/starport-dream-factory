@@ -1,11 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- Tricorn pirate hat with a friendly skull -->
+  <!-- Tricorn pirate hat with a gold star badge and a feather (no skulls or bones in Starport) -->
+  <path d="M44 20c6-7 13-8 16-6-3 1-6 4-8 8-2 3-5 5-8 5z" fill="#ff6fb5"/>
+  <path d="M46 24c4-4 8-7 13-9" stroke="#e0478f" stroke-width="1.5" fill="none" stroke-linecap="round"/>
   <path d="M4 40c6-6 14-9 28-9s22 3 28 9c-4 6-14 10-28 10S8 46 4 40z" fill="#2b2540"/>
   <path d="M12 38c1-12 9-22 20-22s19 10 20 22c-6-3-13-4-20-4s-14 1-20 4z" fill="#3a3256"/>
   <path d="M4 40c6-6 14-9 28-9s22 3 28 9" fill="none" stroke="#f2c230" stroke-width="2.5" stroke-linecap="round"/>
-  <circle cx="32" cy="26" r="6.5" fill="#fff"/>
-  <rect x="28.5" y="29" width="7" height="4.5" rx="1.5" fill="#fff"/>
-  <circle cx="29.6" cy="25.6" r="1.6" fill="#2b2540"/>
-  <circle cx="34.4" cy="25.6" r="1.6" fill="#2b2540"/>
-  <path d="M24 34l16 5M40 34l-16 5" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M32 19.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L32 32.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" fill="#f2c230" stroke="#c99a1a" stroke-width="1" stroke-linejoin="round"/>
 </svg>

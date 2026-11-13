@@ -636,6 +636,7 @@ async function checkPicture(
                 (musts ? `- Any of the child's picks is missing or wrong (kind of animal or item, color, fur/scales/feathers, extra legs, many eyes, wings, size).\n` : "") +
                 `- Anything that looks like a weapon or sharp object: gun, laser, blaster, ray gun, sword, knife, spear, arrow, axe.\n` +
                 `- A space suit or helmet that wasn't asked for.\n` +
+                `- Any skull, skeleton or bone (including skull-and-crossbones on pirate things).\n` +
                 `Otherwise ok = true. Small style differences are fine. Call picture_check.`,
             },
           ],

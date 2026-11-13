@@ -159,4 +159,4 @@ export const IMAGE_STYLE =
 
 /** Always added to the picture prompt. */
 export const IMAGE_NEVER =
-  "Never draw weapons or sharp things: no guns, lasers, blasters, ray guns, swords, knives, spears, arrows or axes. Hands and paws hold nothing unless the subject says so. No space suits or helmets unless the subject says so.";
+  "Never draw weapons or sharp things: no guns, lasers, blasters, ray guns, swords, knives, spears, arrows or axes. Hands and paws hold nothing unless the subject says so. No space suits or helmets unless the subject says so. No skulls, skeletons or bones anywhere (not even on pirate things).";

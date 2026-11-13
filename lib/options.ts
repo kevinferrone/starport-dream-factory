@@ -371,7 +371,7 @@ export const CHARACTER_GROUPS: OptionGroup[] = [
           outfit("Cozy sweater", "🧶"), outfit("Jeans", "👖"), outfit("Coat", "🧥", "a cozy coat"), outfit("Robe of stars", "🌌"),
           outfit("Pajamas", "🛌"), outfit("Chef apron", "🧑‍🍳"), outfit("Lab coat", "🥼"), outfit("Raincoat", "🌧️"),
           outfit("Superhero suit", "🦸"), outfit("Sports jersey", "🎽"), outfit("Fancy suit", "🤵"), outfit("Fancy dress", "👗"),
-          outfit("Tutu", "🩰"), outfit("Mail carrier uniform", "📮"), { ...outfit("Pirate coat", "🏴‍☠️", "a big swishy pirate coat (no weapons)"), img: "/icons/pirate-hat.svg" },
+          outfit("Tutu", "🩰"), outfit("Mail carrier uniform", "📮"), { ...outfit("Pirate coat", "🏴‍☠️", "a big swishy pirate coat with gold buttons and a tricorn hat with a feather (no weapons, no skulls or bones)"), img: "/icons/pirate-hat.svg" },
           outfit("Knight armor", "🛡️", "shiny storybook knight armor (no weapons)"),
         ],
       },
