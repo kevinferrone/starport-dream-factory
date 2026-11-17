@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { newQuestion } from "@/lib/grownup";
+import { isGrownup, newQuestion } from "@/lib/grownup";
 import { answerGrownup } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -11,6 +11,8 @@ export default async function GrownupGate({ searchParams }: { searchParams: Prom
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+  // Already unlocked (or an admin account): go straight on.
+  if (await isGrownup(user.id)) redirect(next.startsWith("/") && !next.startsWith("//") ? next : "/plans");
   const q = newQuestion();
 
   return (

@@ -2,6 +2,7 @@
 // plan changes and admin, so kids don't wander into billing by accident.
 import { createHmac, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export const GROWNUP_COOKIE = "grownup_ok";
 const OPEN_FOR_MS = 10 * 60 * 1000; // stays unlocked on this device for 10 minutes
@@ -38,8 +39,15 @@ export function passValue(userId: string) {
   return { value: `${exp}.${sign(`${userId}.${exp}`)}`, maxAge: OPEN_FOR_MS / 1000 };
 }
 
-/** True if this user passed the grown-up check in the last 10 minutes on this device. */
+/** Admin accounts (profiles.is_admin) skip the question entirely; parents still get it. */
+async function isAdminAccount(userId: string): Promise<boolean> {
+  const { data } = await createAdminClient().from("profiles").select("is_admin").eq("id", userId).single();
+  return !!data?.is_admin;
+}
+
+/** True if this user is an admin, or passed the grown-up check in the last 10 minutes on this device. */
 export async function isGrownup(userId: string): Promise<boolean> {
+  if (await isAdminAccount(userId)) return true;
   const raw = (await cookies()).get(GROWNUP_COOKIE)?.value;
   if (!raw) return false;
   const [exp, sig] = raw.split(".");
