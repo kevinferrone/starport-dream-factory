@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { puzzleState } from "@/lib/puzzles/server";
 import BadgeShelf from "@/components/puzzles/BadgeShelf";
+import { PUZZLES, type PuzzleKind } from "@/lib/puzzles/progress";
 import { SpeakingLink } from "@/components/ReadAloud";
 
 export const dynamic = "force-dynamic";
@@ -13,18 +14,12 @@ export default async function PuzzleLab() {
   const s = await puzzleState(user.id);
   const u = s.unlocks;
 
+  // Puzzles that aren't ready yet (PUZZLES[...].ready = false, e.g. Code breaker) stay hidden.
   const tiles = [
     { id: "sudoku", href: "/puzzles/sudoku", title: "Sudoku", icon: "🧩", open: u.sudoku.open, progress: u.sudoku.progress },
     { id: "wordsearch", href: "/puzzles/word-search", title: "Word search", icon: "🔎", open: u.wordsearch.open, progress: u.wordsearch.progress },
-    {
-      id: "codebreaker",
-      href: "",
-      title: "Code breaker",
-      icon: "🔐",
-      open: false,
-      progress: u.codebreaker.open ? "Coming soon!" : u.codebreaker.progress,
-    },
-  ];
+    { id: "codebreaker", href: "/puzzles/code-breaker", title: "Code breaker", icon: "🔐", open: u.codebreaker.open, progress: u.codebreaker.progress },
+  ].filter((t) => PUZZLES[t.id as PuzzleKind].ready);
 
   return (
     <>
