@@ -29,6 +29,15 @@ export default function ArtFrame({ src, alt, art, onMove }: Props) {
     return () => ro.disconnect();
   }, []);
 
+  // A picture that finished loading before the page came alive never fires onLoad; read its size here.
+  useEffect(() => {
+    const im = imgEl.current;
+    if (im?.complete && im.naturalWidth) {
+      setNat({ w: im.naturalWidth, h: im.naturalHeight });
+      setBg(edgeColor(im, im.naturalWidth, im.naturalHeight));
+    }
+  }, [src]);
+
   const rect = size && nat ? artRect(size.w, size.h, nat.w, nat.h, art) : null;
   const canMove = !!onMove && art?.fit === "fill";
   const whole = art?.fit !== "fill";

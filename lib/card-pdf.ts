@@ -4,7 +4,7 @@ import { jsPDF } from "jspdf";
 import type { Kind } from "@/lib/options";
 import type { AnyCard } from "@/lib/generate";
 import { cardPieces } from "@/lib/card-text";
-import { artRect, edgeColor, paintWhole, type ArtFit } from "@/lib/art-fit";
+import { artRect, edgeColor, paintWhole, type ArtFit, heroArt } from "@/lib/art-fit";
 
 // The frame's deep color and pattern, matching .tcard in globals.css.
 const FRAME_DK: Record<Kind, string> = { character: "#e0478f", creature: "#e9682b", equipment: "#7b5af0", pet: "#1bbb88" };
@@ -245,6 +245,15 @@ function fit(doc: jsPDF, item: Item, W: number, H: number, fixedR?: number) {
 function drawCard(doc: jsPDF, item: Item, x0: number, y0: number, artR?: number) {
   const W = CARD_W;
   const H = CARD_H;
+  // Hero cards: the picture fills the whole card, edge to edge, exactly as on screen.
+  if (item.kind === "character") {
+    if (item.art) doc.addImage(framed(item.art, H / W, heroArt(item.card.art)), "JPEG", x0, y0, W, H);
+    else {
+      doc.setFillColor("#f4f2ff");
+      doc.rect(x0, y0, W, H, "F");
+    }
+    return;
+  }
   const g = W / 300;
   const frame = 10 * g;
   const { f, r } = fit(doc, item, W, H, artR ?? item.card.art?.r);

@@ -161,11 +161,13 @@ export function characterStyle(choices: Record<string, string[]>) {
   const plain = !loc || loc.id === "plain-background";
   return (
     "Whimsical children's storybook illustration for a kids' game hero card. Bright saturated colors, soft clean outlines, friendly expressive face, cute and funny, never scary. " +
-    "One kid-aged hero (child proportions: big head, big eyes, small body), full body visible and centered, with any pets beside them, drawn a little small so nothing touches or is cut off by the edges. " +
+    "This tall picture IS the whole trading card, so it is a complete scene that fills the frame edge to edge. " +
+    "One kid-aged hero (child proportions: big head, big eyes, small body), full body visible head to toe and centered, with any pets beside them. " +
+    "Keep the hero's head, feet, hands and pets well away from all four edges (the left and right edges get trimmed a little). " +
     (plain
-      ? "Simple soft pastel background with a few sparkles."
-      : `Background: ${say(loc)}, painted softly and simply so the hero stands out.`) +
-    " No text, no letters, no words, no frame."
+      ? "Simple soft pastel background with a few sparkles, filling the whole picture."
+      : `Background: ${say(loc)}, filling the whole picture, painted softly so the hero stands out.`) +
+    " No text, no letters, no words, no border, no frame."
   );
 }
 

@@ -401,6 +401,9 @@ button { font: inherit; color: inherit; }
   --pat: url("/frames/character.png");
   --pat-size: 120px;
 }
+/* Hero cards: the picture is the whole card */
+.tcard.full { padding: 0; overflow: hidden; background: #f4f2ff; }
+.tcard.full .art { flex: 1; min-height: 0; max-height: none; height: 100%; border-radius: inherit; }
 .tcard.equipment {
   --c: var(--equipment);
   --c-dk: #7b5af0;

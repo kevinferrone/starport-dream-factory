@@ -11,6 +11,9 @@
 export type ArtFit = { fit: "whole" | "fill"; x: number; y: number; zoom: number; r?: number };
 
 export const DEFAULT_ART: ArtFit = { fit: "whole", x: 50, y: 50, zoom: 1 };
+
+/** Hero cards always fill the whole card edge to edge (the kid can still zoom and move it). */
+export const heroArt = (art?: ArtFit | null): ArtFit => ({ ...DEFAULT_ART, ...(art ?? {}), fit: "fill" });
 export const ZOOM_MAX = 3;
 
 const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n));

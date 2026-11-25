@@ -691,11 +691,11 @@ export async function drawPicture(
           model,
           image: await Promise.all(refs.map((d, i) => asFile(d, `ref${i + 1}`))),
           prompt,
-          size: "1024x1024",
+          size: "1024x1536", // tall, because the picture is the whole hero card
           quality,
           n: 1,
         })
-      : openai().images.generate({ model, prompt, size: "1024x1024", quality, n: 1 });
+      : openai().images.generate({ model, prompt, size: "1024x1536", quality, n: 1 });
   };
 
   const draw = async (fix: string) => {

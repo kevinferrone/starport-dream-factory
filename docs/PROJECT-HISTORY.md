@@ -278,3 +278,9 @@ Google, emailed link, or password (set on the Grown-ups page).
 - Nov 12 update: Characters tile is now Kevin's full-body Pockets art (waving, transparent background) at `public/tiles/character.webp`. The "Dream Factory" homepage title is no longer tilted (the tilt drew it in two offset halves on some screens).
 - Nov 12: removed Gekkoid and Dactyloid from Who are you?; Slime is now a gooey green slime kid (icon version 2, repaint in Admin).
 - Nov 13: no skulls, skeletons or bones in any picture (IMAGE_NEVER + picture check). Pirate hat icon uses a gold star and a feather.
+
+## Nov 25, 2026: hero cards are one full picture
+- Character cards show only the picture, filling the whole card edge to edge: no frame, name, description, chips or footer (on screen, in the card PDF, Print and the 6-per-page sheet). Name and description are still saved (My cards list, read-aloud, Edit my card).
+- New hero pictures are drawn tall (1024x1536) as a complete scene that fills the frame, with the hero kept away from the edges. Edit my card on a hero has only Zoom and drag (always "fill").
+- Older heroes made with square pictures get trimmed at the sides to fill the card; Edit my card → drag/zoom to adjust.
+- ArtFrame now reads a picture's size even if it loaded before the page came alive (was missing on fast/cached loads).

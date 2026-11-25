@@ -3,7 +3,7 @@
 import type { Kind } from "@/lib/options";
 import type { AnyCard, CreatureCard, EquipmentCard, PetCard } from "@/lib/generate";
 import { LIMITS } from "@/lib/card-edit";
-import { DEFAULT_ART, ZOOM_MAX } from "@/lib/art-fit";
+import { DEFAULT_ART, ZOOM_MAX, heroArt } from "@/lib/art-fit";
 
 type Props = {
   kind: Kind;
@@ -22,7 +22,7 @@ export default function CardEditor({ kind, card, onChange, onSave, onCancel, bus
   // The card above is the draft, so dragging the picture there and typing here stay in step.
   const draft = card;
   const set = (patch: Record<string, unknown>) => onChange({ ...draft, ...patch } as AnyCard);
-  const art = draft.art ?? DEFAULT_ART;
+  const art = kind === "character" ? heroArt(draft.art) : draft.art ?? DEFAULT_ART;
 
   const Text = ({ label, value, max, rows = 1, onText }: { label: string; value: string; max: number; rows?: number; onText: (v: string) => void }) => (
     <label className="edit-field">
@@ -57,6 +57,7 @@ export default function CardEditor({ kind, card, onChange, onSave, onCancel, bus
       {hasPicture && (
         <fieldset className="edit-group">
           <legend>Picture</legend>
+          {kind !== "character" && (
           <div className="pic-fit" role="group" aria-label="How the picture fits">
             <button type="button" aria-pressed={art.fit === "whole"} onClick={() => set({ art: { ...art, fit: "whole" } })}>
               Show the whole picture
@@ -65,6 +66,7 @@ export default function CardEditor({ kind, card, onChange, onSave, onCancel, bus
               Fill the frame
             </button>
           </div>
+          )}
           {art.fit === "fill" && (
             <>
               <label className="zoom">

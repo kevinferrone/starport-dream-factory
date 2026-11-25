@@ -3,6 +3,7 @@ import { KINDS } from "@/lib/options";
 import type { AnyCard } from "@/lib/generate";
 import { cardPieces, wordOffsets, words, type Piece } from "@/lib/card-text";
 import ArtFrame from "@/components/ArtFrame";
+import { heroArt } from "@/lib/art-fit";
 
 /** Text split into word spans so the read-aloud can highlight each one. */
 function Words({ text, start, highlight }: { text: string; start: number; highlight: number | null }) {
@@ -32,6 +33,19 @@ export default function Card({
   /** Lets the picture be dragged while the card is being edited. */
   onArtMove?: (x: number, y: number) => void;
 }) {
+  // Hero cards are one picture filling the whole card: no frame, name or words.
+  if (kind === "character") {
+    return (
+      <article className="tcard character full" id="the-card">
+        {imageUrl ? (
+          <ArtFrame src={imageUrl} alt={card.name} art={heroArt(card.art)} onMove={onArtMove} />
+        ) : (
+          <div className="art" />
+        )}
+      </article>
+    );
+  }
+
   const pieces = cardPieces(kind, card);
   const offsets = wordOffsets(pieces);
   const at = (i: number) => <Words text={pieces[i].text} start={offsets[i]} highlight={highlight} />;
