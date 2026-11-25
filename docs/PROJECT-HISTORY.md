@@ -284,3 +284,7 @@ Google, emailed link, or password (set on the Grown-ups page).
 - New hero pictures are drawn tall (1024x1536) as a complete scene that fills the frame, with the hero kept away from the edges. Edit my card on a hero has only Zoom and drag (always "fill").
 - Older heroes made with square pictures get trimmed at the sides to fill the card; Edit my card → drag/zoom to adjust.
 - ArtFrame now reads a picture's size even if it loaded before the page came alive (was missing on fast/cached loads).
+
+## Nov 25, 2026: holiday gift email scheduled
+- Mailchimp campaign 6429472 ("Give your family the gift of adventure this Christmas") scheduled for Mon Nov 30, 10:00 AM ET to 1,955 subscribers. Design: public/email/holiday/email.html (Mailchimp re-imports this URL at send time, so edits before then go out).
+- Instagram: @starportrpgforkids. Facebook Page ID 101266021398529.
